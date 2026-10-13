@@ -28,7 +28,7 @@
   "dependencies": {
     "@videojs/html": "^10.0.1",
     "bootstrap": "^5.3.3",
-    "bootstrap-icons": "^1.11.3",
+    "bootstrap-icons": "^1.13.2",
     "buttplug": "^5.0.2",
     "dglab-kit": "^1.0.5",
     "markdown-it": "^15.0.2",
