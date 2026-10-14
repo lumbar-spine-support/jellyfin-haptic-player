@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.2.1.1",
+        "changelog": "Beta build 1.2.1.1 from dev (commit 8f56259). Not released yet, may be unstable.",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.2.1.1.zip",
+        "checksum": "fe02d384b9e17df382e26c745e721217",
+        "timestamp": "2026-10-14T19:59:17Z"
+      },
+      {
         "version": "1.2.1.0",
         "changelog": "## [1.2.1](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.2.0...v1.2.1) (2026-10-14)\n\n\n### Bug Fixes\n\n* **dependencies:** update package dependencies and remove duplicates ([84f01c6](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/84f01c62966bd0f9fa7a2a5a70258019029c68c5))\n* **webvtt:** update cueText function to improve cue timing separator handling ([354d9ba](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/354d9ba373c6042e2a0643cbbc560199036b0f1c))\n\nInstall or update HAPPY through its Jellyfin plugin repository: https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/jellyfin-plugin-repository/manifest.json (Dashboard → Plugins → Repositories), or download `happy_1.2.1.0.zip` below.",
         "targetAbi": "12.1.0.0",
