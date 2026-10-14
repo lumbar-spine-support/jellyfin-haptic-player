@@ -190,6 +190,8 @@ export interface ClientSettings {
   chapterSourcePriority: ChapterSource[];
   /** Ids of the Jellyfin libraries HAPPY loads, chosen on the plugin's settings page; empty for all. */
   libraryIds: string[];
+  /** Level (1–6) that `#` headings in track descriptions render at; deeper headings shift along, capped at h6. */
+  descriptionHeadingLimit: number;
 }
 
 export type QueueSource =

@@ -75,6 +75,7 @@ const FALLBACK_SETTINGS: ClientSettings = {
   funscriptSuffixes: DEFAULT_FUNSCRIPT_SUFFIXES,
   chapterSourcePriority: ['embedded', 'funscript'],
   libraryIds: [],
+  descriptionHeadingLimit: 1,
 };
 
 class App {
@@ -684,7 +685,7 @@ class App {
 
   private renderTrackDescription(markdown: string): void {
     if (!this.descriptionEl || !this.descriptionSection) return;
-    const html = markdown.trim() ? Markdown.render(markdown) : '';
+    const html = markdown.trim() ? Markdown.render(markdown, this.settings.descriptionHeadingLimit) : '';
     this.descriptionEl.innerHTML = html;
     this.descriptionSection.classList.toggle('d-none', html === '');
   }

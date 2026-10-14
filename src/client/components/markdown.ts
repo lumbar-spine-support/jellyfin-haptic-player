@@ -6,8 +6,29 @@ export namespace Markdown {
         linkify: true,
         typographer: false,
     });
-    export function render(markdown: string): string {
-        return md.render(markdown);
+
+    interface RenderEnv extends Env {
+        headingLimit?: number;
+    }
+
+    // Shifts every heading down so the top level (h1) becomes h<headingLimit>, keeping the relative
+    // structure until it hits h6: with 2, `#` → h2 and `##` → h3; with 6, all headings are h6.
+    md.core.ruler.push('heading_limit', (state) => {
+        const shift = ((state.env as RenderEnv).headingLimit ?? 1) - 1;
+        if (shift <= 0) return;
+        for (const token of state.tokens) {
+            if (token.type !== 'heading_open' && token.type !== 'heading_close') continue;
+            token.tag = `h${Math.min(6, Number(token.tag.slice(1)) + shift)}`;
+        }
+    });
+
+    /**
+     * Renders untrusted Markdown (raw HTML is escaped).
+     * @param headingLimit the level `#` headings get (1–6); deeper headings shift along, capped at h6.
+     */
+    export function render(markdown: string, headingLimit = 1): string {
+        const env: RenderEnv = { headingLimit };
+        return md.render(markdown, env);
     }
 
     export interface DocLinks {

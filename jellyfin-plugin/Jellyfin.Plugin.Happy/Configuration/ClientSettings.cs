@@ -90,6 +90,10 @@ public sealed record ClientSettings
     [JsonPropertyName("cardViewLargePortraitArtwork")]
     public bool CardViewLargePortraitArtwork { get; init; }
 
+    /// <summary>Gets the heading level (1–6) that <c>#</c> headings in track descriptions render at.</summary>
+    [JsonPropertyName("descriptionHeadingLimit")]
+    public int DescriptionHeadingLimit { get; init; } = 1;
+
     /// <summary>Gets the theme, one of <see cref="Themes"/>.</summary>
     [JsonPropertyName("theme")]
     public string Theme { get; init; } = DefaultTheme;
@@ -112,7 +116,8 @@ public sealed record ClientSettings
 
     /// <summary>
     /// Builds the client settings from the plugin configuration, repairing values the client could
-    /// not use (unknown interpolation methods, themes and chapter sources, empty suffixes, negative ranges).
+    /// not use (unknown interpolation methods, themes and chapter sources, empty suffixes, negative ranges,
+    /// heading levels outside 1–6).
     /// </summary>
     /// <param name="config">The plugin configuration.</param>
     /// <returns>The client settings.</returns>
@@ -137,6 +142,7 @@ public sealed record ClientSettings
             FunscriptColorGradient = config.FunscriptColorGradient,
             CardViewForceSquareArtwork = config.CardViewForceSquareArtwork,
             CardViewLargePortraitArtwork = config.CardViewLargePortraitArtwork,
+            DescriptionHeadingLimit = Math.Clamp(config.DescriptionHeadingLimit, 1, 6),
             Theme = ParseTheme(config.Theme),
             FunscriptSuffixes = new FunscriptSuffixes
             {

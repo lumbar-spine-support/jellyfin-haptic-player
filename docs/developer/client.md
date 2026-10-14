@@ -236,7 +236,7 @@ Both call `prepareScript()` from [shared/interpolation.ts](../../src/shared/inte
 
 The raw JSON also carries `metadata.chapters`. Once all scripts of a track are loaded, `applyFunscriptChapters()` merges them (`parseFunscriptChapters`, `mergeChapters`, `normalizeChapters`) and, unless embedded chapters exist and come first in `chapterSourcePriority`, replaces `track.chapters` and calls `PlaybackSession.updateChapters()`, which swaps the chapter `<track>` of every slot showing that track without reloading the media.
 
-The description on the track page is `track.description` (the Jellyfin overview), rendered with `Markdown.render`.
+The description on the track page is `track.description` (the Jellyfin overview), rendered with `Markdown.render`; a markdown-it core rule shifts its headings by the `descriptionHeadingLimit` setting (h1 → h<limit>, capped at h6).
 
 ## Video.js integration
 

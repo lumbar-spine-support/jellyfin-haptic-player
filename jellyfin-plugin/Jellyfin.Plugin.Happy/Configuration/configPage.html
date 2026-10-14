@@ -143,6 +143,19 @@
                         <label class="emby-checkbox-label"><input id="CardViewLargePortraitArtwork" type="checkbox"
                                 is="emby-checkbox" /><span>Portrait artwork takes two rows</span></label>
                     </div>
+                    <div class="selectContainer">
+                        <label class="selectLabel" for="DescriptionHeadingLimit">Largest heading in descriptions</label>
+                        <select id="DescriptionHeadingLimit" is="emby-select">
+                            <option value="1">Heading 1 (unchanged)</option>
+                            <option value="2">Heading 2</option>
+                            <option value="3">Heading 3</option>
+                            <option value="4">Heading 4</option>
+                            <option value="5">Heading 5</option>
+                            <option value="6">Heading 6 (all headings the same size)</option>
+                        </select>
+                        <div class="fieldDescription">Shrinks the headings of track descriptions: <code>#</code>
+                            becomes this level and smaller headings move down with it, up to heading 6.</div>
+                    </div>
 
                     <h3>Funscript file names</h3>
                     <p class="fieldDescription">A script belongs to the media file with the same name:
@@ -193,7 +206,7 @@
                 var pluginId = '98652011-fd1c-4b30-8359-fcae3b45ed37';
                 var page = document.querySelector('#HappyConfigPage');
                 var form = page.querySelector('#HappyConfigForm');
-                var numbers = ['VideoSeekInterval', 'HapticFrequency', 'HapticDelay', 'HapticDelayLimit'];
+                var numbers = ['VideoSeekInterval', 'HapticFrequency', 'HapticDelay', 'HapticDelayLimit', 'DescriptionHeadingLimit'];
                 var flags = ['BlurContent', 'FunscriptColorGradient', 'AutoReconnectIntiface', 'DglabEnabled', 'DglabSandboxEnabled',
                     'AutoReconnectDglab', 'CardViewForceSquareArtwork', 'CardViewLargePortraitArtwork', 'DebugLogging', 'ShowInJellyfinMenu'];
                 var texts = ['ChapterSourcePriority', 'FunscriptInterpolationMethod', 'DglabRelayUrl', 'FunscriptSeparator',

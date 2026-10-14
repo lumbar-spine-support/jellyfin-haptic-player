@@ -38,3 +38,19 @@ test(`${TAG} render escapes raw HTML`, () => {
     const html = Markdown.render('<script>alert(1)</script>');
     assert.ok(!html.includes('<script>'));
 });
+
+test(`${TAG} render keeps headings without a heading limit`, () => {
+    assert.equal(Markdown.render('# A\n\n## B'), '<h1>A</h1>\n<h2>B</h2>\n');
+    assert.equal(Markdown.render('# A', 1), '<h1>A</h1>\n');
+});
+
+test(`${TAG} render shifts headings down to the heading limit`, () => {
+    assert.equal(Markdown.render('# A\n\n## B\n\nC\n---', 2), '<h2>A</h2>\n<h3>B</h3>\n<h3>C</h3>\n');
+    assert.equal(Markdown.render('# A\n\n## B\n\n###### F', 5), '<h5>A</h5>\n<h6>B</h6>\n<h6>F</h6>\n');
+});
+
+test(`${TAG} render with heading limit 6 flattens all headings`, () => {
+    const html = Markdown.render('# A\n## B\n### C\n#### D\n##### E\n###### F', 6);
+    assert.equal(html.match(/<h6>/g)?.length, 6);
+    assert.ok(!/<h[1-5]>/.test(html));
+});

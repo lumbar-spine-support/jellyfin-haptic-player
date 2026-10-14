@@ -87,6 +87,12 @@ public class PluginConfiguration : BasePluginConfiguration
     public bool CardViewLargePortraitArtwork { get; set; }
 
     /// <summary>
+    /// Gets or sets the heading level (1–6) that <c>#</c> headings in track descriptions render at.
+    /// Deeper headings shift along, capped at 6; 1 leaves descriptions unchanged.
+    /// </summary>
+    public int DescriptionHeadingLimit { get; set; } = 1;
+
+    /// <summary>
     /// Gets or sets the look of HAPPY: oled (pure black) or jellyfin (Jellyfin's dark theme).
     /// </summary>
     public string Theme { get; set; } = "oled";
