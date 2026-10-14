@@ -31,6 +31,21 @@ Settings marked *(user)* are only starting values: each user can change them in 
 | Colour the timeline by speed *(user)* | off | Colour the timeline graph on a heat scale by movement speed (blue = slow, red = fast). |
 | Reconnect to Intiface on page load | on | Reconnect to Intiface on page load if it was connected when the page was last used. |
 
+## Auto funscript
+
+An extra funscript for every media file, generated from its audio. See [Auto funscript](library.md#auto-funscript).
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| Generate an Auto funscript from the audio | off | Give every media file an *Auto* script that follows how loud the frequency band below is. It is generated with Jellyfin's ffmpeg the first time someone opens the file and cached afterwards. |
+| Lowest frequency (Hz) | `20` | Lower edge of the frequency band the script follows. |
+| Highest frequency (Hz) | `200` | Upper edge of the band. 20–200 Hz follows bass and kick drums; voices sit around 100–1000 Hz. |
+| Threshold (%) | `5` | Below this share of the band's loudest moment in the file, the position stays at 0. |
+| Resolution (ms) | `50` | Time between two measurements. |
+| Smallest change (0–100) | `2` | Smaller position changes add no point; peaks and dips are always kept. |
+
+Changing any of the values generates new scripts the next time each file is opened.
+
 ## DG-Lab Coyote (experimental)
 
 | Setting | Default | Description |

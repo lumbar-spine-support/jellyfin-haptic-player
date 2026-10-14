@@ -65,7 +65,8 @@ const CARD_TYPE_FILTERS: Record<CardType, MediaFilterKey> = {
     video: 'videos',
 };
 
-const HAPTIC_TYPES = Object.keys(ROLE_LABELS) as FunscriptType[];
+/** Every file has an Auto script when the plugin generates them, so filtering by it would select nothing. */
+const HAPTIC_TYPES = (Object.keys(ROLE_LABELS) as FunscriptType[]).filter((type) => type !== 'auto');
 
 const SORT_LABELS: Record<LibrarySortField, string> = {
     title: 'Title',

@@ -227,16 +227,25 @@ The detailed sequence is in [Browse and play a track](use-cases/browse-and-play.
 
 ### Funscripts on the client
 
-`App.fetchTrackScripts(track)` downloads each funscript listed in `track.funscripts` once through the plugin (`fetchFunscript(track, info)` → `/Happy/Items/{id}/Funscripts/{key}`) and caches the promise per track id in `scriptCache`. The same raw `Funscript` objects then go to:
+`App.trackScripts(track)` starts downloading each script of `trackFunscripts(track, autoFunscriptEnabled)` (the files in `track.funscripts`, plus the generated Auto script when enabled) through the plugin and caches the result per track id in `scriptCache`. Each entry is a `PendingScript { channel, loaded }`: the channel is known at once, `loaded` resolves to a prepared `LoadedScript` (or `null` when it failed) on its own, because the Auto script can take far longer than the files:
 
-- `Visualization.mount()` for the browsed track (timelines),
-- every `FunscriptSync.loadScripts()` for the active track (device output).
+- `Visualization.mount(container, channels)` draws one row per channel at once, as a glowing placeholder (Bootstrap `placeholder-glow`, on the canvas and the label, `aria-busy`); `setScript(channel, prepared)` fills a row in, or removes it when the script failed.
+- For the active track, each script joins the running `FunscriptSync` engines with `addScript()` as it arrives, which does not stop the devices like `resyncNow()` would. `activeGeneration` drops scripts of a track that is no longer active.
+- `openTrack()` waits for the script files (not the Auto script) before autoplay, as before.
 
-Both call `prepareScript()` from [shared/interpolation.ts](../../src/shared/interpolation.ts) themselves. See [haptics.md](haptics.md#funscript-pipeline).
+Scripts are prepared once with `prepareScript()` from [shared/interpolation.ts](../../src/shared/interpolation.ts). See [haptics.md](haptics.md#funscript-pipeline).
 
-The raw JSON also carries `metadata.chapters`. Once all scripts of a track are loaded, `applyFunscriptChapters()` merges them (`parseFunscriptChapters`, `mergeChapters`, `normalizeChapters`) and, unless embedded chapters exist and come first in `chapterSourcePriority`, replaces `track.chapters` and calls `PlaybackSession.updateChapters()`, which swaps the chapter `<track>` of every slot showing that track without reloading the media.
+The raw JSON also carries `metadata.chapters`. Once the script files of a track are loaded, `applyFunscriptChapters()` merges them (`parseFunscriptChapters`, `mergeChapters`, `normalizeChapters`) and, unless embedded chapters exist and come first in `chapterSourcePriority`, replaces `track.chapters` and calls `PlaybackSession.updateChapters()`, which swaps the chapter `<track>` of every slot showing that track without reloading the media.
 
-The description on the track page is `track.description` (the Jellyfin overview), rendered with `Markdown.render`; a markdown-it core rule shifts its headings by the `descriptionHeadingLimit` setting (h1 → h<limit>, capped at h6).
+The description on the track page is `track.description` (the Jellyfin overview), rendered with `Markdown.render`; a markdown-it core rule shifts its headings by the `descriptionHeadingLimit` setting (h1 → h<limit>, capped at h6). It and the tags render as soon as the page opens, without waiting for the scripts.
+
+### Loading placeholders
+
+Things still loading glow with Bootstrap's placeholders (`placeholders` is imported in `_bootstrap-theme.scss`):
+
+- **Covers** in the grid, the list and the album/playlist header carry `placeholder` inside a `placeholder-glow` until they load. `settleImagePlaceholders()` ([utils/imagePlaceholders.ts](../../src/client/utils/imagePlaceholders.ts)) is one capture-phase `load`/`error` listener on the document that removes the class from any image; `markImageLoading()` sets it on a reused `<img>` only when its new source is not already shown (which would fire no `load`).
+- **Description and tags** of a file page opened directly (`?view=player`) wait for the whole library; until it arrives `showPlayerPlaceholders()` fills them with glowing lines and chips ([templates/description-placeholder.html](../../src/client/templates/description-placeholder.html), [templates/tags-placeholder.html](../../src/client/templates/tags-placeholder.html)).
+- **Funscript timelines** glow per row until their script loads (above).
 
 ## Video.js integration
 
