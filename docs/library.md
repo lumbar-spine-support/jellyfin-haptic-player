@@ -29,15 +29,20 @@ Playlists are Jellyfin playlists. Create them in Jellyfin, or save a [queue](#qu
 
 ## Tags and descriptions
 
-- **Tags** are Jellyfin's tags plus genres. Jellyfin never reads its *Tags* field from tags embedded in a media file, so the file-based route is the genre:
-  - **Audio:** give the genre field several values (most taggers can store multiple values in one field; Mp3tag separates them with `\\`). A single text like `sfw; vanilla` stays one genre, unless you enable custom tag delimiters in the library settings.
-  - **Video:** an embedded genre like `sfw; vanilla; funny` is split into separate genres. For Jellyfin's *Tags*, put an NFO file next to the video (`<video name>.nfo` with `<tag>` entries, see below).
-  - Tags can also be set by hand in Jellyfin's metadata editor.
-- **Descriptions** are Jellyfin's overview of the item. For audio, put the text into the file's comment tag. Markdown is rendered, so you can use [links](https://github.com), **bold text** and more.
+**Tags** are the keywords HAPPY shows and filters by, like `funny`, `nsfw` or `18+` (not the metadata tags inside a file). HAPPY takes them from Jellyfin's *Tags* plus its *Genres*. Jellyfin never fills *Tags* from metadata embedded in a media file, so how you get tags in depends on the media type:
 
-Markdown sidecar files (`<name>.md`) are no longer read; move their tags into the genre field (or an NFO for videos) and their text into the comment (audio) or the NFO's `<plot>` (video).
+- **Video:** use an NFO file (see [Videos: NFO files](#videos-nfo-files)).
+- **Audio** (Books library): put each tag as a separate genre value in the file (see [Audio: file tags](#audio-file-tags)).
 
-A video NFO looks like this; Jellyfin reads it when NFO is enabled as a metadata reader of the library (the default). In a Music Videos library, use `<musicvideo>` as the root element and add `<artist>` entries:
+Tags can also be set by hand in Jellyfin's metadata editor.
+
+**Descriptions** are Jellyfin's overview of the item: the NFO's `<plot>` for videos, the comment tag for audio. Markdown is rendered, so you can use [links](https://github.com), **bold text** and more.
+
+Markdown sidecar files (`<name>.md`) are no longer read; move their tags and text into an NFO (video) or the genre and comment tags (audio).
+
+### Videos: NFO files
+
+Put an NFO file named like the video (`<video name>.nfo`) next to it, with one `<tag>` per tag. Jellyfin reads it when NFO is enabled as a metadata reader of the library (the default). In a Music Videos library, use `<musicvideo>` as the root element and add `<artist>` entries:
 
 ```xml
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
@@ -50,7 +55,31 @@ A video NFO looks like this; Jellyfin reads it when NFO is enabled as a metadata
 </movie>
 ```
 
-Use [Mp3tag](https://www.mp3tag.de/) (Win) or [Puddletag](https://docs.puddletag.net/) (Linux) to edit these tags, then rescan the library in Jellyfin.
+### Audio: file tags
+
+For audio, tags go into the genre field of the file, one value per tag. Most taggers can store several values in one field (Mp3tag separates them with `\\`). A single text like `sfw; funny` stays one genre, unless you enable custom tag delimiters in the library settings.
+
+In Kid3, separate the values with `|`; a literal `|` inside a tag is written `\|`. For example, the Genre field of *Big Buck Bunny* could be:
+
+```
+Animation|Comedy|Short|Haptic \| Stroker
+```
+
+This gives four tags: *Animation*, *Comedy*, *Short* and *Haptic | Stroker*.
+
+For MP3 files these are the fields (ID3v2 tags, *Tag 2* in [Kid3](https://kid3.sourceforge.io/)):
+
+| Kid3 field | ID3 frame | What to put in it | Jellyfin uses it as |
+| --- | --- | --- | --- |
+| Title | `TIT2` | Book or episode title | Title |
+| Artist | `TPE1` | Author or narrator | Artist / author |
+| Date | `TDRC` | Year only, e.g. `2026` | Year |
+| Genre | `TCON` | One value per tag or category, as separate values | Genres, and so HAPPY's tags (the only way to get tags into Jellyfin from an audio file) |
+| Comment | `COMM` (language `eng`, empty description) | Description in Markdown, optionally followed by a `# Instructions` section | Description (Books library only); other players show it too |
+| WWW Audio Source | `WOAS` | Source page URL | Not used; kept for reference |
+| Picture | `APIC`, type *Cover (front)* | Cover image (PNG or JPEG) | Cover art |
+
+Use [Kid3](https://kid3.sourceforge.io/), [Mp3tag](https://www.mp3tag.de/) (Win) or [Puddletag](https://docs.puddletag.net/) (Linux) to edit these tags, then rescan the library in Jellyfin.
 
 ## Filtering and sorting
 
