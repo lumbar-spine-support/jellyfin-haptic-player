@@ -55,6 +55,16 @@ const MEDIA_FILTERS = [
 ] as const satisfies readonly FilterOption[];
 type MediaFilterKey = typeof MEDIA_FILTERS[number]['key'];
 
+type CardType = 'audio' | 'video' | 'album' | 'playlist';
+
+/** Cards show their type with the icon of the matching media filter. */
+const CARD_TYPE_FILTERS: Record<CardType, MediaFilterKey> = {
+    album: 'albums',
+    audio: 'tracks',
+    playlist: 'playlists',
+    video: 'videos',
+};
+
 const HAPTIC_TYPES = Object.keys(ROLE_LABELS) as FunscriptType[];
 
 const SORT_LABELS: Record<LibrarySortField, string> = {
@@ -839,7 +849,7 @@ export class Library {
         col.className = CARD_SQUARE_GRID_CLASSES;
         const artSrc = renderTrackArt(album.coverTrackId ? tracksById.get(album.coverTrackId) : null);
         const artist = `${album.artist || 'Unknown'}`;
-        const meta = this.prependYear(this.buildCardMeta('album', album.durationSeconds), album.year);
+        const meta = this.buildCardMeta('album', album.durationSeconds, album.year);
         col.innerHTML = cardHtml({
             href: detailHref('album', album.id),
             artSrc,
@@ -847,7 +857,7 @@ export class Library {
             altText: 'Album art',
             title: album.title,
             artist,
-            meta
+            ...meta
         });
         col.querySelector('a')?.addEventListener('click', (event) => {
             event.preventDefault();
@@ -863,7 +873,7 @@ export class Library {
         col.className = CARD_SQUARE_GRID_CLASSES;
         const artSrc = renderTrackArt(track);
         const artist = track.artist || 'Unknown';
-        const meta = this.prependYear(this.buildCardMeta(track.type, track.durationSeconds), track.year);
+        const meta = this.buildCardMeta(track.type, track.durationSeconds, track.year);
         col.innerHTML = cardHtml({
             href: trackHref(track.id),
             artSrc,
@@ -871,7 +881,7 @@ export class Library {
             altText: 'Album art',
             title: track.title,
             artist: artist,
-            meta
+            ...meta
         });
         col.querySelector('a')?.addEventListener('click', (event) => {
             event.preventDefault();
@@ -912,7 +922,7 @@ export class Library {
             altText: 'Playlist cover',
             title: playlist.name,
             artist: artists,
-            meta,
+            ...meta,
         });
         applyPlaylistCover(col.querySelector('img'), playlist.entries.map((entry) => tracksById.get(entry.trackId)));
         col.querySelector('a')?.addEventListener('click', (event) => {
@@ -1020,15 +1030,10 @@ export class Library {
         return Array.from(types);
     }
 
-    private buildCardMeta(type: 'audio' | 'video' | 'album' | 'playlist', durationSeconds: number): string {
-        return `${type.toUpperCase()} • ${formatHoursMinutes(durationSeconds)}`;
-    }
-
-    private prependYear(label: string, year: string): string {
-        const trimmedLabel = label.trim();
-        const trimmedYear = year.trim();
-        if (!trimmedYear) return trimmedLabel;
-        return trimmedLabel ? `${trimmedYear} • ${trimmedLabel}` : trimmedYear;
+    private buildCardMeta(type: CardType, durationSeconds: number, year = ''): { typeIcon: string; typeLabel: string; meta: string } {
+        const filter = MEDIA_FILTERS.find((f) => f.key === CARD_TYPE_FILTERS[type])!;
+        const meta = [year.trim(), formatHoursMinutes(durationSeconds)].filter(Boolean).join(' • ');
+        return { typeIcon: filter.icon, typeLabel: filter.label, meta };
     }
 
     private playlistArtists(playlist: PlaylistInfo): string {
