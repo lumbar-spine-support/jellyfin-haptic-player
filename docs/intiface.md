@@ -26,6 +26,9 @@ Each stroker has its own position limits on its device card, so a long and a sho
 
 See [docs/library.md#funscripts](library.md#funscripts) for how funscripts must be stored in your library for HAPPY to connect them with your audio or video file.
 
+When the plugin generates [Auto funscripts](library.md#auto-funscript) from the audio, features can
+also be assigned to *Auto*, which every media file then has.
+
 The status badge above each funscript shows whether a device will play it; click it for details.
 
 ## Unsupported Features

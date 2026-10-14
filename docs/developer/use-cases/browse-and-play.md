@@ -28,16 +28,20 @@ sequenceDiagram
   PC->>PS: browse(request)
   PS->>PS: not the active track → load into the other slot (paused)
   PS-->>PC: onChange
-  A->>A: loadTrackAssets(track)
+  A->>A: loadTrackAssets(track): renderTrackDescription(track.description)
+  A->>V: mount(container, channels): one glowing placeholder row per script
+  A->>A: publishChannels → DeviceStatus, DeviceAssignment
   A->>J: GET /Happy/Items/{id}/Funscripts/{key} (once per file, cached)
-  J-->>A: raw funscript JSON
-  A->>V: mount(container, scripts)
-  V->>V: prepareScript() per script, draw timelines
+  J-->>A: raw funscript JSON → prepareScript()
+  A->>V: setScript(channel, prepared): row drawn
+  opt autoFunscriptEnabled
+    A->>J: GET /Happy/Items/{id}/AutoFunscript
+    J-->>A: 202 while generated (polled), then the script
+    A->>V: setScript(auto, prepared), or row removed on 422
+  end
   opt funscripts carry metadata.chapters
     A->>PS: updateChapters(id, chapters, blob URL)<br/>per chapterSourcePriority
   end
-  A->>A: publishChannels → DeviceStatus, DeviceAssignment
-  A->>A: renderTrackDescription(track.description)
   Note over PS: The media element itself streams<br/>/Videos|Audio/{id}/stream?static=true&ApiKey=…<br/>from Jellyfin with range requests (CORS mode)
 ```
 
@@ -65,9 +69,9 @@ sequenceDiagram
   PC-->>A: onActiveTrack(track)
   A->>FS: clearScripts() → stop(), stopAll
   A->>A: set navigator.mediaSession metadata
-  A->>A: await fetchTrackScripts(track) (cache hit)
-  A->>FS: loadScripts(scripts) → prepareScript
-  A->>FS: resyncNow() (no-op while stopped)
+  A->>A: trackScripts(track) (cache hit)
+  A->>FS: addScript(script) as each one loads (already prepared)
+  A->>FS: resyncNow() once the script files loaded (no-op while stopped)
   PS-->>FS: next store update (timeupdate) → start()
   FS->>BE: stopAll(), then tick
   loop every 1000 / rate ms while playing
@@ -135,7 +139,7 @@ Repeat-one does not go through the controller at all: it sets `loop` on the medi
 
 | Step | Files |
 | --- | --- |
-| Track page, asset loading | `openTrack`, `loadTrackAssets`, `fetchTrackScripts`, `applyFunscriptChapters`, `onActiveTrackChanged` in [src/client/index.ts](../../../src/client/index.ts) |
+| Track page, asset loading | `openTrack`, `loadTrackAssets`, `trackScripts`, `applyFunscriptChapters`, `onActiveTrackChanged` in [src/client/index.ts](../../../src/client/index.ts) |
 | URLs and WebVTT | [src/client/api.ts](../../../src/client/api.ts), [jellyfin/urls.ts](../../../src/client/jellyfin/urls.ts) |
 | Slots and handoff | [player/session.ts](../../../src/client/components/player/session.ts) |
 | Queue and autoplay | [player/controller.ts](../../../src/client/components/player/controller.ts), [player/queue.ts](../../../src/client/components/player/queue.ts) |

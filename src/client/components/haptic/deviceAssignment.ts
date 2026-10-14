@@ -1,5 +1,5 @@
 import {
-  FUNSCRIPT_TYPES,
+  assignableChannels,
   channelKey,
   channelLabel,
   parseChannelKey,
@@ -45,9 +45,12 @@ export class DeviceAssignment {
   private readonly expandedFeatures = new Set<string>();
   /** Detail panel body per feature id, from the latest render. */
   private detailPanels = new Map<string, HTMLElement>();
+  /** Whether the plugin generates Auto scripts, which makes `auto` an assignable channel. */
+  private readonly autoChannel: boolean;
 
-  constructor(buttplug: HapticBackend) {
+  constructor(buttplug: HapticBackend, options: { autoChannel?: boolean } = {}) {
     this.buttplug = buttplug;
+    this.autoChannel = options.autoChannel ?? false;
     buttplug.onDevicesChange(() => this.render());
     buttplug.onAssignmentsChange(() => this.render());
     buttplug.onStateChange(() => this.render());
@@ -99,14 +102,8 @@ export class DeviceAssignment {
     }
   }
 
-  /** Base types plus any subcategory channels found in the current track. */
   private selectableChannels(): HapticChannel[] {
-    const channels: HapticChannel[] = FUNSCRIPT_TYPES.map((type) => ({ type }));
-    for (const channel of this.trackChannels) {
-      if (!channel.sub) continue;
-      if (!channels.some((c) => channelKey(c) === channelKey(channel))) channels.push(channel);
-    }
-    return channels;
+    return assignableChannels(this.trackChannels, this.autoChannel);
   }
 
   private buildDeviceCard(device: HapticDevice): HTMLElement {

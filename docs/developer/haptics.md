@@ -147,13 +147,14 @@ flowchart LR
     Index["FunscriptIndex<br/>longest stem prefix,<br/>same folder first"]
     Listing["GET /Happy/Funscripts<br/>item id → Key, FileName"]
     Raw["GET /Happy/Items/{id}/Funscripts/{key}<br/>raw JSON"]
+    AutoRoute["GET /Happy/Items/{id}/AutoFunscript<br/>generated from the audio, 202 until ready"]
     Files --> Index --> Listing
     Index --> Raw
   end
 
   subgraph client["Browser"]
     Parse["buildLibrary(): parseFunscriptName()<br/>TrackInfo.funscripts[]<br/>key, filename, type, sub"]
-    Fetch["App.fetchTrackScripts()<br/>fetchFunscript(track, info)<br/>cached per track id"]
+    Fetch["App.trackScripts()<br/>trackFunscripts() + fetchFunscript()<br/>one promise per script, cached per track id"]
     Ch["applyFunscriptChapters()<br/>metadata.chapters"]
     Loaded["LoadedScript[]<br/>channel + prepared script"]
     VizPrep["Visualization"]
@@ -166,7 +167,10 @@ flowchart LR
 
   Listing -- "loadLibrary()" --> Parse --> Fetch
   Raw --> Fetch
+  AutoRoute -- "polled while 202" --> Fetch
 ```
+
+The `auto` channel is the exception: while `autoFunscriptEnabled` is on, `trackFunscripts()` adds `AUTO_FUNSCRIPT` to every track and `fetchFunscript()` polls the plugin until it has generated the script (see [jellyfin-plugin.md](jellyfin-plugin.md#auto-funscripts)). It is an ordinary `FunscriptType` otherwise: assignable to device features (`assignableChannels()`), but left out of the library's haptics filter and card icons, since every file has one.
 
 The plugin only matches files to items; type and subcategory are parsed in the browser with the `funscriptSuffixes` setting from `/Happy/Config`. See [jellyfin-plugin.md](jellyfin-plugin.md#matching).
 

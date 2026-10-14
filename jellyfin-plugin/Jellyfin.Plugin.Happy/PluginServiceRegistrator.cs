@@ -1,3 +1,4 @@
+using Jellyfin.Plugin.Happy.AutoFunscripts;
 using Jellyfin.Plugin.Happy.Funscripts;
 using Jellyfin.Plugin.Happy.Web;
 using MediaBrowser.Controller;
@@ -16,6 +17,7 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
     public void RegisterServices(IServiceCollection serviceCollection, IServerApplicationHost applicationHost)
     {
         serviceCollection.AddSingleton<FunscriptIndex>();
+        serviceCollection.AddSingleton<AutoFunscriptService>();
         serviceCollection.AddTransient<IStartupFilter, WebConfigStartupFilter>();
     }
 }

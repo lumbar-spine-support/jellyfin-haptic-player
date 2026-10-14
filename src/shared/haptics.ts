@@ -1,6 +1,6 @@
 import type { FunscriptType } from './types';
 
-export const FUNSCRIPT_TYPES: readonly FunscriptType[] = ['stroker', 'buttplug', 'vibrator', 'estim', 'machine', 'unknown'];
+export const FUNSCRIPT_TYPES: readonly FunscriptType[] = ['stroker', 'buttplug', 'vibrator', 'estim', 'machine', 'unknown', 'auto'];
 
 /**
  * One scriptable output channel.
@@ -34,6 +34,7 @@ export const CHANNEL_TYPE_LABELS: Record<FunscriptType, string> = {
     estim: 'E-Stim',
     machine: 'Machine',
     unknown: 'Generic',
+    auto: 'Auto',
 };
 
 /** Display names for commonly used subcategories, keyed by their lowercased filename token. */
@@ -66,4 +67,19 @@ export function subLabel(sub: string): string {
 export function channelLabel(channel: HapticChannel): string {
     const base = CHANNEL_TYPE_LABELS[channel.type];
     return channel.sub ? `${base} — ${subLabel(channel.sub)}` : base;
+}
+
+/**
+ * Channels a device feature can be assigned to: every base type plus the subcategories of the
+ * current track. `auto` only while the plugin generates Auto scripts (`autoFunscriptEnabled`).
+ */
+export function assignableChannels(trackChannels: readonly HapticChannel[], autoChannel: boolean): HapticChannel[] {
+    const channels: HapticChannel[] = FUNSCRIPT_TYPES
+        .filter((type) => type !== 'auto' || autoChannel)
+        .map((type) => ({ type }));
+    for (const channel of trackChannels) {
+        if (!channel.sub) continue;
+        if (!channels.some((c) => channelKey(c) === channelKey(channel))) channels.push(channel);
+    }
+    return channels;
 }

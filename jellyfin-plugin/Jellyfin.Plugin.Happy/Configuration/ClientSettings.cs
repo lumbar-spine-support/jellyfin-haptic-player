@@ -94,6 +94,10 @@ public sealed record ClientSettings
     [JsonPropertyName("descriptionHeadingLimit")]
     public int DescriptionHeadingLimit { get; init; } = 1;
 
+    /// <summary>Gets a value indicating whether every media file has an Auto funscript generated from its audio.</summary>
+    [JsonPropertyName("autoFunscriptEnabled")]
+    public bool AutoFunscriptEnabled { get; init; }
+
     /// <summary>Gets the theme, one of <see cref="Themes"/>.</summary>
     [JsonPropertyName("theme")]
     public string Theme { get; init; } = DefaultTheme;
@@ -143,6 +147,7 @@ public sealed record ClientSettings
             CardViewForceSquareArtwork = config.CardViewForceSquareArtwork,
             CardViewLargePortraitArtwork = config.CardViewLargePortraitArtwork,
             DescriptionHeadingLimit = Math.Clamp(config.DescriptionHeadingLimit, 1, 6),
+            AutoFunscriptEnabled = config.AutoFunscriptEnabled,
             Theme = ParseTheme(config.Theme),
             FunscriptSuffixes = new FunscriptSuffixes
             {

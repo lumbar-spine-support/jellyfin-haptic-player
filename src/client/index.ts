@@ -1,4 +1,4 @@
-import { fetchFunscript, fetchDoc, docAssetUrl, fetchVersion, fetchClientSettings, logout, artworkUrl, chaptersVttUrl, useJellyfin, createJellyfinPlaylist, overwriteJellyfinPlaylist, deleteJellyfinPlaylist } from './api';
+import { fetchFunscript, trackFunscripts, fetchDoc, docAssetUrl, fetchVersion, fetchClientSettings, logout, artworkUrl, chaptersVttUrl, useJellyfin, createJellyfinPlaylist, overwriteJellyfinPlaylist, deleteJellyfinPlaylist } from './api';
 import { JellyfinRequestError } from './jellyfin/library';
 import { JellyfinConnection } from './jellyfin/connection';
 import { ensureSignedIn, showMissingServerNotice } from './jellyfin/signIn';
@@ -32,6 +32,8 @@ import { DetailView } from './components/library/detail';
 import { toggleFavorite } from './components/library/favorites';
 import { setQueueActions } from './components/library/queueMenu';
 import { showToast } from './utils/toast';
+import { settleImagePlaceholders } from './utils/imagePlaceholders';
+import { descriptionPlaceholderHtml, tagsPlaceholderHtml } from './templates';
 import { setFavoriteTarget } from '@/components/videojs/features/favorite';
 import { bindIntifaceSettings } from './components/settings/intiface';
 import { bindDelaySlider, bindUpdateRateSlider } from './components/settings/haptics';
@@ -76,6 +78,7 @@ const FALLBACK_SETTINGS: ClientSettings = {
   chapterSourcePriority: ['embedded', 'funscript'],
   libraryIds: [],
   descriptionHeadingLimit: 1,
+  autoFunscriptEnabled: false,
 };
 
 class App {
@@ -110,6 +113,8 @@ class App {
   private readonly syncEngines: FunscriptSync[] = [];
   private readonly intifaceSync: FunscriptSync;
   private activeScripts: LoadedScript[] = [];
+  /** Counts active-track changes, so scripts of a track that stopped being active are not added late. */
+  private activeGeneration = 0;
   private readonly deviceStatus: DeviceStatus;
   /** One device list per backend, rendered inside that backend's settings section. */
   private readonly deviceAssignments: DeviceAssignment[] = [];
@@ -124,7 +129,7 @@ class App {
 
   private currentTrackId: string | null = null;
   /** Funscripts per track id, shared by the timeline view and the haptic engine. */
-  private readonly scriptCache = new Map<string, Promise<LoadedScript[]>>();
+  private readonly scriptCache = new Map<string, PendingScript[]>();
   /** Scroll position to restore when returning to library view */
   private savedLibraryScrollPosition = 0;
   /** Server-provided defaults, applied only where localStorage has no stored value. */
@@ -268,6 +273,8 @@ class App {
     // Needs the Jellyfin session to decide whether there is anyone to sign out.
     this.bindLogout();
     await yieldToMain();
+    // A file page opened directly waits for the library; until then its sections glow.
+    if (new URLSearchParams(location.search).get('view') === 'player') this.showPlayerPlaceholders();
     await this.library.load();
     await yieldToMain();
     await this.router.start();
@@ -309,7 +316,7 @@ class App {
   private mountDeviceAssignment(backend: HapticBackend, containerSelector: string): void {
     const container = qs<HTMLElement>(containerSelector);
     if (!container) return;
-    const assignment = new DeviceAssignment(backend);
+    const assignment = new DeviceAssignment(backend, { autoChannel: this.settings.autoFunscriptEnabled });
     assignment.setAvailableChannels(this.trackChannels);
     assignment.mount(container);
     this.deviceAssignments.push(assignment);
@@ -318,6 +325,16 @@ class App {
   // ── End tag management ─────────────────────────────────────────────────────
 
 
+
+  /** Shows the file page with placeholders for what only the loaded library can fill in. */
+  private showPlayerPlaceholders(): void {
+    this.libraryView?.classList.add('d-none');
+    this.playerView?.classList.remove('d-none');
+    if (this.descriptionEl) this.descriptionEl.innerHTML = descriptionPlaceholderHtml();
+    if (this.trackTagsEl) this.trackTagsEl.innerHTML = tagsPlaceholderHtml();
+    this.descriptionSection?.classList.remove('d-none');
+    this.trackTagsSection?.classList.remove('d-none');
+  }
 
   private renderPlayerTags(track: TrackInfo): void {
     if (!this.trackTagsSection || !this.trackTagsEl) return;
@@ -666,6 +683,7 @@ class App {
 
   /** Another file took over playback: repoint haptics and the OS media controls. */
   private async onActiveTrackChanged(track: TrackInfo | null): Promise<void> {
+    const generation = ++this.activeGeneration;
     this.activeScripts = [];
     for (const engine of this.syncEngines) engine.clearScripts();
     if (!track) return;
@@ -675,11 +693,19 @@ class App {
     if (this.currentTrackId && this.currentTrackId !== track.id) {
       await this.openTrack(track.id, true);
     }
-    const scripts = await this.fetchTrackScripts(track);
-    if (this.session.activeTrackId !== track.id) return;
-    this.activeScripts = scripts;
-    for (const engine of this.syncEngines) engine.loadScripts(scripts);
-    this.publishChannels(scripts);
+    // Each script joins the running engines as soon as it loads, so a slow Auto script
+    // neither delays nor interrupts the others.
+    const scripts = this.trackScripts(track);
+    for (const { loaded } of scripts) {
+      void loaded.then((script) => {
+        if (!script || this.activeGeneration !== generation) return;
+        this.activeScripts = [...this.activeScripts, script];
+        for (const engine of this.syncEngines) engine.addScript(script);
+      });
+    }
+    await settled(scripts.filter((script) => script.channel.type !== 'auto'));
+    if (this.activeGeneration !== generation) return;
+    this.publishChannels(this.activeScripts.map((script) => script.channel));
     for (const engine of this.syncEngines) engine.resyncNow();
   }
 
@@ -690,54 +716,64 @@ class App {
     this.descriptionSection.classList.toggle('d-none', html === '');
   }
 
-  private renderFunscripts(scripts: LoadedScript[]): void {
-    if (!this.funscriptsSection) return;
-    this.funscriptsSection.classList.toggle('d-none', scripts.length === 0);
-  }
-
-  /** Renders the funscript timelines and description of the browsed track. */
+  /**
+   * Renders the description and funscript timelines of the browsed track. Timelines start as
+   * placeholders and fill in as their scripts load; resolves once the funscript files loaded
+   * (not the Auto script, which may still be generated).
+   */
   private async loadTrackAssets(track: TrackInfo): Promise<void> {
-    this.renderTrackDescription('');
-    const scripts = await this.fetchTrackScripts(track);
-    if (this.currentTrackId !== track.id) return;
-
-    this.renderFunscripts(scripts);
+    this.renderTrackDescription(track.description);
+    const scripts = this.trackScripts(track);
+    this.funscriptsSection?.classList.toggle('d-none', scripts.length === 0);
     if (this.vizContainer) {
-      this.viz.mount(this.vizContainer, scripts);
+      this.viz.mount(this.vizContainer, scripts.map((script) => script.channel));
       this.viz.redraw();
     }
-    this.publishChannels(scripts);
-    this.renderTrackDescription(track.description);
+    this.publishChannels(scripts.map((script) => script.channel));
+    for (const { channel, loaded } of scripts) {
+      void loaded.then((script) => {
+        if (this.currentTrackId === track.id) this.viz.setScript(channel, script?.prepared ?? null);
+      });
+    }
+
+    await settled(scripts.filter((script) => script.channel.type !== 'auto'));
+    void settled(scripts).then((loaded) => {
+      if (this.currentTrackId !== track.id) return;
+      this.funscriptsSection?.classList.toggle('d-none', loaded.length === 0);
+      this.publishChannels(loaded.map((script) => script.channel));
+    });
   }
 
   /** Tell the status badges and the assignment UI which channels this track carries. */
-  private publishChannels(scripts: LoadedScript[]): void {
-    const channels = scripts.map((script) => script.channel);
-    this.trackChannels = channels;
+  private publishChannels(channels: HapticChannel[]): void {
     this.deviceStatus.setAvailableChannels(channels);
     for (const assignment of this.deviceAssignments) assignment.setAvailableChannels(channels);
   }
 
-  private fetchTrackScripts(track: TrackInfo): Promise<LoadedScript[]> {
+  /**
+   * Starts loading a track's funscripts, once per track. Each entry knows its channel right away and
+   * resolves on its own, so the page and the engines need not wait for the slowest (the Auto script
+   * is generated on first request). Funscript chapters apply once the script files loaded.
+   */
+  private trackScripts(track: TrackInfo): PendingScript[] {
     const cached = this.scriptCache.get(track.id);
     if (cached) return cached;
     const chapterLists: RawChapter[][] = [];
-    const pending = Promise.all(track.funscripts.map(async (fsInfo) => {
-      try {
-        const funscript = await fetchFunscript(track, fsInfo);
+    const scripts = trackFunscripts(track, this.settings.autoFunscriptEnabled).map((fsInfo): PendingScript => {
+      const channel: HapticChannel = { type: fsInfo.type, ...(fsInfo.sub ? { sub: fsInfo.sub } : {}) };
+      const loaded = fetchFunscript(track, fsInfo).then((funscript) => {
         chapterLists.push(parseFunscriptChapters(funscript));
-        const channel: HapticChannel = { type: fsInfo.type, ...(fsInfo.sub ? { sub: fsInfo.sub } : {}) };
         return { channel, prepared: prepareScript(funscript.actions, this.settings.funscriptInterpolationMethod) };
-      } catch (err) {
+      }).catch((err: unknown) => {
         console.warn(`[player] Failed to load funscript ${fsInfo.filename}:`, err);
         return null;
-      }
-    })).then((loaded) => {
-      this.applyFunscriptChapters(track, chapterLists);
-      return loaded.filter((script): script is LoadedScript => script !== null);
+      });
+      return { channel, loaded };
     });
-    this.scriptCache.set(track.id, pending);
-    return pending;
+    void settled(scripts.filter((script) => script.channel.type !== 'auto'))
+      .then(() => this.applyFunscriptChapters(track, chapterLists));
+    this.scriptCache.set(track.id, scripts);
+    return scripts;
   }
 
   /**
@@ -778,6 +814,18 @@ class App {
   }
 }
 
+/** One funscript of a track: its channel is known at once, the script arrives later (null if it failed). */
+interface PendingScript {
+  channel: HapticChannel;
+  loaded: Promise<LoadedScript | null>;
+}
+
+/** Waits for every script to finish loading and resolves to the ones that loaded. */
+async function settled(scripts: readonly PendingScript[]): Promise<LoadedScript[]> {
+  const loaded = await Promise.all(scripts.map((script) => script.loaded));
+  return loaded.filter((script): script is LoadedScript => script !== null);
+}
+
 function whenIdle(fn: () => void): void {
   if ('requestIdleCallback' in window) requestIdleCallback(fn, { timeout: 2000 });
   else setTimeout(fn, 0);
@@ -789,6 +837,7 @@ function yieldToMain(): Promise<void> {
 }
 
 async function main(): Promise<void> {
+  settleImagePlaceholders();
   const slotA = qs<HTMLElement>('#player-slot-a');
   const slotB = qs<HTMLElement>('#player-slot-b');
   if (!slotA || !slotB) return;

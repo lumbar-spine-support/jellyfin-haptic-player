@@ -18,6 +18,7 @@ export const ROLE_ICON_CLASSES: Record<FunscriptType, string> = {
     estim: 'device-role-icon-estim',
     machine: 'device-role-icon-machine',
     unknown: 'device-role-icon-generic bi bi-patch-question-fill',
+    auto: 'device-role-icon-auto bi bi-stars',
 };
 
 export const ROLE_LABELS: Record<FunscriptType, string> = {
@@ -27,6 +28,7 @@ export const ROLE_LABELS: Record<FunscriptType, string> = {
     estim: 'E-stim',
     machine: 'Machine',
     unknown: 'Generic',
+    auto: 'Auto',
 };
 
 export function renderHapticIcons(types: FunscriptType[]): string {

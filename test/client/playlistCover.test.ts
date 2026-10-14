@@ -105,8 +105,18 @@ test(`${TAG} images that fail to load are skipped`, async () => {
     assert.equal(draws.length, 3);
 });
 
+/** A cover `<img>` with just what applyPlaylistCover touches; `complete` is whether its source is already shown. */
+function coverImg(complete = false): HTMLImageElement {
+    const classes = new Set<string>();
+    return {
+        src: '',
+        complete,
+        classList: { toggle: (name: string, on: boolean) => (on ? classes.add(name) : classes.delete(name), on), contains: (name: string) => classes.has(name) },
+    } as unknown as HTMLImageElement;
+}
+
 test(`${TAG} applyPlaylistCover shows first art then swaps to collage`, async () => {
-    const img = { src: '' } as HTMLImageElement;
+    const img = coverImg();
     const tracks = ['a1', 'a2', 'a3', 'a4'].map((id) => track(id));
     artwork.applyPlaylistCover(img, tracks);
     assert.equal(img.src, artwork.renderTrackArt(tracks[0]));
@@ -116,7 +126,7 @@ test(`${TAG} applyPlaylistCover shows first art then swaps to collage`, async ()
 });
 
 test(`${TAG} applyPlaylistCover ignores stale collage after src changes`, async () => {
-    const img = { src: '' } as HTMLImageElement;
+    const img = coverImg();
     const tracks = ['s1', 's2', 's3', 's4'].map((id) => track(id));
     artwork.applyPlaylistCover(img, tracks);
     img.src = 'other.jpg';
@@ -126,8 +136,19 @@ test(`${TAG} applyPlaylistCover ignores stale collage after src changes`, async 
 });
 
 test(`${TAG} applyPlaylistCover keeps single cover for short lists`, async () => {
-    const img = { src: '' } as HTMLImageElement;
+    const img = coverImg();
     artwork.applyPlaylistCover(img, [track('x', false)]);
     await new Promise((resolve) => setImmediate(resolve));
     assert.equal(img.src, artwork.FALLBACK_ART_DATA_URI);
+});
+
+test(`${TAG} applyPlaylistCover glows until a new cover loads`, () => {
+    const loading = coverImg(false);
+    artwork.applyPlaylistCover(loading, [track('g1')]);
+    assert.equal(loading.classList.contains('placeholder'), true);
+
+    // Revisiting a page whose cover is already shown fires no load event, so it must not glow.
+    const shown = coverImg(true);
+    artwork.applyPlaylistCover(shown, [track('g1')]);
+    assert.equal(shown.classList.contains('placeholder'), false);
 });

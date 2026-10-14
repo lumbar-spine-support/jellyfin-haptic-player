@@ -22,7 +22,7 @@ export const DEFAULT_FUNSCRIPT_SUFFIXES: FunscriptSuffixes = {
   machine: 'machine',
 };
 
-const TYPED: readonly Exclude<FunscriptType, 'unknown'>[] = ['stroker', 'buttplug', 'vibrator', 'estim', 'machine'];
+const TYPED: readonly Exclude<FunscriptType, 'unknown' | 'auto'>[] = ['stroker', 'buttplug', 'vibrator', 'estim', 'machine'];
 
 /**
  * Split a funscript file name into media stem, type and optional subcategory.

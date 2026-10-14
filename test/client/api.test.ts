@@ -123,6 +123,33 @@ test(`${TAG} fetchFunscript throws on HTTP errors`, async () => {
     await assert.rejects(api.fetchFunscript({ id: 't' } as TrackInfo, { key: 'k' } as FunscriptInfo), /Funscript fetch failed: 500/);
 });
 
+test(`${TAG} fetchFunscript polls the Auto script until the plugin generated it`, async () => {
+    const script = { actions: [{ at: 128, pos: 0 }] };
+    let requests = 0;
+    const { connection, calls } = fakeConnection({
+        '/Happy/Items/': () => (++requests < 3
+            ? new Response(null, { status: 202, headers: { 'Retry-After': '0.01' } })
+            : json(script)),
+    });
+    api.useJellyfin(connection, OPTIONS);
+    const result = await api.fetchFunscript({ id: 't 1' } as TrackInfo, api.AUTO_FUNSCRIPT);
+    assert.deepEqual(result, script);
+    assert.deepEqual(calls.map((call) => call.path), Array(3).fill('/Happy/Items/t%201/AutoFunscript'));
+});
+
+test(`${TAG} fetchFunscript gives up on an Auto script the plugin cannot generate`, async () => {
+    api.useJellyfin(fakeConnection({ '/Happy/Items/': () => json({}, 422) }).connection, OPTIONS);
+    await assert.rejects(api.fetchFunscript({ id: 't' } as TrackInfo, api.AUTO_FUNSCRIPT), /Funscript fetch failed: 422/);
+});
+
+test(`${TAG} trackFunscripts adds the Auto script only when the plugin generates them`, () => {
+    const files = [{ key: 'k', filename: 'a.stroker.funscript', type: 'stroker' }] as FunscriptInfo[];
+    const track = { id: 't', funscripts: files } as TrackInfo;
+    assert.deepEqual(api.trackFunscripts(track, false), files);
+    assert.deepEqual(api.trackFunscripts(track, true), [...files, api.AUTO_FUNSCRIPT]);
+    assert.equal(track.funscripts.length, 1);
+});
+
 test(`${TAG} fetchVersion maps the plugin info`, async () => {
     api.useJellyfin(fakeConnection({ '/Happy/Info': () => json({ Version: '0.16.0.0', Channel: 'preview', Commit: 'abc' }) }).connection, OPTIONS);
     assert.deepEqual(await api.fetchVersion(), { version: '0.16.0', channel: 'preview', commit: 'abc', builtAt: null });

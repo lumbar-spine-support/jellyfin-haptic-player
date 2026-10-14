@@ -149,6 +149,21 @@ Funscripts without a recognised toy suffix (`file.funscript`) are still picked u
 
 If your funscripts follow another naming pattern, e.g. `file-prostate.funscript` instead of `file.buttplug.funscript` you can change the separator character and expected suffixes on the plugin's settings page (see [Configuration](configuration.md#funscript-file-names)). The plugin matches files with the new separator within about 30 seconds; reload HAPPY afterwards.
 
+### Auto funscript
+
+When the plugin setting *Generate an Auto funscript from the audio* is on (see
+[Configuration](configuration.md#auto-funscript)), every media file also gets an **Auto** script,
+shown with a stars icon, even files without any funscript. It follows how loud a frequency
+band of the audio is, by default the bass (20–200 Hz): the loudest moment of the band in the file
+is position 100, silence is 0.
+
+- The script is generated the first time someone opens the file, which takes a moment (a few
+  seconds for an hour of audio). Its timeline glows meanwhile; other scripts and playback do not
+  wait for it. Afterwards Jellyfin keeps it in its cache.
+- Files without an audio track get no Auto script.
+- Assign a device to *Auto* in its device card like any other script. As every file has one, the
+  library's haptics filter does not list it.
+
 ### Where funscripts are found
 
 Jellyfin does not know funscripts; the HAPPY plugin finds them. It looks through all folders of your Jellyfin libraries and assigns each `.funscript` file to the media file whose name it starts with:

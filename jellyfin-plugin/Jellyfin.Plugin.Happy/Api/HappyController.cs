@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Mime;
 using System.Reflection;
 using System.Threading.Tasks;
+using Jellyfin.Plugin.Happy.AutoFunscripts;
 using Jellyfin.Plugin.Happy.Configuration;
 using Jellyfin.Plugin.Happy.Funscripts;
 using MediaBrowser.Controller.Entities;
@@ -26,6 +27,7 @@ namespace Jellyfin.Plugin.Happy.Api;
 public class HappyController : ControllerBase
 {
     private readonly FunscriptIndex _index;
+    private readonly AutoFunscriptService _autoFunscripts;
     private readonly ILibraryManager _libraryManager;
     private readonly IAuthorizationContext _authorizationContext;
 
@@ -33,11 +35,17 @@ public class HappyController : ControllerBase
     /// Initializes a new instance of the <see cref="HappyController"/> class.
     /// </summary>
     /// <param name="index">The funscript index.</param>
+    /// <param name="autoFunscripts">The Auto funscript generator.</param>
     /// <param name="libraryManager">Instance of the <see cref="ILibraryManager"/> interface.</param>
     /// <param name="authorizationContext">Instance of the <see cref="IAuthorizationContext"/> interface.</param>
-    public HappyController(FunscriptIndex index, ILibraryManager libraryManager, IAuthorizationContext authorizationContext)
+    public HappyController(
+        FunscriptIndex index,
+        AutoFunscriptService autoFunscripts,
+        ILibraryManager libraryManager,
+        IAuthorizationContext authorizationContext)
     {
         _index = index;
+        _autoFunscripts = autoFunscripts;
         _libraryManager = libraryManager;
         _authorizationContext = authorizationContext;
     }
@@ -140,5 +148,47 @@ public class HappyController : ControllerBase
         }
 
         return PhysicalFile(file.Path, MediaTypeNames.Application.Json);
+    }
+
+    /// <summary>
+    /// Gets the Auto funscript of an item, generated from its audio. The first request starts the
+    /// generation and answers <c>202 Accepted</c> until the script is ready; poll again after
+    /// <c>Retry-After</c> seconds.
+    /// </summary>
+    /// <param name="itemId">The item id.</param>
+    /// <returns>The funscript, <c>202</c> while it is generated, <c>422</c> when the file has no usable audio.</returns>
+    [HttpGet("Items/{itemId}/AutoFunscript")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status202Accepted)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> GetAutoFunscript([FromRoute] Guid itemId)
+    {
+        var user = (await _authorizationContext.GetAuthorizationInfo(Request).ConfigureAwait(false)).User;
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        var config = Plugin.Instance?.Configuration ?? new PluginConfiguration();
+        if (!config.AutoFunscriptEnabled
+            || _libraryManager.GetItemById<BaseItem>(itemId, user) is not { IsFolder: false, Path: { Length: > 0 } path } item
+            || item.MediaType is not (Jellyfin.Data.Enums.MediaType.Audio or Jellyfin.Data.Enums.MediaType.Video))
+        {
+            return NotFound();
+        }
+
+        var status = _autoFunscripts.Get(itemId, path, AutoFunscriptSettings.From(config));
+        switch (status.State)
+        {
+            case AutoFunscriptState.Ready when status.Path is { } file:
+                return PhysicalFile(file, MediaTypeNames.Application.Json);
+            case AutoFunscriptState.Pending:
+                Response.Headers.RetryAfter = "2";
+                return Accepted();
+            default:
+                return UnprocessableEntity();
+        }
     }
 }
