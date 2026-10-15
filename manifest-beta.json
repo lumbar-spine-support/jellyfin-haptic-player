@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.2.1.6",
+        "changelog": "Beta build 1.2.1.6 from dev (commit 6d48b68). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- feat(library): only offer tags that still match in the tags view (#48) (6d48b68)\n- feat: generate an Auto funscript from the audio of every media file (#47) (6ac28f1)\n- feat(library): limit heading levels in track descriptions (6c2f006)\n- feat(library): show the card's media type as its filter icon (89f3015)\n- fix(docs): update tags and descriptions section for clarity and accuracy (1f6af85)",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.2.1.6.zip",
+        "checksum": "8eebb00280d63736edbc5d5f07c31f96",
+        "timestamp": "2026-10-15T21:27:30Z"
+      },
+      {
         "version": "1.2.1.5",
         "changelog": "Beta build 1.2.1.5 from dev (commit 6ac28f1). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- feat: generate an Auto funscript from the audio of every media file (#47) (6ac28f1)\n- feat(library): limit heading levels in track descriptions (6c2f006)\n- feat(library): show the card's media type as its filter icon (89f3015)\n- fix(docs): update tags and descriptions section for clarity and accuracy (1f6af85)",
         "targetAbi": "12.1.0.0",
@@ -39,14 +47,6 @@
         "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.2.1.2.zip",
         "checksum": "1bf211d567865788383eac690d7fdc68",
         "timestamp": "2026-10-14T20:00:53Z"
-      },
-      {
-        "version": "1.2.1.1",
-        "changelog": "Beta build 1.2.1.1 from dev (commit 8f56259). Not released yet, may be unstable.",
-        "targetAbi": "12.1.0.0",
-        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.2.1.1.zip",
-        "checksum": "fe02d384b9e17df382e26c745e721217",
-        "timestamp": "2026-10-14T19:59:17Z"
       },
       {
         "version": "1.2.1.0",
