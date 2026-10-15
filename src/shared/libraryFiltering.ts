@@ -80,6 +80,38 @@ export function filterAvailableTags(
     !isArtistTag(tag) && !selected.has(tag.toLowerCase()) && (!q || tag.toLowerCase().includes(q)));
 }
 
+/**
+ * Lower-cased tags that can still be added to the plain tags in `activeTags` with at least one
+ * album, track, playlist or video left matching (the items `countMediaMatches` counts). Albums and
+ * playlists carry the tags of all their tracks. Artist entries are ignored.
+ */
+export function reachableTags(
+  library: {
+    tracks: readonly TrackInfo[];
+    videos: readonly TrackInfo[];
+    albums: readonly Pick<AlbumInfo, 'trackIds'>[];
+    playlists: readonly Pick<PlaylistInfo, 'entries'>[];
+  },
+  activeTags: readonly string[],
+): Set<string> {
+  const { tags } = splitActiveTags(activeTags);
+  const required = tags.map((tag) => tag.toLowerCase());
+  const tracksById = new Map([...library.tracks, ...library.videos].map((track) => [track.id, track]));
+  const reachable = new Set<string>();
+  const collect = (trackIds: Iterable<string>): void => {
+    const itemTags = new Set<string>();
+    for (const trackId of trackIds) {
+      for (const tag of tracksById.get(trackId)?.tags ?? []) itemTags.add(tag.toLowerCase());
+    }
+    if (!required.every((tag) => itemTags.has(tag))) return;
+    for (const tag of itemTags) reachable.add(tag);
+  };
+  for (const track of [...library.tracks, ...library.videos]) collect([track.id]);
+  for (const album of library.albums) collect(album.trackIds);
+  for (const playlist of library.playlists) collect(playlist.entries.map((entry) => entry.trackId));
+  return reachable;
+}
+
 export type MediaCounts = { albums: number; tracks: number; playlists: number; videos: number };
 
 /** Counts items per media type matching the plain tags in `activeTags`; artist entries are ignored. */

@@ -33,6 +33,7 @@ Playlists are Jellyfin playlists. Create them in Jellyfin, or save a [queue](#qu
   - **Audio:** give the genre field several values (most taggers can store multiple values in one field; Mp3tag separates them with `\\`). A single text like `sfw; vanilla` stays one genre, unless you enable custom tag delimiters in the library settings.
   - **Video:** an embedded genre like `sfw; vanilla; funny` is split into separate genres. For Jellyfin's *Tags*, put an NFO file next to the video (`<video name>.nfo` with `<tag>` entries, see below).
   - Tags can also be set by hand in Jellyfin's metadata editor.
+  - The tags view combines the tags you pick (all must match) and only offers tags that still leave something to show, so a pick like *anal* hides *no anal* when no item carries both. Albums and playlists count with the tags of all their tracks.
 - **Descriptions** are Jellyfin's overview of the item. For audio, put the text into the file's comment tag. Markdown is rendered, so you can use [links](https://github.com), **bold text** and more.
 
 Markdown sidecar files (`<name>.md`) are no longer read; move their tags into the genre field (or an NFO for videos) and their text into the comment (audio) or the NFO's `<plot>` (video).
