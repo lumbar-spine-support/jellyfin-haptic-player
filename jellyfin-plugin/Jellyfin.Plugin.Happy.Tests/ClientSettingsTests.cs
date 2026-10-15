@@ -21,6 +21,7 @@ public class ClientSettingsTests
         Assert.Equal(".", settings.FunscriptSuffixes.Separator);
         Assert.Equal("stroker", settings.FunscriptSuffixes.Stroker);
         Assert.Equal(string.Empty, settings.JellyfinUrl);
+        Assert.Equal(1, settings.DescriptionHeadingLimit);
     }
 
     [Fact]
@@ -67,6 +68,15 @@ public class ClientSettingsTests
     [InlineData("", new string[0])]
     public void ParsesChapterSources(string value, string[] expected)
         => Assert.Equal(expected, ClientSettings.ParseChapterSources(value));
+
+    [Theory]
+    [InlineData(0, 1)]
+    [InlineData(1, 1)]
+    [InlineData(4, 4)]
+    [InlineData(6, 6)]
+    [InlineData(9, 6)]
+    public void ClampsTheDescriptionHeadingLimit(int value, int expected)
+        => Assert.Equal(expected, ClientSettings.From(new PluginConfiguration { DescriptionHeadingLimit = value }).DescriptionHeadingLimit);
 
     [Theory]
     [InlineData(null, "oled")]

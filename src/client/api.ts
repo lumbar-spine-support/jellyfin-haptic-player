@@ -8,6 +8,7 @@ import { toPlaylist } from './jellyfin/mapper';
 import { canOverwritePlaylist, createPlaylist, deletePlaylist, loadPlaylist, replacePlaylistItems } from './jellyfin/playlists';
 import { imageUrl, streamUrl, trickplayVtt } from './jellyfin/urls';
 import { versionFromPluginInfo, type PluginInfo } from './utils/formatVersion';
+import { markImageLoading } from './utils/imagePlaceholders';
 
 /** The signed-in Jellyfin session the library, streams and funscripts come from. */
 let jellyfin: JellyfinConnection | null = null;
@@ -62,12 +63,40 @@ export function deleteJellyfinPlaylist(playlistId: string): Promise<void> {
   return deletePlaylist(requireJellyfin(), playlistId);
 }
 
-/** Fetches one funscript through the HAPPY Jellyfin plugin. The raw JSON also carries chapter metadata. */
+/**
+ * The script the plugin generates from a file's audio. Every file has one while the plugin setting
+ * `autoFunscriptEnabled` is on, so it is not part of `TrackInfo.funscripts` (see `trackFunscripts`).
+ */
+export const AUTO_FUNSCRIPT: FunscriptInfo = { key: 'auto', filename: 'Auto funscript', type: 'auto' };
+
+/** The scripts to load for a track: its files, plus the Auto script when the plugin generates them. */
+export function trackFunscripts(track: TrackInfo, autoFunscriptEnabled: boolean): FunscriptInfo[] {
+  return autoFunscriptEnabled ? [...track.funscripts, AUTO_FUNSCRIPT] : track.funscripts;
+}
+
+/** Fallback wait between polls of an Auto script that is still being generated. */
+const AUTO_FUNSCRIPT_RETRY_MS = 2000;
+
+/**
+ * Fetches one funscript through the HAPPY Jellyfin plugin. The raw JSON also carries chapter metadata.
+ * The Auto script is generated on first request: the plugin answers `202` until it is ready, and this
+ * keeps asking, so the promise can take as long as analysing the file's audio.
+ */
 export async function fetchFunscript(track: TrackInfo, funscript: FunscriptInfo): Promise<Funscript & { metadata?: unknown }> {
-  const res = await requireJellyfin().request(
-    `/Happy/Items/${encodeURIComponent(track.id)}/Funscripts/${encodeURIComponent(funscript.key)}`);
-  if (!res.ok) throw new Error(`Funscript fetch failed: ${res.status}`);
-  return res.json() as Promise<Funscript & { metadata?: unknown }>;
+  const item = encodeURIComponent(track.id);
+  const path = funscript.type === 'auto'
+    ? `/Happy/Items/${item}/AutoFunscript`
+    : `/Happy/Items/${item}/Funscripts/${encodeURIComponent(funscript.key)}`;
+  for (;;) {
+    const res = await requireJellyfin().request(path);
+    if (res.status === 202) {
+      const retryAfter = Number(res.headers.get('Retry-After')) * 1000;
+      await new Promise((resolve) => setTimeout(resolve, retryAfter > 0 ? retryAfter : AUTO_FUNSCRIPT_RETRY_MS));
+      continue;
+    }
+    if (!res.ok) throw new Error(`Funscript fetch failed: ${res.status}`);
+    return res.json() as Promise<Funscript & { metadata?: unknown }>;
+  }
 }
 
 /** Builds the media-stream URL for a track or video. */
@@ -214,6 +243,7 @@ export function playlistCoverArt(tracks: (TrackInfo | null | undefined)[]): Prom
 export function applyPlaylistCover(img: HTMLImageElement | null, tracks: (TrackInfo | null | undefined)[]): void {
     if (!img) return;
     img.src = renderTrackArt(tracks[0]);
+    markImageLoading(img);
     if (tracks.length < 4) return;
     const expected = img.src;
     void playlistCoverArt(tracks).then((src) => {

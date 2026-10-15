@@ -13,6 +13,8 @@ export function cardHtml(values: {
     altText: string;
     title: string;
     artist: string;
+    typeIcon: string;
+    typeLabel: string;
     meta: string;
 }): string {
     return renderTemplate(cardTemplate, values);

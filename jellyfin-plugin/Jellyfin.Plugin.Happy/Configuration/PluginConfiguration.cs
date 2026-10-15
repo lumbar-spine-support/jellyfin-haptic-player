@@ -87,6 +87,12 @@ public class PluginConfiguration : BasePluginConfiguration
     public bool CardViewLargePortraitArtwork { get; set; }
 
     /// <summary>
+    /// Gets or sets the heading level (1–6) that <c>#</c> headings in track descriptions render at.
+    /// Deeper headings shift along, capped at 6; 1 leaves descriptions unchanged.
+    /// </summary>
+    public int DescriptionHeadingLimit { get; set; } = 1;
+
+    /// <summary>
     /// Gets or sets the look of HAPPY: oled (pure black) or jellyfin (Jellyfin's dark theme).
     /// </summary>
     public string Theme { get; set; } = "oled";
@@ -127,6 +133,37 @@ public class PluginConfiguration : BasePluginConfiguration
     /// Empty disables chapters.
     /// </summary>
     public string ChapterSourcePriority { get; set; } = "embedded,funscript";
+
+    /// <summary>
+    /// Gets or sets a value indicating whether HAPPY offers an "Auto" funscript for every media file,
+    /// generated from its audio the first time the file is opened.
+    /// </summary>
+    public bool AutoFunscriptEnabled { get; set; }
+
+    /// <summary>
+    /// Gets or sets the lower bound in Hz of the frequency band the Auto funscript follows.
+    /// </summary>
+    public int AutoFunscriptMinFrequency { get; set; } = 20;
+
+    /// <summary>
+    /// Gets or sets the upper bound in Hz of the frequency band the Auto funscript follows.
+    /// </summary>
+    public int AutoFunscriptMaxFrequency { get; set; } = 200;
+
+    /// <summary>
+    /// Gets or sets the band power in percent of its loudest moment below which the Auto funscript stays at 0.
+    /// </summary>
+    public int AutoFunscriptMinPower { get; set; } = 5;
+
+    /// <summary>
+    /// Gets or sets the time resolution of the Auto funscript in milliseconds.
+    /// </summary>
+    public int AutoFunscriptFrameMs { get; set; } = 50;
+
+    /// <summary>
+    /// Gets or sets the smallest position change (0–100) that adds a point to the Auto funscript.
+    /// </summary>
+    public int AutoFunscriptMinPositionDelta { get; set; } = 2;
 
     /// <summary>
     /// Gets or sets a value indicating whether HAPPY logs debug output to the browser console.

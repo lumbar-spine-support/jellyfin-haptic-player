@@ -40,6 +40,7 @@ and hands it to the tab when it returns. A newly connecting app likewise replace
 - Serve the client settings (`/Happy/Config`) and the version (`/Happy/Info`) to signed-in users
 - Let admins edit the client settings on its dashboard page
 - Index funscripts next to the media of the selected libraries (`LibraryIds`, all when empty) and serve them only for items the signed-in user can see
+- Optionally generate an *Auto* funscript per media file from a frequency band of its audio (Jellyfin's ffmpeg + an FFT in `AutoFunscripts/`), on first request, cached in Jellyfin's cache folder
 - List HAPPY in Jellyfin's web client by adding a `menuLinks` entry to `/web/config.json` (`Web/WebConfigStartupFilter.cs`)
 
 ### Jellyfin web client integration
@@ -218,7 +219,7 @@ with `PlaybackSession`, `PlaybackQueue` and `PlaybackController`.
 The haptic pipeline is:
 
 1. user opens a track
-2. client fetches the track's funscripts from the HAPPY plugin by key
+2. client fetches the track's funscripts from the HAPPY plugin by key, plus the generated Auto script when `autoFunscriptEnabled` is on (polled while the plugin answers `202`); each script is used as soon as it arrives
 3. `FunscriptSync` receives sorted script actions
 4. store updates from the active player slot drive sync start/pause/seek/stop
 5. device commands are routed through `ButtplugClientManager`
@@ -341,6 +342,8 @@ Covers are requested lazily rather than eagerly:
   Do **not** add `width`/`height` attributes to these tags: they map to CSS presentational hints,
   and since `.track-art` sets only `width`, the `height` hint would win and stretch square covers
   into rectangles while suppressing `aspect-ratio`.
+- Covers glow with Bootstrap's `placeholder` until they load; one capture-phase listener
+  (`utils/imagePlaceholders.ts`) clears it, so templates only add the class.
 - `renderTrackArt()` is the single place that decides between a real URL and the inline
   `FALLBACK_ART_DATA_URI` placeholder. It emits a request only when `hasArtwork` is true, so
   art-less media costs no round trip at all. Album covers point at `coverTrackId`, which album

@@ -79,6 +79,14 @@ export class FunscriptSync {
     }));
   }
 
+  /**
+   * Adds a script that finished loading after the others, e.g. a generated Auto script. The next
+   * tick picks it up; unlike `resyncNow` it does not stop the devices already playing.
+   */
+  addScript({ channel, prepared }: LoadedScript): void {
+    this.scripts = [...this.scripts, { channel, prepared, moveLockedUntil: 0, lastSentPos: null }];
+  }
+
   /** Clear all loaded Funscripts. */
   clearScripts(): void {
     this.scripts = [];

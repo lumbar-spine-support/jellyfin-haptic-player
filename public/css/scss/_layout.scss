@@ -191,7 +191,9 @@ body.blur-content media-container {
   height: min(calc((100cqw - var(--bs-gutter-x, 1rem)) / 2), 300px);
 }
 
-.track-art-thumb {
+.track-art-thumb,
+// Bootstrap's .placeholder (while the cover loads) would make it inline-block.
+.track-art-thumb.placeholder {
   display: block;
   height: 40px;
   width: auto;
@@ -268,6 +270,12 @@ body.blur-content media-container {
 
   &.canvas-locked canvas {
     cursor: not-allowed;
+  }
+
+  // A row whose script still loads pulses like Bootstrap's placeholders, label included.
+  .placeholder-glow .viz-label {
+    animation: placeholder-glow 2s ease-in-out infinite;
+    cursor: wait;
   }
 }
 

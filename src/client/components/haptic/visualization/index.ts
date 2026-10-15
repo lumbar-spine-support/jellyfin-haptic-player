@@ -1,6 +1,5 @@
 import { channelKey, channelLabel, type HapticChannel } from '../../../../shared/haptics';
 import type { PreparedScript } from '../../../../shared/interpolation';
-import type { LoadedScript } from '../../funscriptSync';
 import { ROLE_ICON_CLASSES } from '../icons';
 import type { PlaybackSession } from '../../player';
 import { emptyStateHtml, scriptRowHtml } from './templates';
@@ -13,7 +12,8 @@ interface ScriptRenderer {
   /** Last applied cursor offset, so a fixed (zoomed) cursor isn't restyled every frame. */
   cursorX: number;
   wrapper: HTMLDivElement;
-  prepared: PreparedScript;
+  /** Null while the script is still loading; the row then shows a placeholder. */
+  prepared: PreparedScript | null;
   /** CSS pixel size; the backing buffer is this times devicePixelRatio. */
   width: number;
   height: number;
@@ -77,24 +77,25 @@ export class Visualization {
   }
 
   /**
-   * Attach canvases to the container element and render the provided scripts.
-   * Each script gets its own labelled canvas.
+   * Attach one labelled canvas per channel to the container element. Rows start as glowing
+   * placeholders until `setScript` hands them their script, so the layout does not jump while
+   * slow scripts (such as a generated Auto script) load.
    */
   mount(
     container: HTMLElement,
-    scripts: readonly LoadedScript[],
+    channels: readonly HapticChannel[],
   ): void {
     container.innerHTML = '';
     this.resizeObserver.disconnect();
     this.renderers = [];
     this.container = container;
 
-    if (scripts.length === 0) {
+    if (channels.length === 0) {
       container.innerHTML = emptyStateHtml();
       return;
     }
 
-    for (const { channel, prepared } of scripts) {
+    for (const channel of channels) {
       const template = document.createElement('template');
       template.innerHTML = scriptRowHtml({
         iconClass: ROLE_ICON_CLASSES[channel.type],
@@ -104,6 +105,7 @@ export class Visualization {
       const wrapper = template.content.firstElementChild as HTMLDivElement;
       const canvas = wrapper.querySelector('canvas') as HTMLCanvasElement;
       const cursor = wrapper.querySelector('.viz-cursor') as HTMLDivElement;
+      setLoading(wrapper, true, channel.type === 'auto');
       canvas.addEventListener('pointerdown', (event) => this.handleSeek(event, canvas));
       container.appendChild(wrapper);
 
@@ -113,7 +115,7 @@ export class Visualization {
         cursor,
         cursorX: Number.NaN,
         wrapper,
-        prepared,
+        prepared: null,
         width: 0,
         height: 0,
       });
@@ -123,6 +125,23 @@ export class Visualization {
     this.refreshColors();
     this.setVisible(this.visible);
     this.resizeCanvases();
+  }
+
+  /** Fills the row of a channel once its script loaded, or drops it when the script failed. */
+  setScript(channel: HapticChannel, prepared: PreparedScript | null): void {
+    const key = channelKey(channel);
+    const renderer = this.renderers.find((r) => channelKey(r.channel) === key);
+    if (!renderer) return;
+    if (!prepared) {
+      this.resizeObserver.unobserve(renderer.canvas);
+      renderer.wrapper.remove();
+      this.renderers = this.renderers.filter((r) => r !== renderer);
+      if (this.renderers.length === 0 && this.container) this.container.innerHTML = emptyStateHtml();
+      return;
+    }
+    renderer.prepared = prepared;
+    setLoading(renderer.wrapper, false);
+    this.renderScript(renderer, this.currentTime, this.clock.duration);
   }
 
   /** Redraw all canvases immediately at the current playback position. */
@@ -218,8 +237,8 @@ export class Visualization {
     ctx.setTransform(canvas.width / W, 0, 0, canvas.height / H, 0, 0);
     ctx.clearRect(0, 0, W, H);
 
-    r.cursor.hidden = duration <= 0;
-    if (duration <= 0) return;
+    r.cursor.hidden = duration <= 0 || !prepared;
+    if (duration <= 0 || !prepared) return;
 
     const { startSec, endSec } = this.getVisibleWindow(currentTime, duration, Math.max(1, this.zoomLevel));
     const startMs = startSec * 1000;
@@ -294,4 +313,16 @@ export class Visualization {
     const halfWindow = duration / zoom / 2;
     return { startSec: currentTime - halfWindow, endSec: currentTime + halfWindow };
   }
+}
+
+/**
+ * Bootstrap's glowing placeholder on a row while its script loads: on the canvas, and on the label,
+ * which stays visible when the timelines are collapsed.
+ */
+function setLoading(wrapper: HTMLElement, loading: boolean, auto = false): void {
+  wrapper.classList.toggle('placeholder-glow', loading);
+  wrapper.querySelector('canvas')?.classList.toggle('placeholder', loading);
+  wrapper.setAttribute('aria-busy', String(loading));
+  const label = wrapper.querySelector<HTMLElement>('.viz-label');
+  if (label) label.title = loading ? (auto ? 'Generating from the audio…' : 'Loading…') : '';
 }

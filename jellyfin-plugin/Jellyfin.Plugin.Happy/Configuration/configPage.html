@@ -104,6 +104,45 @@
                                 is="emby-checkbox" /><span>Reconnect to Intiface on page load</span></label>
                     </div>
 
+                    <h3>Auto funscript</h3>
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label class="emby-checkbox-label"><input id="AutoFunscriptEnabled" type="checkbox"
+                                is="emby-checkbox" /><span>Generate an Auto funscript from the audio</span></label>
+                        <div class="fieldDescription checkboxFieldDescription">Every media file gets an extra script that
+                            follows how loud the frequency band below is. It is generated with Jellyfin's ffmpeg the
+                            first time someone opens the file, which takes a moment, and is cached afterwards.
+                            Changing the values below generates new scripts.</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="AutoFunscriptMinFrequency">Lowest frequency
+                            (Hz)</label>
+                        <input id="AutoFunscriptMinFrequency" type="number" min="1" max="20000" is="emby-input" />
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="AutoFunscriptMaxFrequency">Highest frequency
+                            (Hz)</label>
+                        <input id="AutoFunscriptMaxFrequency" type="number" min="1" max="20000" is="emby-input" />
+                        <div class="fieldDescription">20–200 Hz follows bass and kick drums; voices sit around
+                            100–1000 Hz.</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="AutoFunscriptMinPower">Threshold (%)</label>
+                        <input id="AutoFunscriptMinPower" type="number" min="0" max="100" is="emby-input" />
+                        <div class="fieldDescription">Below this share of the band's loudest moment in the file the
+                            position stays at 0.</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="AutoFunscriptFrameMs">Resolution (ms)</label>
+                        <input id="AutoFunscriptFrameMs" type="number" min="10" max="1000" is="emby-input" />
+                        <div class="fieldDescription">Time between two measurements.</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="AutoFunscriptMinPositionDelta">Smallest
+                            change (0–100)</label>
+                        <input id="AutoFunscriptMinPositionDelta" type="number" min="0" max="100" is="emby-input" />
+                        <div class="fieldDescription">Smaller changes add no point; peaks and dips are always kept.</div>
+                    </div>
+
                     <h3>DG-Lab Coyote (experimental)</h3>
                     <div class="checkboxContainer checkboxContainer-withDescription">
                         <label class="emby-checkbox-label"><input id="DglabEnabled" type="checkbox"
@@ -142,6 +181,19 @@
                     <div class="checkboxContainer checkboxContainer-withDescription">
                         <label class="emby-checkbox-label"><input id="CardViewLargePortraitArtwork" type="checkbox"
                                 is="emby-checkbox" /><span>Portrait artwork takes two rows</span></label>
+                    </div>
+                    <div class="selectContainer">
+                        <label class="selectLabel" for="DescriptionHeadingLimit">Largest heading in descriptions</label>
+                        <select id="DescriptionHeadingLimit" is="emby-select">
+                            <option value="1">Heading 1 (unchanged)</option>
+                            <option value="2">Heading 2</option>
+                            <option value="3">Heading 3</option>
+                            <option value="4">Heading 4</option>
+                            <option value="5">Heading 5</option>
+                            <option value="6">Heading 6 (all headings the same size)</option>
+                        </select>
+                        <div class="fieldDescription">Shrinks the headings of track descriptions: <code>#</code>
+                            becomes this level and smaller headings move down with it, up to heading 6.</div>
                     </div>
 
                     <h3>Funscript file names</h3>
@@ -193,9 +245,12 @@
                 var pluginId = '98652011-fd1c-4b30-8359-fcae3b45ed37';
                 var page = document.querySelector('#HappyConfigPage');
                 var form = page.querySelector('#HappyConfigForm');
-                var numbers = ['VideoSeekInterval', 'HapticFrequency', 'HapticDelay', 'HapticDelayLimit'];
+                var numbers = ['VideoSeekInterval', 'HapticFrequency', 'HapticDelay', 'HapticDelayLimit', 'DescriptionHeadingLimit',
+                    'AutoFunscriptMinFrequency', 'AutoFunscriptMaxFrequency', 'AutoFunscriptMinPower', 'AutoFunscriptFrameMs',
+                    'AutoFunscriptMinPositionDelta'];
                 var flags = ['BlurContent', 'FunscriptColorGradient', 'AutoReconnectIntiface', 'DglabEnabled', 'DglabSandboxEnabled',
-                    'AutoReconnectDglab', 'CardViewForceSquareArtwork', 'CardViewLargePortraitArtwork', 'DebugLogging', 'ShowInJellyfinMenu'];
+                    'AutoReconnectDglab', 'CardViewForceSquareArtwork', 'CardViewLargePortraitArtwork', 'DebugLogging', 'ShowInJellyfinMenu',
+                    'AutoFunscriptEnabled'];
                 var texts = ['ChapterSourcePriority', 'FunscriptInterpolationMethod', 'DglabRelayUrl', 'FunscriptSeparator',
                     'FunscriptSuffixStroker', 'FunscriptSuffixButtplug', 'FunscriptSuffixVibrator', 'FunscriptSuffixEstim',
                     'FunscriptSuffixMachine', 'JellyfinMenuName', 'JellyfinMenuIcon', 'Theme'];

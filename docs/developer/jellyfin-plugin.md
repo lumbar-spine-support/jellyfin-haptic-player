@@ -1,6 +1,6 @@
 # Jellyfin plugin
 
-HAPPY uses Jellyfin for the library, metadata, artwork, trickplay, chapters, users and streaming. The HAPPY plugin in [jellyfin-plugin/](../../jellyfin-plugin/) adds everything else HAPPY needs from a server: it serves the built web app, the client settings (edited on its dashboard page), the version and the user docs, and, since Jellyfin has no idea what a funscript is, it indexes `.funscript` files next to the media and serves them to signed-in users. There is no other HAPPY server; only the optional [DG-Lab relay](../../dglab-relay/README.md) runs separately.
+HAPPY uses Jellyfin for the library, metadata, artwork, trickplay, chapters, users and streaming. The HAPPY plugin in [jellyfin-plugin/](../../jellyfin-plugin/) adds everything else HAPPY needs from a server: it serves the built web app, the client settings (edited on its dashboard page), the version and the user docs, and, since Jellyfin has no idea what a funscript is, it indexes `.funscript` files next to the media and serves them to signed-in users. Optionally it also generates an *Auto* funscript per media file from its audio. There is no other HAPPY server; only the optional [DG-Lab relay](../../dglab-relay/README.md) runs separately.
 
 The plugin is deliberately dumb. It serves files and settings, maps scripts to items and checks access. Parsing the script type and subcategory, funscript chapters and VR detection stay in the TypeScript client, where they are already tested.
 
@@ -13,6 +13,9 @@ flowchart LR
   Index -- "media items + library folders" --> LibraryManager
   Index -- "Match()" --> Matcher["FunscriptMatcher"]
   PostScan["FunscriptPostScanTask"] -- "Rebuild()" --> Index
+  Client -- "GET /Happy/Items/{itemId}/AutoFunscript" --> Controller
+  Controller -- "Get(id, path, settings)" --> Auto["AutoFunscriptService"]
+  Auto -- "PCM via Jellyfin's ffmpeg" --> Analyzer["SpectrumAnalyzer"]
 ```
 
 ## Endpoints
@@ -28,6 +31,7 @@ All routes except the docs require a Jellyfin token (`Authorization: MediaBrowse
 | `GET /Happy/Docs`, `/Happy/Docs/{page}`, `/Happy/Docs/assets/{path}` | The user docs (`docs/*.md` and their images), embedded in the DLL. **Anonymous**, like the docs on GitHub; `<img>` tags carry no token. |
 | `GET /Happy/Funscripts` | `{ "<itemId>": [{ "Key": "<16 hex>", "FileName": "clip.stroker.funscript" }] }`. Only items the user can see, and only items that have scripts. |
 | `GET /Happy/Items/{itemId}/Funscripts/{key}` | The raw funscript JSON. Returns 404 for unknown, hidden or script-less items and for unknown keys alike. |
+| `GET /Happy/Items/{itemId}/AutoFunscript` | The [Auto funscript](#auto-funscripts) generated from the item's audio. `202 Accepted` with `Retry-After` while it is generated (the first request starts it), `422` when the file has no usable audio, `404` while the setting is off and for unknown or hidden items. |
 
 Besides its routes, the plugin rewrites two responses of Jellyfin's own:
 
@@ -60,6 +64,19 @@ Only the folders of the libraries in `LibraryIds` (*Libraries* on the settings p
 - on the next request once it is older than 30 s, so scripts added without a media change still appear shortly after
 
 Concurrent callers share one build.
+
+## Auto funscripts
+
+With `AutoFunscriptEnabled` on (*Generate an Auto funscript from the audio*), `/Happy/Config` returns `autoFunscriptEnabled: true` and the client adds an `auto` script to every track itself; `/Happy/Funscripts` does not list it.
+
+`AutoFunscriptService` (a singleton) answers `GET /Happy/Items/{itemId}/AutoFunscript` from its cache in Jellyfin's cache folder, `happy/auto-funscripts/<item id>-<hash>.funscript`. The hash covers the media path, size and modification time and the analysis settings (`AutoFunscriptSettings.Fingerprint`), so a changed file or setting misses the cache; writing the new script deletes the item's older ones. On a miss it starts a background task and returns `Pending`:
+
+1. One file is analysed at a time (a `SemaphoreSlim`); concurrent requests for the same file share one task.
+2. Jellyfin's ffmpeg (`IMediaEncoder.EncoderPath`) decodes the first audio stream (`-map 0:a:0`) to mono `f32le` at `AutoFunscriptSettings.SampleRate` (2.5× the band's upper edge, 8–48 kHz) and pipes it into `SpectrumAnalyzer`.
+3. `SpectrumAnalyzer` is a streaming Hann-windowed STFT (~4 Hz bins, one frame per `FrameMs`). Each bin of the band is scaled to its own loudest moment; bins that stay below −60 dBFS are ignored. The per-frame mean is scaled again so the loudest moment is 100, cut to 0 below `MinPower`, and thinned to changes of at least `MinPositionDelta`, keeping every turning point.
+4. The script is written to a temporary file and moved into place, so a request never reads half of it.
+
+Failures (a video without audio, a broken file) are remembered in memory until Jellyfin restarts, so a client polling them does not restart ffmpeg. The analysis is ported from the old Node server (`feature/auto-funscript-from-audio`); unlike there, it no longer renders a debug spectrogram.
 
 ## Build, test, install
 
@@ -137,6 +154,7 @@ The audio tags are written by `node scripts/tag-fixture-audio.mjs`. It keeps the
 | Jellyfin menu link | [Web/WebConfigStartupFilter.cs](../../jellyfin-plugin/Jellyfin.Plugin.Happy/Web/WebConfigStartupFilter.cs), [Web/WebConfigMenuLink.cs](../../jellyfin-plugin/Jellyfin.Plugin.Happy/Web/WebConfigMenuLink.cs) |
 | Endpoints | [Api/HappyController.cs](../../jellyfin-plugin/Jellyfin.Plugin.Happy/Api/HappyController.cs) (config, info, funscripts), [Api/WebController.cs](../../jellyfin-plugin/Jellyfin.Plugin.Happy/Api/WebController.cs) (web app), [Api/DocsController.cs](../../jellyfin-plugin/Jellyfin.Plugin.Happy/Api/DocsController.cs) (docs) |
 | Embedded files | [Web/StaticFileSource.cs](../../jellyfin-plugin/Jellyfin.Plugin.Happy/Web/StaticFileSource.cs) (DLL resources, or `HAPPY_DEV_WEB_ROOT`/`HAPPY_DEV_DOCS_ROOT` in the dev Jellyfin), [Web/ContentTypes.cs](../../jellyfin-plugin/Jellyfin.Plugin.Happy/Web/ContentTypes.cs) |
+| Auto funscripts | [AutoFunscripts/AutoFunscriptService.cs](../../jellyfin-plugin/Jellyfin.Plugin.Happy/AutoFunscripts/AutoFunscriptService.cs), [AutoFunscripts/SpectrumAnalyzer.cs](../../jellyfin-plugin/Jellyfin.Plugin.Happy/AutoFunscripts/SpectrumAnalyzer.cs), [AutoFunscripts/AutoFunscriptSettings.cs](../../jellyfin-plugin/Jellyfin.Plugin.Happy/AutoFunscripts/AutoFunscriptSettings.cs) |
 | Index and matching | [Funscripts/FunscriptIndex.cs](../../jellyfin-plugin/Jellyfin.Plugin.Happy/Funscripts/FunscriptIndex.cs), [Funscripts/FunscriptMatcher.cs](../../jellyfin-plugin/Jellyfin.Plugin.Happy/Funscripts/FunscriptMatcher.cs), [Funscripts/FunscriptPostScanTask.cs](../../jellyfin-plugin/Jellyfin.Plugin.Happy/Funscripts/FunscriptPostScanTask.cs) |
 | Tests | [Jellyfin.Plugin.Happy.Tests/](../../jellyfin-plugin/Jellyfin.Plugin.Happy.Tests/), [test/integration/jellyfin/](../../test/integration/jellyfin/) |
 | Packaging | [build.yaml](../../jellyfin-plugin/build.yaml), [package.sh](../../jellyfin-plugin/package.sh) |

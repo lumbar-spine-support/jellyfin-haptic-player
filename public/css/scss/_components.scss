@@ -293,7 +293,8 @@
 }
 
 // Drawn with the Bootstrap Icons font, so the masked background must be cleared.
-.device-role-icon-generic {
+.device-role-icon-generic,
+.device-role-icon-auto {
   background-color: transparent;
   font-size: 1.1rem;
   line-height: 1.25rem;
