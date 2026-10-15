@@ -9,6 +9,7 @@ import {
     isArtistTag,
     makeArtistTag,
     playlistMatchesActiveTags,
+    reachableTags,
     sortLibraryItems,
     splitActiveTags,
     trackMatchesActiveTags,
@@ -69,6 +70,21 @@ test(`${TAG} countMediaMatches counts per media type and ignores artist entries`
     };
     assert.deepEqual(countMediaMatches(library, []), { albums: 2, tracks: 2, playlists: 1, videos: 1 });
     assert.deepEqual(countMediaMatches(library, ['asmr', 'artist:Nobody']), { albums: 1, tracks: 1, playlists: 0, videos: 1 });
+});
+
+test(`${TAG} reachableTags keeps only tags that still leave a match`, () => {
+    const track = (id: string, tags: string[]) => ({ id, tags, artist: 'A', funscripts: [] }) as never;
+    const library = {
+        tracks: [track('t1', ['Anal', 'asmr']), track('t2', ['no anal', 'asmr']), track('t3', ['sfw'])],
+        videos: [track('v1', ['anal', 'story'])],
+        albums: [{ trackIds: ['t1', 't3'] }],
+        playlists: [],
+    };
+    assert.deepEqual([...reachableTags(library, [])].sort(), ['anal', 'asmr', 'no anal', 'sfw', 'story']);
+    // 'no anal' never appears together with 'anal'; 'sfw' does through the album t1 + t3.
+    assert.deepEqual([...reachableTags(library, ['anal'])].sort(), ['anal', 'asmr', 'sfw', 'story']);
+    assert.deepEqual([...reachableTags(library, ['anal', 'asmr', 'artist:Nobody'])].sort(), ['anal', 'asmr', 'sfw']);
+    assert.deepEqual([...reachableTags(library, ['missing'])], []);
 });
 
 test(`${TAG} splitActiveTags separates artists from plain tags`, () => {

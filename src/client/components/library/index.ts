@@ -16,6 +16,7 @@ import {
     makeArtistTag,
     playlistMatchesActiveTags,
     playlistMatchesHapticFilters,
+    reachableTags,
     sortLibraryItems,
     trackMatchesActiveTags,
     trackMatchesHapticFilters,
@@ -420,7 +421,12 @@ export class Library {
         }
         this.tagViewSelected.classList.toggle('d-none', selected.length === 0);
 
-        for (const tag of filterAvailableTags(this.getAllTags(), this.activeTags, this.searchQuery)) {
+        const library = { tracks: this.tracks, videos: this.videos, albums: this.albums, playlists: this.playlists };
+        // Only offer tags that still leave something to show next to the ones already selected.
+        const reachable = reachableTags(library, this.activeTags);
+        const available = filterAvailableTags(this.getAllTags(), this.activeTags, this.searchQuery)
+            .filter((tag) => reachable.has(tag.toLowerCase()));
+        for (const tag of available) {
             const chip = document.createElement('button');
             chip.type = 'button';
             chip.className = 'tag-chip tag-chip-suggestion';
@@ -430,10 +436,7 @@ export class Library {
             this.tagViewAvailable.appendChild(chip);
         }
 
-        const counts = countMediaMatches(
-            { tracks: this.tracks, videos: this.videos, albums: this.albums, playlists: this.playlists },
-            this.activeTags,
-        );
+        const counts = countMediaMatches(library, this.activeTags);
         this.tagViewCounts?.querySelectorAll<HTMLElement>('[data-count]').forEach((el) => {
             el.textContent = String(counts[el.dataset.count as keyof typeof counts] ?? 0);
         });

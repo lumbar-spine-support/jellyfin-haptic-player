@@ -29,7 +29,12 @@ Playlists are Jellyfin playlists. Create them in Jellyfin, or save a [queue](#qu
 
 ## Tags and descriptions
 
-**Tags** are the keywords HAPPY shows and filters by, like `funny`, `nsfw` or `18+` (not the metadata tags inside a file). HAPPY takes them from Jellyfin's *Tags* plus its *Genres*. Jellyfin never fills *Tags* from metadata embedded in a media file, so how you get tags in depends on the media type:
+- **Tags** are Jellyfin's tags plus genres. Jellyfin never reads its *Tags* field from tags embedded in a media file, so the file-based route is the genre:
+  - **Audio:** give the genre field several values (most taggers can store multiple values in one field; Mp3tag separates them with `\\`). A single text like `sfw; vanilla` stays one genre, unless you enable custom tag delimiters in the library settings.
+  - **Video:** an embedded genre like `sfw; vanilla; funny` is split into separate genres. For Jellyfin's *Tags*, put an NFO file next to the video (`<video name>.nfo` with `<tag>` entries, see below).
+  - Tags can also be set by hand in Jellyfin's metadata editor.
+  - The tags view combines the tags you pick (all must match) and only offers tags that still leave something to show, so a pick like *anal* hides *no anal* when no item carries both. Albums and playlists count with the tags of all their tracks.
+- **Descriptions** are Jellyfin's overview of the item. For audio, put the text into the file's comment tag. Markdown is rendered, so you can use [links](https://github.com), **bold text** and more.
 
 - **Video:** use an NFO file (see [Videos: NFO files](#videos-nfo-files)).
 - **Audio** (Books library): put each tag as a separate genre value in the file (see [Audio: file tags](#audio-file-tags)).
