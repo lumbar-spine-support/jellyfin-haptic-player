@@ -422,8 +422,10 @@ body.blur-content media-container {
   min-width: 2.5rem;
 }
 
-// Mobile: media, haptics and sort share the row in equal parts.
+// Mobile: the media, haptics and sort-field dropdowns share the row in equal
+// parts; the icon-only buttons (favorites, sort direction) keep one fixed width.
 @media (max-width: 767.98px) {
+  $icon-btn-width: 3rem;
 
   .library-filter-group>*,
   .library-sort-field {
@@ -431,9 +433,16 @@ body.blur-content media-container {
     min-width: 0;
   }
 
-  // A single icon; it keeps its size while the dropdowns share the rest.
-  .library-filter-group>.library-favorites-toggle {
-    flex: 0 0 auto;
+  // .btn outranks Bootstrap's `.btn-group > .btn { flex: 1 1 auto }`.
+  .library-filter-group .btn.library-icon-btn {
+    flex: 0 0 $icon-btn-width;
+    width: $icon-btn-width;
+  }
+
+  // Its basis is the direction button, so the sort field gets the same share
+  // of the remaining space as the other dropdowns.
+  .library-filter-group>.library-sort-group {
+    flex: 1 1 $icon-btn-width;
   }
 
   .library-filter-group .dropdown-toggle {
