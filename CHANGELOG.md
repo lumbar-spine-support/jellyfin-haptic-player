@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.3.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.2.1...v1.3.0) (2026-10-16)
+
+
+### Features
+
+* enhance mobile layout for filter and sort buttons with fixed widths ([27f7dd5](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/27f7dd53d67256cf95ae9d36766c78c4204813f7))
+* generate an Auto funscript from the audio of every media file ([#47](https://github.com/lumbar-spine-support/jellyfin-haptic-player/issues/47)) ([6ac28f1](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/6ac28f1232deb25afa0b1172f3c1976399f2ba6f))
+* **library:** limit heading levels in track descriptions ([6c2f006](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/6c2f0060a0a3db24704df2748879dd27b923c482))
+* **library:** only offer tags that still match in the tags view ([#48](https://github.com/lumbar-spine-support/jellyfin-haptic-player/issues/48)) ([6d48b68](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/6d48b689fa9bcdd3a5161066e341824a10eca93d))
+* **library:** show the card's media type as its filter icon ([89f3015](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/89f30152ecb1628ab2dd21f2a522aa853e0237ce))
+
+
+### Bug Fixes
+
+* **docs:** update tags and descriptions section for clarity and accuracy ([1f6af85](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/1f6af85618e4a21024c43c2e86eed2daf226ace5))
+* update button group structure for sorting functionality ([ed5b84b](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/ed5b84bea3455733f1655204f0a531027abb799d))
+
 ## [1.2.1](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.2.0...v1.2.1) (2026-10-14)
 
 
