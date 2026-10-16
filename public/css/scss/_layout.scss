@@ -451,3 +451,25 @@ body.blur-content media-container {
     overflow: hidden;
   }
 }
+// Grid ↔ list switch (Library.morphView): an item's art morphs between its card and its row.
+[data-morph='art'] {
+  view-transition-class: morph-art;
+}
+
+::view-transition-group(*) {
+  animation-duration: 300ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+// Snapshots include ink overflow (e.g. the blur-content halo that the card normally clips): clip it to the box.
+::view-transition-group(.morph-art) {
+  overflow: clip;
+  border-radius: var(--bs-border-radius); // Matches the art's .rounded
+}
+
+// Cards may be landscape or portrait while thumbnails are square: crop like the art does.
+::view-transition-old(.morph-art),
+::view-transition-new(.morph-art) {
+  block-size: 100%;
+  object-fit: cover;
+}

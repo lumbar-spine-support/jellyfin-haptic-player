@@ -38,6 +38,8 @@ type LibraryViewMode = 'grid' | 'list' | 'tags';
 
 /** A single media entry, rendered as a card in grid view and a row in list view. */
 interface LibraryRow extends SortableLibraryItem {
+    /** Pairs an item's card with its row so a view switch can morph one into the other. */
+    morphKey: string;
     buildCard(): HTMLElement;
     buildRow(): HTMLElement;
 }
@@ -190,6 +192,7 @@ export class Library {
 
         const rows: LibraryRow[] = [
             ...visibleAlbums.map((album) => ({
+                morphKey: `album-${album.id}`,
                 typeLabel: 'Album',
                 title: album.title,
                 artist: album.artist ?? '',
@@ -199,6 +202,7 @@ export class Library {
                 buildRow: () => this.createAlbumRow(album, tracksById),
             })),
             ...visiblePlaylists.map((playlist) => ({
+                morphKey: `playlist-${playlist.id}`,
                 typeLabel: 'Playlist',
                 title: playlist.name,
                 artist: this.playlistArtists(playlist),
@@ -208,6 +212,7 @@ export class Library {
                 buildRow: () => this.createPlaylistRow(playlist, tracksById),
             })),
             ...[...tracks, ...videos].map((track) => ({
+                morphKey: `track-${track.id}`,
                 typeLabel: track.type === 'video' ? 'Video' : 'Audio',
                 title: track.title,
                 artist: track.artist,
@@ -219,8 +224,66 @@ export class Library {
         ];
 
         const sorted = sortLibraryItems(rows, this.sortField, this.sortAsc);
-        this.appendInBatches(this.grid, sorted.map((row) => row.buildCard));
-        this.appendInBatches(this.list, sorted.map((row) => row.buildRow));
+        const keyed = (key: string, build: () => HTMLElement) => (): HTMLElement => {
+            const el = build();
+            el.dataset.morphKey = key;
+            return el;
+        };
+        this.appendInBatches(this.grid, sorted.map((row) => keyed(row.morphKey, row.buildCard)));
+        this.appendInBatches(this.list, sorted.map((row) => keyed(row.morphKey, row.buildRow)));
+    }
+
+    /**
+     * Runs a view switch as a View Transition: the art of each item visible in the outgoing view
+     * morphs into the same item's art in the incoming one, and everything else
+     * cross-fades. Without View Transitions support, or with reduced motion, the switch is instant.
+     */
+    private morphView(update: () => void): void {
+        if (typeof document.startViewTransition !== 'function'
+            || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            update();
+            return;
+        }
+        const container = (): HTMLElement | null =>
+            this.currentViewMode === 'grid' ? this.grid : this.currentViewMode === 'list' ? this.list : null;
+        const items = (): NodeListOf<HTMLElement> | [] =>
+            container()?.querySelectorAll<HTMLElement>(':scope > [data-morph-key]') ?? [];
+        let named: HTMLElement[] = [];
+        const setNames = (item: HTMLElement, index: number): void => {
+            for (const part of item.querySelectorAll<HTMLElement>('[data-morph]')) {
+                part.style.viewTransitionName = `morph-${part.dataset.morph}-${index}`;
+                named.push(part);
+            }
+        };
+        const clearNames = (): void => {
+            for (const part of named) part.style.viewTransitionName = '';
+            named = [];
+        };
+
+        // Name only on-screen items: every named element costs a snapshot, and names must be unique.
+        const names = new Map<string, number>();
+        let anchor: { key: string; top: number } | null = null;
+        for (const item of items()) {
+            const rect = item.getBoundingClientRect();
+            if (rect.bottom <= 0 || rect.top >= window.innerHeight) continue;
+            const key = item.dataset.morphKey ?? '';
+            anchor ??= { key, top: rect.top };
+            setNames(item, names.size);
+            names.set(key, names.size);
+        }
+
+        const transition = document.startViewTransition(() => {
+            clearNames();
+            update();
+            for (const item of items()) {
+                const key = item.dataset.morphKey ?? '';
+                // Keep the first visible item where it was so the morph stays on screen.
+                if (key === anchor?.key) window.scrollBy(0, item.getBoundingClientRect().top - anchor.top);
+                const index = names.get(key);
+                if (index !== undefined) setNames(item, index);
+            }
+        });
+        void transition.finished.finally(clearNames);
     }
 
     private appendInBatches(container: HTMLElement, builders: Array<() => HTMLElement>): void {
@@ -273,18 +336,19 @@ export class Library {
             this.renderActiveTags();
         };
 
-        this.btnGrid?.addEventListener('click', () => {
-            applyView('grid');
-            if (!this.callbacks.isLibraryRoute()) this.callbacks.navigateTo(buildUrl('library'));
-        });
-        this.btnList?.addEventListener('click', () => {
-            applyView('list');
-            if (!this.callbacks.isLibraryRoute()) this.callbacks.navigateTo(buildUrl('library'));
-        });
-        this.btnTags?.addEventListener('click', () => {
-            applyView('tags');
-            if (!this.callbacks.isLibraryRoute()) this.callbacks.navigateTo(buildUrl('library'));
-        });
+        const switchView = (mode: LibraryViewMode): void => {
+            // Morph only on the library itself; the transition runs the update after a frame, so off
+            // the library the switch must happen before navigating there.
+            if (this.callbacks.isLibraryRoute()) {
+                if (mode !== this.currentViewMode) this.morphView(() => applyView(mode));
+                return;
+            }
+            applyView(mode);
+            this.callbacks.navigateTo(buildUrl('library'));
+        };
+        this.btnGrid?.addEventListener('click', () => switchView('grid'));
+        this.btnList?.addEventListener('click', () => switchView('list'));
+        this.btnTags?.addEventListener('click', () => switchView('tags'));
         this.navbarHomeLink?.addEventListener('click', (event) => {
             event.preventDefault();
             this.callbacks.navigateTo(buildUrl('library'));

@@ -172,6 +172,8 @@ Favorites are Jellyfin's per-user flag (`TrackInfo.isFavorite`, `PlaylistInfo.is
 
 Grid cards start with `CARD_SQUARE_GRID_CLASSES`. When an album or track card's artwork loads, `classifyArtAspect()` (`client/utils/artAspect.ts`) checks its natural size. Art at a ratio of 1.2 or wider switches the card to `CARD_LANDSCAPE_GRID_CLASSES` with `.track-card-landscape`, which shows the image at 2:1. Art at a ratio of 1/1.2 or taller adds `.track-card-portrait`, which spans two grid rows. `#track-grid` is a CSS grid (2/4/6 columns at xs/sm/lg) with `grid-auto-flow: dense`, so smaller cards fill gaps left by wide or tall ones. Playlist cards and the fallback art stay square. If `cardViewForceSquareArtwork` is on, every card stays square.
 
+Switching views on the library route goes through `Library.morphView()`, a [View Transition](https://developer.mozilla.org/docs/Web/API/View_Transition_API). `render()` stamps each card and row with `data-morph-key` (`album-`, `playlist-` or `track-` plus the id), and the templates mark the art with `data-morph`. Before the switch, only items on screen in the outgoing view get a `view-transition-name` (`morph-art-<n>`); after `applyView()` the items with the same keys in the incoming view get the same names, so their art morphs and everything else cross-fades. The first visible item is kept at the same scroll offset. Names are cleared when the transition ends. Without `document.startViewTransition`, or with `prefers-reduced-motion`, the switch is instant. The CSS (`view-transition-class` `morph-art`) is at the end of `_layout.scss`.
+
 ## The two-player model
 
 There are two `<video-player>` elements. `PlaybackSession` decides which one does what:
