@@ -1,12 +1,87 @@
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+#
+# Commit prefixes follow Conventional Commits for release-please: runtime dependency bumps are
+# `fix(deps)` so they ship in the next release, dev-only bumps are `chore(deps)`.
 
 version: 2
 updates:
-  - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/" # Location of package manifests
-    schedule:
-      interval: "weekly"
-  - package-ecosystem: "docker"
+  # HAPPY client, build and test tooling (bundled into the plugin).
+  - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
+    commit-message:
+      prefix: "fix"
+      prefix-development: "chore"
+      include: "scope"
+    groups:
+      npm-minor-patch:
+        update-types: ["minor", "patch"]
+
+  # DG-Lab relay (own lockfile, own image and release component).
+  - package-ecosystem: "npm"
+    directory: "/dglab-relay"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "fix"
+      prefix-development: "chore"
+      include: "scope"
+    groups:
+      dglab-relay-minor-patch:
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "docker"
+    directory: "/dglab-relay"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "fix"
+      include: "scope"
+
+  # Jellyfin plugin. Jellyfin.Controller/Jellyfin.Model set the supported server version
+  # (targetAbi in build.yaml, the dev Jellyfin image), so only take patch releases automatically.
+  - package-ecosystem: "nuget"
+    directory: "/jellyfin-plugin"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    ignore:
+      - dependency-name: "Jellyfin.*"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+    groups:
+      nuget-minor-patch:
+        update-types: ["minor", "patch"]
+
+  # Local dev Jellyfin; keep its minor version in step with Jellyfin.Controller.
+  - package-ecosystem: "docker-compose"
+    directory: "/dev/jellyfin"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    ignore:
+      - dependency-name: "jellyfin/jellyfin"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    groups:
+      github-actions:
+        patterns: ["*"]
+
+  - package-ecosystem: "devcontainers"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
