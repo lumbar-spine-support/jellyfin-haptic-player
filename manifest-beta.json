@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.4.0.1",
+        "changelog": "Beta build 1.4.0.1 from dev (commit e876e5d). Not released yet, may be unstable.",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.4.0.1.zip",
+        "checksum": "42a392b6686745f9da5cc62b0cce4a2f",
+        "timestamp": "2026-10-16T14:41:18Z"
+      },
+      {
         "version": "1.4.0.0",
         "changelog": "## [1.4.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.3.0...v1.4.0) (2026-10-16)\n\n\n### Features\n\n* **auth:** always require HAPPY's own Jellyfin sign-in ([3d04f63](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/3d04f63f175f0e0e7027a9e5f3146103eb900f0a))\n* **library:** morph cards into list rows when switching views. ([49d6386](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/49d638693d1bde3585ddd0c4538bbca9228e5bf6))\n\nInstall or update HAPPY through its Jellyfin plugin repository: https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/jellyfin-plugin-repository/manifest.json (Dashboard → Plugins → Repositories), or download `happy_1.4.0.0.zip` below.",
         "targetAbi": "12.1.0.0",
