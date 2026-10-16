@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.3.0.4",
+        "changelog": "Beta build 1.3.0.4 from dev (commit 3d04f63). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- feat(auth): always require HAPPY's own Jellyfin sign-in Any Jellyfin user can be used to log into HAPPY, but the user needs to have access to the libraries shared with HAPPY to be able to view the content. Seperating Jellyfin login from HAPPY login was done to enable having different users logged into HAPPY and Jellyfin on the same device. That way, you can have a user logged into Jellyfin who only has access to SFW content and a seperate user logged into HAPPY who only has access to NSFW content. (3d04f63)",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.3.0.4.zip",
+        "checksum": "45ef796c19e375e8534d9d0d6a23ddea",
+        "timestamp": "2026-10-16T11:15:39Z"
+      },
+      {
         "version": "1.3.0.3",
         "changelog": "Beta build 1.3.0.3 from dev (commit 35af84e). Not released yet, may be unstable.",
         "targetAbi": "12.1.0.0",
