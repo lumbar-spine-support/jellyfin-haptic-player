@@ -10,6 +10,17 @@ html {
   overflow-y: scroll; // Always allow scrolling
 }
 
+// Bootstrap locks page scroll behind an open offcanvas with `overflow: hidden` on <body>, but the
+// html rule above keeps the viewport scrollable, so lock it here too (its scrollbar padding still applies).
+html:has(.offcanvas.showing, .offcanvas.show) {
+  overflow: hidden;
+}
+
+// Don't chain scrolling past either end of the settings panel to the page.
+.offcanvas-body {
+  overscroll-behavior: contain;
+}
+
 body {
   padding-bottom: var(--app-player-bar-height);
 }
