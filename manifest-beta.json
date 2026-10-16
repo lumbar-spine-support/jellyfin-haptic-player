@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.3.0.1",
+        "changelog": "Beta build 1.3.0.1 from dev (commit 86f194a). Not released yet, may be unstable.",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.3.0.1.zip",
+        "checksum": "e6e0e5e924dcf2b06af4a3feb120d0a2",
+        "timestamp": "2026-10-16T06:10:48Z"
+      },
+      {
         "version": "1.3.0.0",
         "changelog": "## [1.3.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.2.1...v1.3.0) (2026-10-16)\n\n\n### Features\n\n* enhance mobile layout for filter and sort buttons with fixed widths ([27f7dd5](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/27f7dd53d67256cf95ae9d36766c78c4204813f7))\n* generate an Auto funscript from the audio of every media file ([#47](https://github.com/lumbar-spine-support/jellyfin-haptic-player/issues/47)) ([6ac28f1](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/6ac28f1232deb25afa0b1172f3c1976399f2ba6f))\n* **library:** limit heading levels in track descriptions ([6c2f006](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/6c2f0060a0a3db24704df2748879dd27b923c482))\n* **library:** only offer tags that still match in the tags view ([#48](https://github.com/lumbar-spine-support/jellyfin-haptic-player/issues/48)) ([6d48b68](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/6d48b689fa9bcdd3a5161066e341824a10eca93d))\n* **library:** show the card's media type as its filter icon ([89f3015](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/89f30152ecb1628ab2dd21f2a522aa853e0237ce))\n\n\n### Bug Fixes\n\n* **docs:** update tags and descriptions section for clarity and accuracy ([1f6af85](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/1f6af85618e4a21024c43c2e86eed2daf226ace5))\n* update button group structure for sorting functionality ([ed5b84b](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/ed5b84bea3455733f1655204f0a531027abb799d))\n\nInstall or update HAPPY through its Jellyfin plugin repository: https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/jellyfin-plugin-repository/manifest.json (Dashboard → Plugins → Repositories), or download `happy_1.3.0.0.zip` below.",
         "targetAbi": "12.1.0.0",
