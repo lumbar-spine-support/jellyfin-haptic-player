@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.3.0...v1.4.0) (2026-10-16)
+
+
+### Features
+
+* **auth:** always require HAPPY's own Jellyfin sign-in ([3d04f63](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/3d04f63f175f0e0e7027a9e5f3146103eb900f0a))
+* **library:** morph cards into list rows when switching views. ([49d6386](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/49d638693d1bde3585ddd0c4538bbca9228e5bf6))
+
 ## [1.3.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.2.1...v1.3.0) (2026-10-16)
 
 
