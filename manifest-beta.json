@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.4.0.2",
+        "changelog": "Beta build 1.4.0.2 from dev (commit 4858101). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- fix(settings): stop the settings panel from scrolling the page on mobile (4858101)",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.4.0.2.zip",
+        "checksum": "480e639d7026a346699c0f571effc098",
+        "timestamp": "2026-10-16T14:49:36Z"
+      },
+      {
         "version": "1.4.0.1",
         "changelog": "Beta build 1.4.0.1 from dev (commit e876e5d). Not released yet, may be unstable.",
         "targetAbi": "12.1.0.0",
