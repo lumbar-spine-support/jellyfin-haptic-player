@@ -51,7 +51,7 @@ The plugin is built for one Jellyfin version (currently 12.1). After a Jellyfin 
 
 Open `<your Jellyfin address>/Happy/Web/` in your browser, for example `http://192.168.1.10:8096/Happy/Web/` or `https://jellyfin.example.com/Happy/Web/`. If Jellyfin runs under a base URL such as `/jellyfin`, keep it: `https://example.com/jellyfin/Happy/Web/`. The plugin's settings page (*Dashboard → Plugins → HAPPY*) also has an *Open HAPPY* button.
 
-Jellyfin's web client also lists **HAPPY** in its menu for every user: in the side menu and in the bar above the home page. It opens HAPPY in a new tab. If you are signed in to Jellyfin's web client in that browser, HAPPY uses that sign-in; otherwise sign in with your Jellyfin user name and password.
+Jellyfin's web client also lists **HAPPY** in its menu for every user: in the side menu and in the bar above the home page. It opens HAPPY in a new tab. Sign in there once per browser with a Jellyfin user name and password; it does not have to be the user signed in to Jellyfin's web client.
 
 The settings panel's *Back to Jellyfin* button returns to Jellyfin's web client. Jellyfin's apps for TVs and phones don't show the menu entry; open HAPPY in a browser there. Playback, VR and haptics always happen in HAPPY's own player. HAPPY shows the libraries that user can see in Jellyfin. HAPPY has no accounts of its own: who may see what is decided by Jellyfin's users and their library access, see [Authentication](authentication.md).
 

@@ -14,13 +14,12 @@ let api: typeof import('../../src/client/api');
 type Call = { path: string; init?: RequestInit };
 
 /** A stand-in for the signed-in connection: answers `request()` from `routes` and records each call. */
-function fakeConnection(routes: Record<string, () => Response> = {}, borrowed = false) {
+function fakeConnection(routes: Record<string, () => Response> = {}) {
     const calls: Call[] = [];
     let signedOut = 0;
     const connection = {
         serverUrl: SERVER,
         userId: 'user 1',
-        borrowed,
         endpoint: { serverUrl: SERVER, token: 'tok' },
         async request(path: string, init?: RequestInit): Promise<Response> {
             calls.push({ path, init });
@@ -219,7 +218,7 @@ test(`${TAG} storyboardVttUrl only for videos with trickplay, cached per track`,
     assert.match(vtt, /\/Trickplay\/320\/1\.jpg/, 'five tiles need a second 2x2 sheet');
 });
 
-test(`${TAG} logout signs out and reloads an own session`, async () => {
+test(`${TAG} logout signs out and reloads`, async () => {
     const fake = fakeConnection();
     api.useJellyfin(fake.connection, OPTIONS);
     const actions: string[] = [];
@@ -227,16 +226,6 @@ test(`${TAG} logout signs out and reloads an own session`, async () => {
     await api.logout();
     assert.equal(fake.signedOut(), 1);
     assert.deepEqual(actions, ['reload']);
-});
-
-test(`${TAG} logout of a borrowed session returns to Jellyfin's web client`, async () => {
-    const fake = fakeConnection({}, true);
-    api.useJellyfin(fake.connection, OPTIONS);
-    const actions: string[] = [];
-    (globalThis as any).window = { location: { reload: () => actions.push('reload'), assign: (url: string) => actions.push(`assign:${url}`) } };
-    await api.logout();
-    assert.equal(fake.signedOut(), 1);
-    assert.deepEqual(actions, [`assign:${api.JELLYFIN_WEB_URL}`]);
 });
 
 test(`${TAG} playlist collage falls back to the first cover without a 2D context`, async () => {

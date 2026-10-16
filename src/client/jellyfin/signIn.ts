@@ -4,10 +4,11 @@ import type { JellyfinConnection } from './connection';
 
 /**
  * Shows the Jellyfin sign-in card over the app and resolves once the connection holds a valid
- * session. Resolves immediately when already signed in.
+ * session. Resolves immediately when already signed in. HAPPY keeps its own session and never
+ * takes over Jellyfin's web client's, so HAPPY can use a different Jellyfin user.
  */
 export async function ensureSignedIn(connection: JellyfinConnection): Promise<void> {
-    if (connection.signedIn || await connection.adoptJellyfinWebSession()) return;
+    if (connection.signedIn) return;
 
     const host = document.createElement('div');
     host.innerHTML = renderTemplate(signInTemplate, { server: connection.serverUrl });

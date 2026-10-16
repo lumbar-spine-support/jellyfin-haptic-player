@@ -6,7 +6,6 @@ const TAG = '[client:jellyfin-connection]';
 const SERVER = 'https://jf.example.com';
 const SESSION_KEY = 'happy-jellyfin-session';
 const DEVICE_ID_KEY = 'happy-jellyfin-device-id';
-const WEB_CREDENTIALS_KEY = 'jellyfin_credentials';
 const FIREFOX_UA = 'Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0';
 
 /** In-memory localStorage; `broken` makes every access throw, like blocked storage. */
@@ -93,7 +92,6 @@ test(`${TAG} randomDeviceId is 32 hex characters and differs each time`, () => {
 test(`${TAG} starts signed out without a stored session`, () => {
     const conn = new JellyfinConnection(SERVER, noop);
     assert.equal(conn.signedIn, false);
-    assert.equal(conn.borrowed, false);
     assert.equal(conn.userId, '');
     assert.equal(conn.userName, '');
     assert.deepEqual(conn.endpoint, { serverUrl: SERVER, token: '' });
@@ -103,7 +101,6 @@ test(`${TAG} restores the stored session for the same server`, () => {
     storeSession({ serverUrl: SERVER, token: 'tok', userId: 'u1', userName: 'Alice' });
     const conn = new JellyfinConnection(SERVER, noop);
     assert.equal(conn.signedIn, true);
-    assert.equal(conn.borrowed, false);
     assert.equal(conn.userId, 'u1');
     assert.equal(conn.userName, 'Alice');
     assert.deepEqual(conn.endpoint, { serverUrl: SERVER, token: 'tok' });
@@ -148,7 +145,6 @@ test(`${TAG} signIn posts the credentials and stores the session`, async () => {
     assert.equal(conn.signedIn, true);
     assert.equal(conn.userId, 'u1');
     assert.equal(conn.userName, 'Alice');
-    assert.equal(conn.borrowed, false);
     assert.deepEqual(JSON.parse(storage.data.get(SESSION_KEY)!), { serverUrl: SERVER, token: 'tok', userId: 'u1', userName: 'Alice' });
     // A new connection (page reload) picks the session up again.
     assert.equal(new JellyfinConnection(SERVER, noop).userName, 'Alice');
@@ -233,14 +229,13 @@ test(`${TAG} signOut without a session sends nothing`, async () => {
     assert.equal(calls.length, 0);
 });
 
-test(`${TAG} signOut of a borrowed session leaves Jellyfin's web client signed in`, async () => {
-    storeSession({ serverUrl: SERVER, token: 'tok', userId: 'u1', userName: 'Alice', borrowed: true });
+test(`${TAG} a session taken over from Jellyfin's web client is forgotten, not ended`, async () => {
+    storeSession({ serverUrl: SERVER, token: 'webtok', userId: 'u1', userName: 'Alice', borrowed: true });
     const conn = new JellyfinConnection(SERVER, noop);
-    assert.equal(conn.borrowed, true);
-    await conn.signOut();
-    assert.equal(calls.length, 0);
     assert.equal(conn.signedIn, false);
     assert.equal(storage.data.has(SESSION_KEY), false);
+    await conn.signOut();
+    assert.equal(calls.length, 0);
 });
 
 test(`${TAG} request sends the token, keeps other headers and returns the response`, async () => {
@@ -271,72 +266,4 @@ test(`${TAG} a rejected token signs out and asks to sign in again`, async () => 
     // Signed out already: a further 401 does not trigger the sign-in again.
     await conn.request('/Items');
     assert.equal(unauthorized, 1);
-});
-
-test(`${TAG} adopting Jellyfin web's sign-in`, async (t) => {
-    const webCredentials = JSON.stringify({ Servers: [{ ManualAddress: SERVER, AccessToken: 'webtok', UserId: 'web-user' }] });
-
-    await t.test('is a no-op when already signed in', async () => {
-        storeSession({ serverUrl: SERVER, token: 'tok', userId: 'u1', userName: 'Alice' });
-        storage.data.set(WEB_CREDENTIALS_KEY, webCredentials);
-        const conn = new JellyfinConnection(SERVER, noop);
-        assert.equal(await conn.adoptJellyfinWebSession(), true);
-        assert.equal(calls.length, 0);
-        assert.equal(conn.borrowed, false);
-        storage.data.clear();
-    });
-
-    await t.test('fails without Jellyfin web credentials', async () => {
-        const conn = new JellyfinConnection(SERVER, noop);
-        assert.equal(await conn.adoptJellyfinWebSession(), false);
-        assert.equal(calls.length, 0);
-        assert.equal(conn.signedIn, false);
-    });
-
-    await t.test('checks the token with /Users/Me and stores a borrowed session', async () => {
-        storage.data.set(WEB_CREDENTIALS_KEY, webCredentials);
-        respond = () => json({ Id: 'me-id', Name: 'Bob' });
-        const conn = new JellyfinConnection(SERVER, noop);
-        assert.equal(await conn.adoptJellyfinWebSession(), true);
-        const call = calls[calls.length - 1];
-        assert.equal(call.url, `${SERVER}/Users/Me`);
-        assert.ok(authHeader(call).endsWith('Token="webtok"'));
-        assert.equal(conn.signedIn, true);
-        assert.equal(conn.borrowed, true);
-        assert.equal(conn.userId, 'me-id');
-        assert.equal(conn.userName, 'Bob');
-        assert.deepEqual(conn.endpoint, { serverUrl: SERVER, token: 'webtok' });
-        assert.deepEqual(JSON.parse(storage.data.get(SESSION_KEY)!),
-            { serverUrl: SERVER, token: 'webtok', userId: 'me-id', userName: 'Bob', borrowed: true });
-        storage.data.delete(SESSION_KEY);
-    });
-
-    await t.test('falls back to the stored user id when /Users/Me omits it', async () => {
-        storage.data.set(WEB_CREDENTIALS_KEY, webCredentials);
-        respond = () => json({});
-        const conn = new JellyfinConnection(SERVER, noop);
-        assert.equal(await conn.adoptJellyfinWebSession(), true);
-        assert.equal(conn.userId, 'web-user');
-        assert.equal(conn.userName, '');
-        storage.data.delete(SESSION_KEY);
-    });
-
-    await t.test('fails when Jellyfin rejects the token', async () => {
-        storage.data.set(WEB_CREDENTIALS_KEY, webCredentials);
-        respond = () => new Response('', { status: 401 });
-        const conn = new JellyfinConnection(SERVER, noop);
-        assert.equal(await conn.adoptJellyfinWebSession(), false);
-        assert.equal(conn.signedIn, false);
-        assert.equal(storage.data.has(SESSION_KEY), false);
-    });
-
-    await t.test('fails when Jellyfin is unreachable or answers garbage', async () => {
-        storage.data.set(WEB_CREDENTIALS_KEY, webCredentials);
-        const conn = new JellyfinConnection(SERVER, noop);
-        respond = () => { throw new TypeError('offline'); };
-        assert.equal(await conn.adoptJellyfinWebSession(), false);
-        respond = () => new Response('<html>', { status: 200 });
-        assert.equal(await conn.adoptJellyfinWebSession(), false);
-        assert.equal(conn.signedIn, false);
-    });
 });

@@ -50,7 +50,8 @@ sequenceDiagram
 | `/Happy/Config` fails | The client keeps its built-in defaults and logs a warning |
 | Token rejected later (401) | `JellyfinConnection.request()` forgets the session and reloads; the sign-in card appears again |
 | Session ended in Jellyfin (*Dashboard → Devices*) or user removed | The next request gets a 401, see above |
-| Logout | The lock button runs `logout()` → `POST /Sessions/Logout` to Jellyfin, then a reload, which shows the card |
+| Logout | The sign-out button runs `logout()` → `POST /Sessions/Logout` to Jellyfin, then a reload, which shows the card |
+| Signed in to Jellyfin's web client | Not used: HAPPY always keeps its own session, so it can run as a different Jellyfin user. A stored session from older versions that took over the web client's sign-in (`borrowed: true`) is dropped on load without `/Sessions/Logout`, which would end the web client's session |
 | Chromecast / AirPlay | The stream URL carries the Jellyfin token as `ApiKey`, so receivers need no sign-in of their own |
 | Device list | `DeviceId` is a random id (`crypto.getRandomValues`, which also works on plain-HTTP origins) stored once per browser (`happy-jellyfin-device-id`), so Jellyfin lists one device per browser |
 

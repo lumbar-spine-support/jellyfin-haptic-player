@@ -6,15 +6,13 @@ HAPPY has no accounts or passwords of its own. Your media, artwork and funscript
 
 ## Signing in
 
-If you are already signed in to Jellyfin's web client in the same browser (for example when you open HAPPY from Jellyfin's menu), HAPPY uses that sign-in and asks for nothing. Otherwise, the first time you open HAPPY in a browser it shows a sign-in card for the Jellyfin server HAPPY runs on. After signing in you see exactly the libraries that Jellyfin user can access, and the HAPPY plugin only hands out funscripts of those items.
+The first time you open HAPPY in a browser it shows a sign-in card for the Jellyfin server HAPPY runs on. HAPPY keeps its own sign-in, even when you open it from Jellyfin's menu while signed in to Jellyfin's web client. So HAPPY can use a different Jellyfin user than the web client: for example a separate user that is the only one with access to your haptic libraries, which keeps them out of your everyday Jellyfin account. After signing in you see exactly the libraries that Jellyfin user can access, and the HAPPY plugin only hands out funscripts of those items.
 
 The sign-in is remembered in the browser. Each browser shows up once in Jellyfin under *Dashboard → Devices*, where you can also end its session. If Jellyfin rejects the stored session later (because it was ended there, or the user was removed), HAPPY shows the sign-in card again.
 
 ## Signing out
 
-The lock button in the header (its tooltip names the signed-in user) ends the session in Jellyfin and returns to the sign-in card.
-
-If HAPPY uses the sign-in of Jellyfin's web client, the lock button is *Leave HAPPY* instead. It goes back to Jellyfin's web client, which stays signed in. To sign out completely, sign out in Jellyfin.
+The sign-out button in the header (its tooltip names the signed-in user) ends HAPPY's session in Jellyfin and returns to the sign-in card. Jellyfin's web client stays signed in, and signing out there does not sign out HAPPY.
 
 ## Controlling access
 
