@@ -26,12 +26,12 @@
     "test:plugin": "node scripts/dev-jellyfin.mjs test-plugin"
   },
   "dependencies": {
-    "@videojs/html": "^10.0.1",
+    "@videojs/html": "^10.1.0",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.13.2",
     "buttplug": "^5.0.2",
     "dglab-kit": "^1.0.5",
-    "markdown-it": "^15.0.2",
+    "markdown-it": "^15.0.3",
     "qrcode": "^1.5.4"
   },
   "devDependencies": {
@@ -40,9 +40,9 @@
     "@types/qrcode": "^1.5.6",
     "@types/ws": "^8.18.2",
     "esbuild": "^0.28.2",
-    "js-yaml": "^5.4.3",
-    "playwright": "^1.64.0",
-    "sass": "^1.105.1",
+    "js-yaml": "^5.5.0",
+    "playwright": "^1.64.1",
+    "sass": "^1.105.2",
     "source-map-js": ">=1.2.2",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2",
