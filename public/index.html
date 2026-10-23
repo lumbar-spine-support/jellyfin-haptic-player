@@ -117,26 +117,7 @@
         <div class="spinner-border mb-2" role="status"></div>
         <div>Loading library…</div>
       </div>
-      <table id="track-table" class="table table-dark table-hover d-none">
-        <thead class="track-table-head">
-          <tr>
-            <th scope="col" colspan="2" class="sort-header text-uppercase text-center text-md-start"
-              data-sort-field="title">Title
-              <span class="sort-indicator"></span>
-            </th>
-            <th scope="col" class="sort-header text-uppercase d-none d-md-table-cell" data-sort-field="artist">Artist
-              <span class="sort-indicator"></span>
-            </th>
-            <th scope="col" class="sort-header text-uppercase d-none d-md-table-cell" data-sort-field="type">
-              Type <span class="sort-indicator"></span></th>
-            <th scope="col" class="sort-header text-uppercase d-none d-md-table-cell" data-sort-field="year">
-              Year <span class="sort-indicator"></span></th>
-            <th scope="col" class="text-uppercase d-none d-md-table-cell">Scripts</th>
-            <th scope="col" class="sort-header text-uppercase d-none d-md-table-cell" data-sort-field="duration">
-              Duration <span class="sort-indicator"></span></th>
-            <th scope="col" style="width:1%"><span class="visually-hidden">Favorite</span></th>
-          </tr>
-        </thead>
+      <table id="track-table" class="table table-dark table-hover media-table d-none">
         <tbody id="track-list"></tbody>
       </table>
       <div id="track-grid" class="row g-3"></div>
@@ -151,17 +132,7 @@
                 style="width:200px;height:200px;object-fit:cover;display:none;" />
             </div>
           </div>
-          <table class="table table-dark table-hover">
-            <thead>
-              <tr>
-                <th scope="col" style="width:2rem">#</th>
-                <th scope="col">Title</th>
-                <th scope="col" class="d-none d-md-table-cell">Artist</th>
-                <th scope="col" class="d-none d-md-table-cell">Album</th>
-                <th scope="col" class="d-none d-md-table-cell">Haptics</th>
-                <th scope="col"><span class="visually-hidden">Queue</span></th>
-              </tr>
-            </thead>
+          <table class="table table-dark table-hover media-table">
             <tbody id="detail-list"></tbody>
           </table>
           <div class="detail-actions mt-3">

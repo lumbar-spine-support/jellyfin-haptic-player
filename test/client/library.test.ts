@@ -19,6 +19,7 @@ nodeRequire.extensions['.html'] = (module: NodeModule, filename: string) => {
 };
 
 let Library: typeof import('../../src/client/components/library').Library;
+let createTrackRow: typeof import('../../src/client/components/library/mediaRows').createTrackRow;
 
 const savedGlobals = Object.fromEntries(
     ['document', 'window', 'history', 'localStorage'].map((key) => [key, Object.getOwnPropertyDescriptor(globalThis, key)]),
@@ -33,6 +34,7 @@ test.before(async () => {
         location: { href: 'http://localhost/' },
     };
     ({ Library } = await import('../../src/client/components/library'));
+    ({ createTrackRow } = await import('../../src/client/components/library/mediaRows'));
 });
 
 test.after(() => {
@@ -427,7 +429,7 @@ test(`${TAG} rows end with the queue menu, after a favorite heart for tracks and
     const library = new Library(makeCallbacks());
     const tracksById = new Map<string, TrackInfo>();
 
-    const trackRow = (library as any).createTrackRow(makeTrack({ id: 't1', isFavorite: true })) as FakeElement;
+    const trackRow = createTrackRow(makeTrack({ id: 't1', isFavorite: true }), () => { }) as unknown as FakeElement;
     const trackCell = lastChild(trackRow);
     assert.equal(trackCell.tagName, 'TD');
     assert.equal(trackCell.classList.contains('favorite-cell'), true);

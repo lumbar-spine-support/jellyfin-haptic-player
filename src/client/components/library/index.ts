@@ -26,13 +26,13 @@ import {
 import type { AlbumInfo, LibraryResponse, PlaylistInfo, TrackInfo, FunscriptType } from '../../../shared/types';
 import {
     cardHtml,
-    mediaRowHtml,
     emptyStateHtml,
     tagChipActiveHtml,
     tagChipArtistActiveHtml,
 } from './templates';
 import { createFavoriteButton, type FavoriteItem } from './favorites';
 import { createQueueMenu } from './queueMenu';
+import { createMediaRow, createTrackRow, mediaTypeCell, MEDIA_TYPE_ICONS, type MediaType } from './mediaRows';
 
 type LibraryViewMode = 'grid' | 'list' | 'tags';
 
@@ -51,14 +51,14 @@ interface FilterOption {
 }
 
 const MEDIA_FILTERS = [
-    { key: 'albums', label: 'Albums', icon: 'bi bi-vinyl' },
-    { key: 'tracks', label: 'Audio', icon: 'bi bi-music-note' },
-    { key: 'playlists', label: 'Playlists', icon: 'bi bi-music-note-list' },
-    { key: 'videos', label: 'Videos', icon: 'bi bi-play-btn' },
+    { key: 'albums', label: 'Albums', icon: MEDIA_TYPE_ICONS.album },
+    { key: 'tracks', label: 'Audio', icon: MEDIA_TYPE_ICONS.audio },
+    { key: 'playlists', label: 'Playlists', icon: MEDIA_TYPE_ICONS.playlist },
+    { key: 'videos', label: 'Videos', icon: MEDIA_TYPE_ICONS.video },
 ] as const satisfies readonly FilterOption[];
 type MediaFilterKey = typeof MEDIA_FILTERS[number]['key'];
 
-type CardType = 'audio' | 'video' | 'album' | 'playlist';
+type CardType = MediaType;
 
 /** Cards show their type with the icon of the matching media filter. */
 const CARD_TYPE_FILTERS: Record<CardType, MediaFilterKey> = {
@@ -219,7 +219,7 @@ export class Library {
                 year: track.year ?? '',
                 durationSeconds: track.durationSeconds,
                 buildCard: () => this.createTrackCard(track),
-                buildRow: () => this.createTrackRow(track),
+                buildRow: () => createTrackRow(track, () => this.callbacks.openTrack(track.id)),
             })),
         ];
 
@@ -537,7 +537,6 @@ export class Library {
         const tags = mode === 'tags';
         this.grid?.classList.toggle('d-none', !this.loaded || mode !== 'grid');
         this.table?.classList.toggle('d-none', !this.loaded || mode !== 'list');
-        this.list?.classList.toggle('rows-collapsed', mode !== 'list');
         this.tagView?.classList.toggle('d-none', !this.loaded || !tags);
         this.tagViewCounts?.classList.toggle('d-none', !this.loaded || !tags);
         document.querySelectorAll<HTMLElement>('.library-filter-group').forEach((el) => el.classList.toggle('d-none', tags));
@@ -760,12 +759,6 @@ export class Library {
         }
         document.querySelector('#sort-direction')?.addEventListener('click', () => setSort(this.sortField, !this.sortAsc));
 
-        document.querySelectorAll<HTMLElement>('[data-sort-field]').forEach((th) => {
-            th.addEventListener('click', () => {
-                const field = th.dataset.sortField as LibrarySortField;
-                setSort(field, this.sortField === field ? !this.sortAsc : true);
-            });
-        });
         this.updateSortControls();
     }
 
@@ -783,13 +776,6 @@ export class Library {
             direction.setAttribute('aria-label', text);
             direction.innerHTML = `<i class="bi ${this.sortAsc ? 'bi-sort-up' : 'bi-sort-down'}" aria-hidden="true"></i>`;
         }
-        document.querySelectorAll<HTMLElement>('[data-sort-field]').forEach((th) => {
-            const indicator = th.querySelector<HTMLElement>(':scope > .sort-indicator');
-            if (!indicator) return;
-            indicator.innerHTML = th.dataset.sortField === this.sortField
-                ? `<i class="bi ${this.sortAsc ? 'bi-caret-up-fill' : 'bi-caret-down-fill'}"></i>`
-                : '';
-        });
     }
 
     private filterTrackList(list: TrackInfo[]): TrackInfo[] {
@@ -1015,74 +1001,36 @@ export class Library {
         col.querySelector('[data-card-actions]')?.appendChild(group);
     }
 
-    /** Last cell of a list row: a heart for Jellyfin items (not client-side albums) and the queue menu. */
-    private appendRowActionsCell(tr: HTMLElement, item: FavoriteItem | null, trackIds: () => string[], label: string, deletablePlaylistId?: string): void {
-        const td = document.createElement('td');
-        td.className = 'align-middle text-end pe-2 favorite-cell';
-        const group = document.createElement('span');
-        group.className = 'd-inline-flex align-items-center gap-3';
-        if (item) group.appendChild(createFavoriteButton(item));
-        group.appendChild(createQueueMenu(trackIds, label, deletablePlaylistId));
-        td.appendChild(group);
-        tr.appendChild(td);
-    }
-
     private createAlbumRow(album: AlbumInfo, tracksById: Map<string, TrackInfo>): HTMLElement {
-        const tr = document.createElement('tr');
-        tr.style.cursor = 'pointer';
-        tr.addEventListener('click', () => this.callbacks.openAlbum(album.id));
-        tr.innerHTML = mediaRowHtml({
+        return createMediaRow({
             artSrc: renderTrackArt(album.coverTrackId ? tracksById.get(album.coverTrackId) : null),
             fallbackArt: FALLBACK_ART_DATA_URI,
             title: album.title,
             artist: album.artist || 'Unknown artist',
-            type: 'Album',
+            ...mediaTypeCell('album'),
             year: album.year,
             duration: formatHoursMinutes(album.durationSeconds),
             hapticIcons: renderHapticIcons(this.albumFunscriptTypes(album, tracksById)),
-        });
-        this.appendRowActionsCell(tr, null, () => [...album.trackIds], album.title);
-        return tr;
+        }, () => this.callbacks.openAlbum(album.id), { item: null, trackIds: () => [...album.trackIds], label: album.title });
     }
 
     private createPlaylistRow(playlist: PlaylistInfo, tracksById: Map<string, TrackInfo>): HTMLElement {
-        const firstTrack = tracksById.get(playlist.entries[0]?.trackId ?? '');
-        const artSrc = renderTrackArt(firstTrack);
-        const tr = document.createElement('tr');
-        tr.style.cursor = 'pointer';
-        tr.addEventListener('click', () => this.callbacks.openPlaylist(playlist.id));
-        tr.innerHTML = mediaRowHtml({
-            artSrc,
+        const tr = createMediaRow({
+            artSrc: renderTrackArt(tracksById.get(playlist.entries[0]?.trackId ?? '')),
             fallbackArt: FALLBACK_ART_DATA_URI,
             title: playlist.name,
             artist: this.playlistArtists(playlist),
-            type: 'Playlist',
+            ...mediaTypeCell('playlist'),
             year: '',
             duration: formatHoursMinutes(playlist.durationSeconds),
             hapticIcons: renderHapticIcons(this.playlistFunscriptTypes(playlist, tracksById)),
+        }, () => this.callbacks.openPlaylist(playlist.id), {
+            item: playlist,
+            trackIds: () => playlist.entries.map((entry) => entry.trackId),
+            label: playlist.name,
+            deletablePlaylistId: playlist.canDelete ? playlist.id : undefined,
         });
         applyPlaylistCover(tr.querySelector('img'), playlist.entries.map((entry) => tracksById.get(entry.trackId)));
-        this.appendRowActionsCell(tr, playlist, () => playlist.entries.map((entry) => entry.trackId), playlist.name,
-            playlist.canDelete ? playlist.id : undefined);
-        return tr;
-    }
-
-    private createTrackRow(track: TrackInfo): HTMLElement {
-        const artSrc = renderTrackArt(track);
-        const tr = document.createElement('tr');
-        tr.style.cursor = 'pointer';
-        tr.addEventListener('click', () => this.callbacks.openTrack(track.id));
-        tr.innerHTML = mediaRowHtml({
-            artSrc,
-            fallbackArt: FALLBACK_ART_DATA_URI,
-            title: track.title,
-            artist: track.artist,
-            type: track.type === 'video' ? 'Video' : 'Audio',
-            year: track.year,
-            duration: formatHoursMinutes(track.durationSeconds),
-            hapticIcons: renderHapticIcons(track.funscripts.map((f) => f.type)),
-        });
-        this.appendRowActionsCell(tr, track, () => [track.id], track.title);
         return tr;
     }
 

@@ -109,17 +109,6 @@
   outline-offset: -2px; // Keep outline inside the clipped card
 }
 
-.sort-header:hover {
-  background-color: rgba(var(--happy-text-rgb), 0.05);
-}
-
-.sort-indicator {
-  display: inline-block;
-  width: 1em; // Reserve caret space so headers don't shift when sorting
-  font-size: 0.75em;
-  opacity: 0.7;
-}
-
 // Full rows stretch to the container edge; the filler soaks up the last row's free space.
 #tag-view-selected,
 #tag-view-available {

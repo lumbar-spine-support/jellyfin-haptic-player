@@ -29,7 +29,8 @@ export function mediaRowHtml(values: {
     fallbackArt: string;
     title: string;
     artist: string;
-    type: string;
+    typeIcon: string;
+    typeLabel: string;
     year: string;
     duration: string;
     hapticIcons: string;

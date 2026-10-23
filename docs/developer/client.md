@@ -143,7 +143,7 @@ The logout button (`bindLogout()`, bound after the sign-in) shows whenever there
 
 ## Routing
 
-All state that should survive a reload is in the query string. The `Router` in `router.ts` maps it onto handlers that `App` supplies. `router.navigateTo(url)` pushes history and calls `handleRouteChange()`, and so does the browser back button. Playlist and album pages are rendered by `DetailView` (`components/library/detail.ts`).
+All state that should survive a reload is in the query string. The `Router` in `router.ts` maps it onto handlers that `App` supplies. `router.navigateTo(url)` pushes history and calls `handleRouteChange()`, and so does the browser back button. Playlist and album pages are rendered by `DetailView` (`components/library/detail.ts`). Their track list is a `.media-table` like the library's list view and uses the same rows (`components/library/mediaRows.ts`, template `media-row.html`). Neither table has a header; the library sorts through its toolbar.
 
 ```mermaid
 flowchart TD

@@ -69,55 +69,9 @@ body.blur-content media-container {
   overflow: hidden;
 }
 
-#track-table {
+.media-table {
   border-collapse: separate;
   border-spacing: 0;
-}
-
-// On mobile the columns are merged into one, so sorting uses the toolbar instead.
-@media (max-width: 767.98px) {
-  #track-table .track-table-head {
-    display: none;
-  }
-}
-
-// Collapsed rows still size the columns, so the header keeps its list-view widths.
-#track-list.rows-collapsed>tr {
-  visibility: collapse;
-}
-
-#track-table thead th {
-  white-space: nowrap;
-  vertical-align: middle;
-  border-top: var(--bs-border-width) solid var(--bs-secondary);
-  border-bottom: var(--bs-border-width) solid var(--bs-secondary);
-}
-
-#track-table thead th:first-child {
-  border-left: var(--bs-border-width) solid var(--bs-secondary);
-  border-top-left-radius: var(--bs-border-radius);
-  border-bottom-left-radius: var(--bs-border-radius);
-}
-
-#track-table thead th:last-child {
-  border-right: var(--bs-border-width) solid var(--bs-secondary);
-  border-top-right-radius: var(--bs-border-radius);
-  border-bottom-right-radius: var(--bs-border-radius);
-}
-
-// Below md, `.d-none.d-md-table-cell` columns are hidden: move edge borders to the visible ones.
-@include media-breakpoint-down(md) {
-  #track-table thead th:nth-child(1 of :not(.d-none)) {
-    border-left: var(--bs-border-width) solid var(--bs-secondary);
-    border-top-left-radius: var(--bs-border-radius);
-    border-bottom-left-radius: var(--bs-border-radius);
-  }
-
-  #track-table thead th:nth-last-child(1 of :not(.d-none)) {
-    border-right: var(--bs-border-width) solid var(--bs-secondary);
-    border-top-right-radius: var(--bs-border-radius);
-    border-bottom-right-radius: var(--bs-border-radius);
-  }
 }
 
 .d-md-table-cell {

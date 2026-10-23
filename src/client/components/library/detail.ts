@@ -1,21 +1,14 @@
 import { applyPlaylistCover } from '../../api';
-import { detailRowHtml } from '../../templates';
 import { qs } from '../../utils/html';
-import { renderHapticIcons } from '../haptic/icons';
 import { bindFavoriteButton } from './favorites';
-import { createQueueMenu } from './queueMenu';
-import type { AlbumInfo, FunscriptInfo, PlaylistInfo, QueueSource, TrackInfo } from '../../../shared/types';
+import { createTrackRow } from './mediaRows';
+import type { AlbumInfo, PlaylistInfo, QueueSource, TrackInfo } from '../../../shared/types';
 
 type DetailContext =
     | { type: 'playlist'; playlist: PlaylistInfo }
     | { type: 'album'; album: AlbumInfo };
 
 interface DetailRow {
-    order: number;
-    title: string;
-    artist: string;
-    album: string;
-    funscripts?: FunscriptInfo[];
     trackId: string;
     onClick: () => void;
 }
@@ -65,10 +58,6 @@ export class DetailView {
             playlist.entries.map((entry) => entry.trackId),
         );
         this.renderRows(playlist.entries.map((entry, index) => ({
-            order: entry.order,
-            title: entry.title,
-            artist: entry.artist,
-            album: entry.album,
             trackId: entry.trackId,
             onClick: () => this.options.openTrack(entry.trackId, source, true, index),
         })));
@@ -79,20 +68,11 @@ export class DetailView {
     showAlbum(album: AlbumInfo): void {
         this.context = { type: 'album', album };
         const source: QueueSource = { type: 'album', id: album.id };
-        const media = this.options.allMedia();
         this.renderHeader('Album', album.title, album.artist || 'Unknown artist', [album.coverTrackId]);
-        this.renderRows(album.trackIds.map((trackId, index) => {
-            const track = media.find((item) => item.id === trackId);
-            return {
-                order: index + 1,
-                title: track?.title ?? trackId,
-                artist: track?.artist ?? '',
-                album: track?.album ?? '',
-                funscripts: track?.funscripts ?? [],
-                trackId,
-                onClick: () => this.options.openTrack(trackId, source, false, index),
-            };
-        }));
+        this.renderRows(album.trackIds.map((trackId, index) => ({
+            trackId,
+            onClick: () => this.options.openTrack(trackId, source, false, index),
+        })));
         this.setButtonsEnabled(album.trackIds.length > 0);
         // Albums are grouped client-side; Jellyfin has no item to mark.
         if (this.favoriteBtn) bindFavoriteButton(this.favoriteBtn, null);
@@ -134,25 +114,13 @@ export class DetailView {
         }
     }
 
+    /** The library's list rows; a row whose media HAPPY does not know is left out. */
     private renderRows(rows: DetailRow[]): void {
         if (!this.list) return;
-        this.list.innerHTML = '';
-        for (const row of rows) {
-            const tr = document.createElement('tr');
-            tr.style.cursor = 'pointer';
-            tr.innerHTML = detailRowHtml({
-                order: String(row.order),
-                title: row.title,
-                artist: row.artist,
-                album: row.album,
-                hapticIcons: row.funscripts?.length ? renderHapticIcons(row.funscripts.map((f) => f.type)) : '',
-            });
-            const actions = document.createElement('td');
-            actions.className = 'align-middle text-end pe-2 favorite-cell';
-            actions.appendChild(createQueueMenu(() => [row.trackId], row.title));
-            tr.appendChild(actions);
-            tr.addEventListener('click', row.onClick);
-            this.list.appendChild(tr);
-        }
+        const tracksById = new Map(this.options.allMedia().map((track) => [track.id, track]));
+        this.list.replaceChildren(...rows.flatMap((row) => {
+            const track = tracksById.get(row.trackId);
+            return track ? [createTrackRow(track, row.onClick)] : [];
+        }));
     }
 }

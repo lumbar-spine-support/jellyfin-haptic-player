@@ -5,10 +5,10 @@
 <td class="align-middle text-truncate" style="max-width:14rem">
     <div class="fw-semibold text-truncate">{{title}}</div>
     <div class="small text-muted text-truncate d-md-none">{{artist}}</div>
-    <div class="small text-muted text-truncate d-md-none">{{type}} · {{duration}}</div>
+    <div class="small text-muted text-truncate d-md-none"><i class="{{typeIcon}} me-1" title="{{typeLabel}}" aria-label="{{typeLabel}}"></i>{{duration}}</div>
 </td>
 <td class="align-middle text-muted text-truncate d-none d-md-table-cell" style="max-width:10rem">{{artist}}</td>
-<td class="align-middle text-muted d-none d-md-table-cell">{{type}}</td>
+<td class="align-middle text-muted d-none d-md-table-cell"><i class="{{typeIcon}}" title="{{typeLabel}}" aria-label="{{typeLabel}}"></i></td>
 <td class="align-middle text-muted d-none d-md-table-cell">{{year}}</td>
 <td class="align-middle d-none d-md-table-cell">
     <div class="d-flex flex-wrap gap-1">{{{hapticIcons}}}</div>

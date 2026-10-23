@@ -95,11 +95,11 @@ Next to the search box are four controls:
 - **Favorites** (heart): show only your favorites (see [Favorites](#favorites)).
 - **Sort**: pick the field (Title, Artist, Year, Duration, Type) and click the arrow button next to it to reverse the order. Items without a value (e.g. playlists have no year) are always listed last.
 
-Sorting applies to the grid and the list view alike, and all media types are sorted together. In the list view you can also click a column header. Filters and sort order are remembered in the browser.
+Sorting applies to the grid and the list view alike, and all media types are sorted together. Filters and sort order are remembered in the browser.
 
 ## Favorites
 
-HAPPY uses the favorites of your Jellyfin account, the same ones Jellyfin's own apps show with a heart. Click the heart on a card, in the list view, in the player's top bar (next to picture-in-picture and fullscreen) or on a playlist's page to add or remove a favorite; HAPPY saves it in Jellyfin right away.
+HAPPY uses the favorites of your Jellyfin account, the same ones Jellyfin's own apps show with a heart. Click the heart on a card, in the list view or on an album/playlist page's rows, in the player's top bar (next to picture-in-picture and fullscreen) or on a playlist's page to add or remove a favorite; HAPPY saves it in Jellyfin right away.
 
 - Audio files, videos and playlists can be favorites. Albums are grouped by HAPPY, not by Jellyfin, so they have no heart of their own; with the favorites filter on, an album is shown when one of its tracks is a favorite.
 - Favorites you change in another Jellyfin app show up in HAPPY after a page reload.
