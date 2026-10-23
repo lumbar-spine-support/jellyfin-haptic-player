@@ -26,7 +26,7 @@
     "test:plugin": "node scripts/dev-jellyfin.mjs test-plugin"
   },
   "dependencies": {
-    "@videojs/html": "^10.1.0",
+    "@videojs/html": "^10.2.0",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.13.2",
     "buttplug": "^5.0.2",
