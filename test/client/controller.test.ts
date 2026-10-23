@@ -252,3 +252,25 @@ test(`${TAG} jumping to an entry plays it`, async () => {
     assert.equal(queue.currentId, 't3');
     assert.deepEqual(started, ['t1', 't3']);
 });
+
+test(`${TAG} a queue built before anything played cues its first track until play starts it`, async () => {
+    const { queue, controller, session } = setup();
+    const started: string[] = [];
+    session.start = async (request: { id: string }) => { started.push(request.id); };
+    assert.equal(controller.cued, null);
+    controller.enqueue(['t2', 't3']);
+    const cued = controller.cued as { id: string } | null;
+    assert.equal(cued?.id, 't2');
+
+    await controller.startQueue();
+    assert.equal(queue.currentId, 't2');
+    assert.deepEqual(started, ['t2']);
+    assert.equal(controller.cued, null);
+});
+
+test(`${TAG} nothing is cued while a track owns playback`, () => {
+    const { controller, session } = setup();
+    session.activeRequest = { id: 't1' };
+    controller.enqueue(['t2']);
+    assert.equal(controller.cued, null);
+});

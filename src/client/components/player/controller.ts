@@ -116,6 +116,27 @@ export class PlaybackController {
         return null;
     }
 
+    /**
+     * The track a queue built before anything played would start with, so the
+     * footer can offer it; null once something owns playback.
+     */
+    get cued(): PlaybackRequest | null {
+        if (this.session.activeRequest || this.queue.current) return null;
+        const id = this.queue.upcoming[0]?.trackId;
+        const track = id ? this.library.getTrack(id) : undefined;
+        return track ? this.toRequest(track) : null;
+    }
+
+    /** Starts the queue at its first entry, for the footer's play on a cued track. */
+    async startQueue(): Promise<void> {
+        if (!this.queue.current) await this.step(1);
+    }
+
+    /** Fires whenever the queue changes. */
+    onQueueChange(listener: () => void): () => void {
+        return this.queue.onChange(listener);
+    }
+
     get canStep(): { prev: boolean; next: boolean } {
         return { prev: this.queue.hasPrev, next: this.queue.hasNext };
     }

@@ -154,7 +154,8 @@ Rules:
 - **A single track never throws the queue away.** Playing it jumps to its next
   upcoming entry, or inserts it after the current entry (`playNow`).
 - Tracks queued before anything played wait as "up next" (`currentIndex` -1)
-  until a skip or play starts them.
+  until a skip or play starts them. The footer shows the first of them
+  (`PlaybackController.cued`) and its play button starts the queue.
 - History and the current entry are fixed; only upcoming entries move, go away or
   get shuffled.
 
@@ -210,7 +211,8 @@ with `PlaybackSession`, `PlaybackQueue` and `PlaybackController`.
    - the focused slot promotes itself to active
    - footer and Media Session metadata follow via `PlaybackController.onActiveTrack`
    - scripts are loaded into the haptic sync engine
-5. Footer visibility follows `PlaybackSession.activeRequest`; page-player
+5. Footer visibility follows `PlaybackSession.activeRequest` (or, before anything
+   played, `PlaybackController.cued`); page-player
    visibility follows the focus index
 
 ## Haptic sync lifecycle

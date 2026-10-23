@@ -114,7 +114,7 @@ What plays next is the queue. Playing an album or a playlist (its **Play** or **
 - **Save the queue**: *Save as…* stores the whole queue, in order, as a new Jellyfin playlist that only you can see. A queue that came from one of your playlists can be written back with *Save* once you changed it. HAPPY refuses to overwrite a playlist that holds media from libraries HAPPY does not show, or that was changed elsewhere in the meantime, so nothing gets lost; save it as a new playlist instead. Saved playlists appear in the library right away and in Jellyfin's other apps too.
 - **Delete a playlist**: the **⋯** menu of one of your own playlists in the library has *Delete playlist*. After you confirm, the playlist is removed from Jellyfin, for all apps; the media in it stays.
 
-The queue lives in the open browser tab and is gone after a reload; save it as a playlist to keep it. The bar at the bottom of the page shows what is playing while you browse; click it to get back to the player and its queue.
+The queue lives in the open browser tab and is gone after a reload; save it as a playlist to keep it. The bar at the bottom of the page shows what is playing while you browse; click it to get back to the player and its queue. If you build a queue before playing anything, the bar shows its first file; press play there to start the queue.
 
 ## Cover art in the grid view
 

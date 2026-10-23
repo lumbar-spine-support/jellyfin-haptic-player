@@ -3,13 +3,16 @@ import type { VideoPlayerStore } from '@videojs/html';
 import { StoreController } from '@videojs/store/html';
 import type { PlaybackSession } from './session';
 import type { PlaybackController } from './controller';
+import type { PlaybackRequest } from '../../../shared/types';
 
 type PlaybackSlice = ReturnType<typeof selectPlayback>;
 type VolumeSlice = ReturnType<typeof selectVolume>;
 
 /**
  * Persistent bottom bar. It always represents the *active* player, which may be
- * a different track than the file page the user is browsing.
+ * a different track than the file page the user is browsing. Before anything
+ * played, a queue built from the library shows its first track here, and play
+ * starts the queue.
  *
  * One `StoreController` pair is created per player slot so the bar can follow
  * whichever slot currently owns playback without tearing down subscriptions.
@@ -35,6 +38,7 @@ export class PlayerFooterElement extends UIElement {
         this.#playback = session.stores.map((store) => new StoreController(this, store, selectPlayback));
         this.#volume = session.stores.map((store) => new StoreController(this, store, selectVolume));
         session.onChange(() => this.requestUpdate());
+        controller.onQueueChange(() => this.requestUpdate());
         this.#bindControls();
         this.requestUpdate();
     }
@@ -46,10 +50,14 @@ export class PlayerFooterElement extends UIElement {
 
     #bindControls(): void {
         this.#part('info')?.addEventListener('click', () => {
-            const trackId = this.#session?.activeTrackId;
+            const trackId = this.#request?.id;
             if (trackId) this.#onOpenTrack?.(trackId);
         });
         this.#part('play-pause')?.addEventListener('click', () => {
+            if (!this.#session?.activeRequest) {
+                void this.#controller?.startQueue();
+                return;
+            }
             const playback = this.#playbackSlice;
             if (!playback) return;
             if (playback.paused || playback.ended) void playback.play();
@@ -64,6 +72,11 @@ export class PlayerFooterElement extends UIElement {
         });
     }
 
+    /** The playing track, or the first queued one while nothing has played yet. */
+    get #request(): PlaybackRequest | null {
+        return this.#session?.activeRequest ?? this.#controller?.cued ?? null;
+    }
+
     get #playbackSlice(): PlaybackSlice {
         return this.#playback[this.#session?.activeSlot ?? 0]?.value;
     }
@@ -75,7 +88,7 @@ export class PlayerFooterElement extends UIElement {
     protected override update(changed: Map<string, unknown>): void {
         super.update(changed);
         const session = this.#session;
-        const request = session?.activeRequest ?? null;
+        const request = this.#request;
         const hideFooter = !request || session?.focusedIsActive;
         this.classList.toggle('d-none', hideFooter);
         if (hideFooter) return;
@@ -87,7 +100,7 @@ export class PlayerFooterElement extends UIElement {
         const subtitle = this.#part('subtitle');
         if (subtitle) subtitle.textContent = request.artist;
 
-        const paused = this.#playbackSlice?.paused ?? true;
+        const paused = !session?.activeRequest || (this.#playbackSlice?.paused ?? true);
         const playPause = this.#part('play-pause');
         if (playPause) {
             playPause.setAttribute('aria-label', paused ? 'Play' : 'Pause');
