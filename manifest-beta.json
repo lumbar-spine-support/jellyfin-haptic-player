@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.5.0.2",
+        "changelog": "Beta build 1.5.0.2 from dev (commit f82a468). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- chore(player): bump video.js skin to newest version (f82a468)",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.5.0.2.zip",
+        "checksum": "a718914f6358b7b13c97e070c3942ed2",
+        "timestamp": "2026-10-23T15:15:47Z"
+      },
+      {
         "version": "1.5.0.1",
         "changelog": "Beta build 1.5.0.1 from dev (commit c8ed91f). Not released yet, may be unstable.",
         "targetAbi": "12.1.0.0",
