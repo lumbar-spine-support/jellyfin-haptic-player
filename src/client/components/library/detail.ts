@@ -38,7 +38,6 @@ export class DetailView {
     private readonly shuffleBtn = qs<HTMLButtonElement>('#btn-detail-shuffle');
     private readonly enqueueBtn = qs<HTMLButtonElement>('#btn-detail-enqueue');
     private readonly cover = qs<HTMLImageElement>('#detail-cover');
-    private readonly meta = qs<HTMLElement>('#detail-meta');
     private readonly favoriteBtn = qs<HTMLButtonElement>('#btn-detail-favorite');
     private context: DetailContext | null = null;
 
@@ -63,7 +62,6 @@ export class DetailView {
             'Playlist',
             playlist.name,
             artists.join(', ') || 'Unknown artist',
-            `${playlist.entries.length} media`,
             playlist.entries.map((entry) => entry.trackId),
         );
         this.renderRows(playlist.entries.map((entry, index) => ({
@@ -82,7 +80,7 @@ export class DetailView {
         this.context = { type: 'album', album };
         const source: QueueSource = { type: 'album', id: album.id };
         const media = this.options.allMedia();
-        this.renderHeader('Album', album.title, album.artist || 'Unknown artist', '', [album.coverTrackId]);
+        this.renderHeader('Album', album.title, album.artist || 'Unknown artist', [album.coverTrackId]);
         this.renderRows(album.trackIds.map((trackId, index) => {
             const track = media.find((item) => item.id === trackId);
             return {
@@ -125,11 +123,10 @@ export class DetailView {
         }
     }
 
-    private renderHeader(type: string, title: string, subtitle: string, meta: string, coverTrackIds: (string | null | undefined)[]): void {
+    private renderHeader(type: string, title: string, subtitle: string, coverTrackIds: (string | null | undefined)[]): void {
         if (this.typeLabel) this.typeLabel.textContent = type;
         if (this.title) this.title.textContent = title;
         if (this.subtitle) this.subtitle.textContent = subtitle;
-        if (this.meta) this.meta.textContent = meta;
         if (this.cover) {
             const media = this.options.allMedia();
             applyPlaylistCover(this.cover, coverTrackIds.map((id) => media.find((item) => item.id === id)));
