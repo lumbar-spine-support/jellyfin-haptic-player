@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.5.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.4.1...v1.5.0) (2026-10-23)
+
+
+### Features
+
+* **library:** round, centered play button on album and playlist pages ([056d453](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/056d45302f5f8846996c5a1b7ded5d3ae0dc8704))
+
+
+### Bug Fixes
+
+* **library:** clear the search after picking a tag in the tag view ([57be69f](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/57be69fb79b2a466c462814f4edbccc13f2ed997))
+* **player:** show a queue built before anything played in the footer ([0e34ae9](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/0e34ae9847028bcffe01feb43df649822019b283))
+* **settings:** stop the settings panel from scrolling the page on mobile ([52bc12b](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/52bc12b2534a0e9c8fe6b75758e2271278219b44))
+
 ## [1.4.1](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.4.0...v1.4.1) (2026-10-21)
 
 
