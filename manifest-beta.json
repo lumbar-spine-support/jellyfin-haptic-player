@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.5.0.1",
+        "changelog": "Beta build 1.5.0.1 from dev (commit c8ed91f). Not released yet, may be unstable.",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.5.0.1.zip",
+        "checksum": "6d89fa0fb2d5ec622b36596dae75bfcd",
+        "timestamp": "2026-10-23T14:41:12Z"
+      },
+      {
         "version": "1.5.0.0",
         "changelog": "## [1.5.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.4.1...v1.5.0) (2026-10-23)\n\n\n### Features\n\n* **library:** round, centered play button on album and playlist pages ([056d453](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/056d45302f5f8846996c5a1b7ded5d3ae0dc8704))\n\n\n### Bug Fixes\n\n* **library:** clear the search after picking a tag in the tag view ([57be69f](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/57be69fb79b2a466c462814f4edbccc13f2ed997))\n* **player:** show a queue built before anything played in the footer ([0e34ae9](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/0e34ae9847028bcffe01feb43df649822019b283))\n* **settings:** stop the settings panel from scrolling the page on mobile ([52bc12b](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/52bc12b2534a0e9c8fe6b75758e2271278219b44))\n\nInstall or update HAPPY through its Jellyfin plugin repository: https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/jellyfin-plugin-repository/manifest.json (Dashboard → Plugins → Repositories), or download `happy_1.5.0.0.zip` below.",
         "targetAbi": "12.1.0.0",
