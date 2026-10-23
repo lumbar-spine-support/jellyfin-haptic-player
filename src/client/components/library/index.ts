@@ -496,7 +496,11 @@ export class Library {
             chip.className = 'tag-chip tag-chip-suggestion';
             chip.textContent = tag;
             chip.title = `Add tag: ${tag}`;
-            chip.addEventListener('click', () => this.addTag(tag));
+            chip.addEventListener('click', () => {
+                if (this.searchInput) this.searchInput.value = '';
+                this.searchQuery = '';
+                this.addTag(tag);
+            });
             this.tagViewAvailable.appendChild(chip);
         }
 
