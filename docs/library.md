@@ -97,6 +97,14 @@ Next to the search box are four controls:
 
 Sorting applies to the grid and the list view alike, and all media types are sorted together. Filters and sort order are remembered in the browser.
 
+**Album Display** under *Appearance* in the settings decides how albums of more than one track appear in the library:
+
+- **Albums + Tracks** (default): the album and each of its tracks.
+- **Albums only**: just the album; searching for one of its tracks finds the album.
+- **Tracks only**: just the tracks, not the album.
+
+An album with a single track is not a grouping and always shows as album and track. Album pages and playlists are not affected.
+
 ## Favorites
 
 HAPPY uses the favorites of your Jellyfin account, the same ones Jellyfin's own apps show with a heart. Click the heart on a card, in the list view or on an album/playlist page's rows, in the player's top bar (next to picture-in-picture and fullscreen) or on a playlist's page to add or remove a favorite; HAPPY saves it in Jellyfin right away.

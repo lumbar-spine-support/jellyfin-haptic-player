@@ -11,6 +11,50 @@ export interface SortableLibraryItem {
   durationSeconds: number;
 }
 
+/**
+ * How albums of more than one track appear in the library: as album and tracks, only as the album,
+ * or only as their tracks. Albums of a single track are not a grouping and always show both.
+ */
+export const ALBUM_DISPLAY_MODES = ['albums-tracks', 'albums', 'tracks'] as const;
+export type AlbumDisplayMode = typeof ALBUM_DISPLAY_MODES[number];
+
+export function isAlbumDisplayMode(value: unknown): value is AlbumDisplayMode {
+  return (ALBUM_DISPLAY_MODES as readonly unknown[]).includes(value);
+}
+
+/** An album groups tracks only when it has more than one. */
+export function isGroupingAlbum(album: Pick<AlbumInfo, 'trackIds'>): boolean {
+  return album.trackIds.length > 1;
+}
+
+/** Ids of the tracks that belong to an album of more than one track. */
+export function groupedTrackIds(albums: readonly Pick<AlbumInfo, 'trackIds'>[]): Set<string> {
+  const ids = new Set<string>();
+  for (const album of albums) {
+    if (isGroupingAlbum(album)) for (const id of album.trackIds) ids.add(id);
+  }
+  return ids;
+}
+
+/**
+ * Drops what `mode` hides: the tracks of grouping albums ('albums') or the grouping albums
+ * themselves ('tracks'). `allAlbums` decides which tracks are grouped, so a track stays hidden
+ * even when its album is filtered out.
+ */
+export function applyAlbumDisplay<A extends Pick<AlbumInfo, 'trackIds'>, T extends Pick<TrackInfo, 'id'>>(
+  mode: AlbumDisplayMode,
+  albums: readonly A[],
+  tracks: readonly T[],
+  allAlbums: readonly Pick<AlbumInfo, 'trackIds'>[],
+): { albums: A[]; tracks: T[] } {
+  if (mode === 'tracks') return { albums: albums.filter((album) => !isGroupingAlbum(album)), tracks: [...tracks] };
+  if (mode === 'albums') {
+    const grouped = groupedTrackIds(allAlbums);
+    return { albums: [...albums], tracks: tracks.filter((track) => !grouped.has(track.id)) };
+  }
+  return { albums: [...albums], tracks: [...tracks] };
+}
+
 function sortValue(item: SortableLibraryItem, field: LibrarySortField): string | number {
   if (field === 'type') return item.typeLabel;
   if (field === 'duration') return item.durationSeconds;

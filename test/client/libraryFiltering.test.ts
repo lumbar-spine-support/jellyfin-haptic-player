@@ -3,9 +3,12 @@ import assert from 'node:assert/strict';
 import {
     albumHasFavorite,
     albumMatchesActiveTags,
+    applyAlbumDisplay,
     artistTagValue,
     countMediaMatches,
     filterAvailableTags,
+    groupedTrackIds,
+    isAlbumDisplayMode,
     isArtistTag,
     makeArtistTag,
     playlistMatchesActiveTags,
@@ -131,4 +134,43 @@ test(`${TAG} an album is a favorite when any of its tracks is`, () => {
     assert.equal(albumHasFavorite({ trackIds: ['t1', 't2'] }, tracksById), true);
     assert.equal(albumHasFavorite({ trackIds: ['t1', 'missing'] }, tracksById), false);
     assert.equal(albumHasFavorite({ trackIds: [] }, tracksById), false);
+});
+
+const DISPLAY_ALBUMS = [
+    { id: 'album-ab', trackIds: ['a', 'b'] },
+    { id: 'album-c', trackIds: ['c'] },
+];
+const DISPLAY_TRACKS = [{ id: 'a' }, { id: 'b' }, { id: 'c' }, { id: 'd' }];
+const ids = (items: { id: string }[]) => items.map((entry) => entry.id);
+
+test(`${TAG} groupedTrackIds only counts albums of more than one track`, () => {
+    assert.deepEqual([...groupedTrackIds(DISPLAY_ALBUMS)], ['a', 'b']);
+});
+
+test(`${TAG} applyAlbumDisplay shows albums and tracks by default`, () => {
+    const result = applyAlbumDisplay('albums-tracks', DISPLAY_ALBUMS, DISPLAY_TRACKS, DISPLAY_ALBUMS);
+    assert.deepEqual(ids(result.albums), ['album-ab', 'album-c']);
+    assert.deepEqual(ids(result.tracks), ['a', 'b', 'c', 'd']);
+});
+
+test(`${TAG} applyAlbumDisplay 'albums' hides the tracks of grouping albums`, () => {
+    const result = applyAlbumDisplay('albums', DISPLAY_ALBUMS, DISPLAY_TRACKS, DISPLAY_ALBUMS);
+    assert.deepEqual(ids(result.albums), ['album-ab', 'album-c']);
+    assert.deepEqual(ids(result.tracks), ['c', 'd']);
+});
+
+test(`${TAG} applyAlbumDisplay 'albums' hides grouped tracks even when their album is filtered out`, () => {
+    const result = applyAlbumDisplay('albums', [], DISPLAY_TRACKS, DISPLAY_ALBUMS);
+    assert.deepEqual(ids(result.tracks), ['c', 'd']);
+});
+
+test(`${TAG} applyAlbumDisplay 'tracks' hides grouping albums but keeps all tracks`, () => {
+    const result = applyAlbumDisplay('tracks', DISPLAY_ALBUMS, DISPLAY_TRACKS, DISPLAY_ALBUMS);
+    assert.deepEqual(ids(result.albums), ['album-c']);
+    assert.deepEqual(ids(result.tracks), ['a', 'b', 'c', 'd']);
+});
+
+test(`${TAG} isAlbumDisplayMode accepts only known modes`, () => {
+    assert.ok(isAlbumDisplayMode('albums'));
+    assert.ok(!isAlbumDisplayMode('both'));
 });

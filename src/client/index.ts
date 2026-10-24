@@ -37,7 +37,8 @@ import { descriptionPlaceholderHtml, tagsPlaceholderHtml } from './templates';
 import { setFavoriteTarget } from '@/components/videojs/features/favorite';
 import { bindIntifaceSettings } from './components/settings/intiface';
 import { bindDelaySlider, bindUpdateRateSlider } from './components/settings/haptics';
-import { bindToggle } from './components/settings/toggle';
+import { bindSelect, bindToggle } from './components/settings/toggle';
+import { isAlbumDisplayMode } from '../shared/libraryFiltering';
 import type { TrackInfo, QueueSource, ClientSettings, PlaylistInfo } from '../shared/types';
 import { notifyQueueChanged, type QueueSave } from '@/components/videojs/features/queue';
 import type { HapticChannel } from '../shared/haptics';
@@ -250,6 +251,8 @@ class App {
     bindToggle('#color-gradient-toggle', 'happy-color-gradient', this.settings.funscriptColorGradient,
       (enabled) => this.viz.setColorGradient(enabled));
     bindToggle('#keep-screen-on-toggle', 'happy-keep-screen-on', true, this.setKeepScreenOn);
+    bindSelect('#album-display-select', 'happy-album-display', 'albums-tracks', isAlbumDisplayMode,
+      (mode) => this.library.setAlbumDisplay(mode));
     this.bindZoomControls();
     whenIdle(() => {
       void this.showVersion();

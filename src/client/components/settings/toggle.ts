@@ -14,3 +14,25 @@ export function bindToggle(selector: string, storageKey: string, fallback: boole
     apply(toggle.checked);
   });
 }
+
+/** A settings dropdown persisted in localStorage; stored values `isValid` rejects fall back. */
+export function bindSelect<T extends string>(
+  selector: string,
+  storageKey: string,
+  fallback: T,
+  isValid: (value: string) => value is T,
+  apply: (value: T) => void,
+): void {
+  const select = qs<HTMLSelectElement>(selector);
+  const setting = storedSetting<string>(storageKey, fallback);
+  const stored = setting.get();
+  const value = isValid(stored) ? stored : fallback;
+  apply(value);
+  if (!select) return;
+  select.value = value;
+  select.addEventListener('change', () => {
+    if (!isValid(select.value)) return;
+    setting.set(select.value);
+    apply(select.value);
+  });
+}

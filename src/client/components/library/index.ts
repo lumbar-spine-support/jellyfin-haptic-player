@@ -8,6 +8,7 @@ import {
     albumHasFavorite,
     albumMatchesActiveTags,
     albumMatchesHapticFilters,
+    applyAlbumDisplay,
     artistTagValue,
     countMediaMatches,
     filterAvailableTags,
@@ -20,6 +21,7 @@ import {
     sortLibraryItems,
     trackMatchesActiveTags,
     trackMatchesHapticFilters,
+    type AlbumDisplayMode,
     type LibrarySortField,
     type SortableLibraryItem,
 } from '../../../shared/libraryFiltering';
@@ -138,6 +140,7 @@ export class Library {
     private loaded = false;
     private forceSquareArtwork = false;
     private largePortraitArtwork = true;
+    private albumDisplay: AlbumDisplayMode = 'albums-tracks';
 
     constructor(callbacks: LibraryCallbacks) {
         this.callbacks = callbacks;
@@ -177,13 +180,17 @@ export class Library {
         const isSearching = this.searchQuery.length > 0;
 
         const shows = (key: MediaFilterKey): boolean => this.mediaFilters.size === 0 || this.mediaFilters.has(key);
-        const visibleAlbums = shows('albums') ? this.getFilteredAlbums() : [];
+        const filteredAlbums = shows('albums') ? this.getFilteredAlbums() : [];
         const visiblePlaylists = shows('playlists') ? this.getFilteredPlaylists() : [];
-        const tracks = shows('tracks') ? this.filterTrackList(this.tracks) : [];
-        const videos = shows('videos') ? this.filterTrackList(this.videos) : [];
+        const filteredMedia = [
+            ...(shows('tracks') ? this.filterTrackList(this.tracks) : []),
+            ...(shows('videos') ? this.filterTrackList(this.videos) : []),
+        ];
+        const { albums: visibleAlbums, tracks: visibleMedia } =
+            applyAlbumDisplay(this.albumDisplay, filteredAlbums, filteredMedia, this.albums);
         const tracksById = new Map(this.allMedia().map((track) => [track.id, track]));
 
-        if (tracks.length === 0 && videos.length === 0 && visibleAlbums.length === 0 && visiblePlaylists.length === 0) {
+        if (visibleMedia.length === 0 && visibleAlbums.length === 0 && visiblePlaylists.length === 0) {
             const hasActiveFilter = this.mediaFilters.size > 0 || this.hapticFilters.size > 0 || this.favoritesOnly;
             const msg = (isSearching || hasActiveFilter) ? 'No items match your search or filters.' : 'No media files found in the media directory.';
             this.grid.innerHTML = emptyStateHtml({ message: msg });
@@ -211,7 +218,7 @@ export class Library {
                 buildCard: () => this.createPlaylistCard(playlist, tracksById),
                 buildRow: () => this.createPlaylistRow(playlist, tracksById),
             })),
-            ...[...tracks, ...videos].map((track) => ({
+            ...visibleMedia.map((track) => ({
                 morphKey: `track-${track.id}`,
                 typeLabel: track.type === 'video' ? 'Video' : 'Audio',
                 title: track.title,
@@ -528,6 +535,12 @@ export class Library {
         this.largePortraitArtwork = large;
     }
 
+    /** Re-renders a loaded library, since it changes which items are shown. */
+    setAlbumDisplay(mode: AlbumDisplayMode): void {
+        this.albumDisplay = mode;
+        if (this.loaded) this.render();
+    }
+
     setActiveTags(tags: string[]): void {
         this.activeTags = tags;
     }
@@ -816,8 +829,11 @@ export class Library {
         }
         if (this.searchQuery) {
             const q = this.searchQuery.toLowerCase();
+            // With its tracks hidden, an album is what a search for one of them finds.
+            const searchTracks = this.albumDisplay === 'albums';
             albums = albums.filter((a) =>
-                a.title.toLowerCase().includes(q) || (a.artist ?? '').toLowerCase().includes(q)
+                a.title.toLowerCase().includes(q) || (a.artist ?? '').toLowerCase().includes(q) ||
+                (searchTracks && a.trackIds.some((id) => tracksById.get(id)?.title.toLowerCase().includes(q)))
             );
         }
         return albums;
