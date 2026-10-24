@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.5.0.3",
+        "changelog": "Beta build 1.5.0.3 from dev (commit cfbf0e7). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- feat(library): album display setting for albums, tracks or both (cfbf0e7)\n- chore(player): bump video.js skin to newest version (f82a468)",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.5.0.3.zip",
+        "checksum": "e5db3ceaf0c7f528e65963c8808cf4c8",
+        "timestamp": "2026-10-24T16:48:51Z"
+      },
+      {
         "version": "1.5.0.2",
         "changelog": "Beta build 1.5.0.2 from dev (commit f82a468). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- chore(player): bump video.js skin to newest version (f82a468)",
         "targetAbi": "12.1.0.0",
