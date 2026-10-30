@@ -52,13 +52,50 @@ body.blur-content media-container {
   font-weight: 600;
 }
 
+// All sidebar control labels share one size, matching the -sm inputs and buttons.
+$settings-font-size: 0.875rem;
+
 .settings-label {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  font-size: 0.875rem;
+  font-size: $settings-font-size;
   margin-bottom: 0.125rem;
+}
+
+// One setting per row: label on the left, its switch or dropdown on the right.
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2.25rem;
+  font-size: $settings-font-size;
+
+  // Undo .form-switch's gutter for a leading input; the switch sits at the end instead.
+  &.form-switch {
+    padding-left: 0;
+  }
+
+  .form-check-input {
+    flex-shrink: 0;
+    float: none;
+    margin: 0;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
+  .form-select {
+    width: auto;
+    flex-shrink: 0;
+  }
+}
+
+.settings-row-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  cursor: pointer;
 }
 
 .min-w-0 {
