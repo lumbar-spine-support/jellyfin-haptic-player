@@ -227,6 +227,19 @@ $settings-font-size: 0.875rem;
   flex-shrink: 0;
 }
 
+// Fixed width so the button does not jump while cycling through the labels.
+#viz-window {
+  height: 2.375rem;
+  width: 4.75rem;
+  padding: 0 var(--app-space-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--app-space-1);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
 #visualization {
   padding: var(--app-space-3);
 

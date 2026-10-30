@@ -8,7 +8,6 @@ import { qs } from './utils/html';
 import { storedSetting } from './utils/storedSetting';
 import { keepScreenOnWhilePlaying } from './utils/wakeLock';
 import { Router, buildUrl, trackHref, detailHref } from './router';
-import { bindDragOnlyRange, syncRangeFill } from './components/ui/rangeSlider';
 import { resetScrollPosition } from './scroll';
 import { PlaybackSession, PlaybackQueue, PlaybackController, publishQueue } from './components/player';
 import type { PlayerFooterElement } from './components/player';
@@ -95,7 +94,7 @@ class App {
   private readonly descriptionEl = qs<HTMLElement>('#track-description');
   private readonly trackTagsSection = qs<HTMLElement>('#track-tags-section');
   private readonly trackTagsEl = qs<HTMLElement>('#track-tags');
-  private readonly zoomSlider = qs<HTMLInputElement>('#viz-zoom');
+  private readonly windowButton = qs<HTMLButtonElement>('#viz-window');
   private readonly timelineToggleButton = qs<HTMLButtonElement>('#viz-toggle');
   private readonly timelineLockButton = qs<HTMLButtonElement>('#viz-lock');
   private readonly footer = qs<PlayerFooterElement>('#player-footer');
@@ -253,7 +252,7 @@ class App {
     bindToggle('#keep-screen-on-toggle', 'happy-keep-screen-on', true, this.setKeepScreenOn);
     bindSelect('#album-display-select', 'happy-album-display', 'albums-tracks', isAlbumDisplayMode,
       (mode) => this.library.setAlbumDisplay(mode));
-    this.bindZoomControls();
+    this.bindTimelineControls();
     whenIdle(() => {
       void this.showVersion();
     });
@@ -387,18 +386,26 @@ class App {
     });
   }
 
-  private bindZoomControls(): void {
-    if (!this.zoomSlider) return;
-    const applyZoom = (rawZoom: number): void => {
-      const zoom = Math.max(1, rawZoom);
-      if (this.zoomSlider && Number(this.zoomSlider.value) !== zoom) this.zoomSlider.value = String(zoom);
-      if (this.zoomSlider) syncRangeFill(this.zoomSlider);
-      this.viz.zoomLevel = zoom;
+  private bindTimelineControls(): void {
+    // Each click zooms in one step (whole track, then 10m down to 30s) and wraps back to the whole track.
+    const windows: { seconds: number | null; label: string }[] = [
+      { seconds: null, label: 'All' },
+      { seconds: 300, label: '5m' },
+      { seconds: 60, label: '1m' },
+      { seconds: 30, label: '30s' },
+      { seconds: 10, label: '10s' },
+    ];
+    let index = 0;
+    this.windowButton?.addEventListener('click', () => {
+      index = (index + 1) % windows.length;
+      const { seconds, label } = windows[index]!;
+      const labelEl = this.windowButton?.querySelector('.viz-window-label');
+      if (labelEl) labelEl.textContent = label;
+      this.windowButton?.setAttribute('aria-label', `Time shown in the timelines: ${label}`);
+      this.windowButton?.classList.toggle('active', seconds !== null);
+      this.viz.windowSeconds = seconds;
       this.viz.redraw();
-    };
-    bindDragOnlyRange(this.zoomSlider);
-    this.zoomSlider.addEventListener('input', () => applyZoom(Number(this.zoomSlider?.value ?? 1)));
-    applyZoom(Number(this.zoomSlider.value || 1));
+    });
 
     if (this.timelineToggleButton) {
       this.timelineToggleButton.type = 'button';

@@ -162,6 +162,13 @@ Funscripts without a recognised toy suffix (`file.funscript`) are still picked u
 
 If your funscripts follow another naming pattern, e.g. `file-prostate.funscript` instead of `file.buttplug.funscript` you can change the separator character and expected suffixes on the plugin's settings page (see [Configuration](configuration.md#funscript-file-names)). The plugin matches files with the new separator within about 30 seconds; reload HAPPY afterwards.
 
+### Timelines
+
+The file page draws a timeline per funscript. By default it shows the whole track (*All*). Each
+press of the magnifying glass button zooms in one step, showing 5 minutes, 1 minute, 30 seconds and
+10 seconds centred on the playhead; the next press goes back to the whole track. The eye button hides the timelines, the
+lock button allows seeking by clicking a timeline.
+
 ### Auto funscript
 
 When the plugin setting *Generate an Auto funscript from the audio* is on (see

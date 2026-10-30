@@ -9,7 +9,7 @@ interface ScriptRenderer {
   channel: HapticChannel;
   canvas: HTMLCanvasElement;
   cursor: HTMLDivElement;
-  /** Last applied cursor offset, so a fixed (zoomed) cursor isn't restyled every frame. */
+  /** Last applied cursor offset, so a fixed (windowed) cursor isn't restyled every frame. */
   cursorX: number;
   wrapper: HTMLDivElement;
   /** Null while the script is still loading; the row then shows a placeholder. */
@@ -24,8 +24,8 @@ const CANVAS_HEIGHT = 60;
 /**
  * Renders a line graph for each loaded Funscript on a canvas element.
  *
- * Supports horizontal zoom (zoom > 1 magnifies around the playhead) and
- * draws the cursor as a composited overlay element.
+ * Shows either the whole track or a fixed time window centred on the playhead,
+ * and draws the cursor as a composited overlay element.
  */
 export class Visualization {
   private renderers: ScriptRenderer[] = [];
@@ -40,8 +40,8 @@ export class Visualization {
   private colors = { line: '#6c757d' };
   private colorGradient = false;
 
-  /** Horizontal zoom factor (1 = full view, 2 = 2× zoom, etc.) */
-  zoomLevel = 1;
+  /** Seconds shown around the playhead; null (or a window longer than the track) shows the whole track. */
+  windowSeconds: number | null = null;
 
   constructor(session: PlaybackSession) {
     this.session = session;
@@ -240,7 +240,7 @@ export class Visualization {
     r.cursor.hidden = duration <= 0 || !prepared;
     if (duration <= 0 || !prepared) return;
 
-    const { startSec, endSec } = this.getVisibleWindow(currentTime, duration, Math.max(1, this.zoomLevel));
+    const { startSec, endSec } = this.getVisibleWindow(currentTime, duration);
     const startMs = startSec * 1000;
     const spanMs = (endSec - startSec) * 1000;
     // Keep the stroke inside the canvas at pos 0/100.
@@ -297,20 +297,17 @@ export class Visualization {
 
     const rect = canvas.getBoundingClientRect();
     const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
-    const { startSec, endSec } = this.getVisibleWindow(
-      currentTime,
-      duration,
-      Math.max(1, this.zoomLevel),
-    );
+    const { startSec, endSec } = this.getVisibleWindow(currentTime, duration);
 
     const target = startSec + ((endSec - startSec) * ratio);
     this.seekHandler(Math.max(0, Math.min(duration, target)));
   }
 
-  /** Window centred on the playhead; at zoom 1 it shows the full track without scrolling. */
-  private getVisibleWindow(currentTime: number, duration: number, zoom: number): { startSec: number; endSec: number } {
-    if (zoom <= 1) return { startSec: 0, endSec: duration };
-    const halfWindow = duration / zoom / 2;
+  /** Window centred on the playhead; without a window it shows the full track without scrolling. */
+  private getVisibleWindow(currentTime: number, duration: number): { startSec: number; endSec: number } {
+    const span = this.windowSeconds;
+    if (!span || span >= duration) return { startSec: 0, endSec: duration };
+    const halfWindow = span / 2;
     return { startSec: currentTime - halfWindow, endSec: currentTime + halfWindow };
   }
 }

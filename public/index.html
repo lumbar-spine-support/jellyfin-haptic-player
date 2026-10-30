@@ -195,11 +195,11 @@
           <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
             <h2 class="h6 mb-2">Funscripts</h2>
             <div class="d-flex align-items-center gap-2">
-              <label for="viz-zoom" class="text-muted small mb-0">
+              <button id="viz-window" type="button" class="btn btn-outline-primary" aria-label="Time shown in the timelines: all"
+                title="Zoom the timelines">
                 <i class="bi bi-zoom-in" aria-hidden="true"></i>
-              </label>
-              <input id="viz-zoom" type="range" class="form-range handle-only-range" min="1" max="50" step="1"
-                value="1" />
+                <span class="viz-window-label">All</span>
+              </button>
               <button id="viz-toggle" type="button" class="btn btn-primary" aria-label="Toggle timeline visibility"
                 aria-pressed="true" title="Hide timelines">
                 <i class="bi bi-eye-fill" aria-hidden="true"></i>

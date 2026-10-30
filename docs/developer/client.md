@@ -101,7 +101,7 @@ sequenceDiagram
   A->>P: GET /Happy/Config
   P-->>A: ClientSettings (built-in defaults if this fails)
   A->>A: useJellyfin(connection, suffixes, chapter priority)
-  A->>A: seek step, artwork options, bind library,<br/>Intiface settings, toggles, zoom
+  A->>A: seek step, artwork options, bind library,<br/>Intiface settings, toggles, timeline window
   A-->>P: when idle: GET /Happy/Info → version badge
   A->>A: mount Intiface DeviceAssignment, initHapticControls
   opt dglabEnabled
