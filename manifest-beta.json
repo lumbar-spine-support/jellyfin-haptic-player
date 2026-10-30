@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.6.0.2",
+        "changelog": "Beta build 1.6.0.2 from dev (commit c4726fb). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- feat(library): show single-track albums only as their track (c4726fb)",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.6.0.2.zip",
+        "checksum": "702d9d245422f1ac9de06c3d9fb609a4",
+        "timestamp": "2026-10-30T12:18:38Z"
+      },
+      {
         "version": "1.6.0.1",
         "changelog": "Beta build 1.6.0.1 from dev (commit cf66c15). Not released yet, may be unstable.",
         "targetAbi": "12.1.0.0",
