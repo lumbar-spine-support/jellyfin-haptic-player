@@ -35,6 +35,7 @@ export class DetailView {
     private context: DetailContext | null = null;
 
     constructor(private readonly options: DetailViewOptions) {
+        this.cover?.addEventListener('load', () => this.fitCover());
         this.playBtn?.addEventListener('click', () => this.play(false));
         this.shuffleBtn?.addEventListener('click', () => this.play(true));
         this.enqueueBtn?.addEventListener('click', () => {
@@ -111,7 +112,18 @@ export class DetailView {
             const media = this.options.allMedia();
             applyPlaylistCover(this.cover, coverTrackIds.map((id) => media.find((item) => item.id === id)));
             this.cover.style.display = '';
+            this.fitCover();
         }
+    }
+
+    /** Album covers keep their aspect ratio; playlist covers (and a cover still loading) stay square. */
+    private fitCover(): void {
+        const cover = this.cover;
+        if (!cover) return;
+        const { naturalWidth: w, naturalHeight: h } = cover;
+        const fit = this.context?.type === 'album' && cover.complete && w > 0 && h > 0;
+        cover.classList.toggle('cover-portrait', fit && h > w);
+        cover.classList.toggle('cover-landscape', fit && w > h);
     }
 
     /** The library's list rows; a row whose media HAPPY does not know is left out. */

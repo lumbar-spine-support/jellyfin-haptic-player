@@ -40,6 +40,22 @@ body.blur-content media-container {
   filter: blur(20px);
 }
 
+// Square by default; an album cover keeps its aspect ratio: portrait grows taller, landscape wider.
+#detail-cover {
+  width: 200px;
+  height: 200px;
+  max-width: 100%;
+  object-fit: cover;
+
+  &.cover-portrait {
+    height: auto;
+  }
+
+  &.cover-landscape {
+    width: auto;
+  }
+}
+
 .settings-section {
   margin-bottom: max(var(--bs-offcanvas-padding-y), 2rem);
 }

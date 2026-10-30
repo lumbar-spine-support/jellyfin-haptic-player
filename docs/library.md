@@ -128,6 +128,9 @@ The queue lives in the open browser tab and is gone after a reload; save it as a
 
 In the grid view, cards with widescreen cover art (typical for videos) are twice as wide as other cards. Square and portrait covers are cropped to a square. Turn on *Crop artwork to squares* on the plugin's settings page (see [configuration](configuration.md#library)) to show all covers as squares.
 
+On an album's page the cover keeps its shape: a portrait cover is as wide as a square one and
+taller, a landscape cover as high and wider. Playlist covers stay square.
+
 Cover art is Jellyfin's primary image of each item: embedded cover art, an image next to the file, or a frame Jellyfin extracted from the video. Audio files without cover art show a black player surface.
 
 ## Video codecs
