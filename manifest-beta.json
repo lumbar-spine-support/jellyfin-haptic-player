@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.6.0.1",
+        "changelog": "Beta build 1.6.0.1 from dev (commit cf66c15). Not released yet, may be unstable.",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.6.0.1.zip",
+        "checksum": "de840579eefd920b3ec28b98216bfbbb",
+        "timestamp": "2026-10-30T07:25:04Z"
+      },
+      {
         "version": "1.6.0.0",
         "changelog": "## [1.6.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.5.0...v1.6.0) (2026-10-30)\n\n\n### Features\n\n* **library:** album display setting for albums, tracks or both ([cfbf0e7](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/cfbf0e76158051ad709d3a9b84a8a0875aef1f67))\n* **settings:** one-row layout and one font size in the settings sidebar ([7676195](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/76761957146e72bd48c0c260d9ca798c8242a4ba))\n\nInstall or update HAPPY through its Jellyfin plugin repository: https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/jellyfin-plugin-repository/manifest.json (Dashboard → Plugins → Repositories), or download `happy_1.6.0.0.zip` below.",
         "targetAbi": "12.1.0.0",
