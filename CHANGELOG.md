@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.6.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.5.0...v1.6.0) (2026-10-30)
+
+
+### Features
+
+* **library:** album display setting for albums, tracks or both ([cfbf0e7](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/cfbf0e76158051ad709d3a9b84a8a0875aef1f67))
+* **settings:** one-row layout and one font size in the settings sidebar ([7676195](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/76761957146e72bd48c0c260d9ca798c8242a4ba))
+
 ## [1.5.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.4.1...v1.5.0) (2026-10-23)
 
 
