@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.6.0.3",
+        "changelog": "Beta build 1.6.0.3 from dev (commit 4ca8ac8). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- feat(player): cycle the funscript timeline zoom through fixed time windows (4ca8ac8)\n- feat(library): show single-track albums only as their track (c4726fb)",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.6.0.3.zip",
+        "checksum": "bf7601d10e146cc1ca80726c6656c220",
+        "timestamp": "2026-10-30T15:56:13Z"
+      },
+      {
         "version": "1.6.0.2",
         "changelog": "Beta build 1.6.0.2 from dev (commit c4726fb). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- feat(library): show single-track albums only as their track (c4726fb)",
         "targetAbi": "12.1.0.0",
