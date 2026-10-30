@@ -103,7 +103,7 @@ Sorting applies to the grid and the list view alike, and all media types are sor
 - **Albums only**: just the album; searching for one of its tracks finds the album.
 - **Tracks only**: just the tracks, not the album.
 
-An album with a single track is not a grouping and always shows as album and track. Album pages and playlists are not affected.
+An album with a single track is not a grouping and always shows as just the track, whatever this setting says; it is not counted as an album either. Album pages and playlists are not affected.
 
 ## Favorites
 

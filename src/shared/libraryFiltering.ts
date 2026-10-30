@@ -13,7 +13,7 @@ export interface SortableLibraryItem {
 
 /**
  * How albums of more than one track appear in the library: as album and tracks, only as the album,
- * or only as their tracks. Albums of a single track are not a grouping and always show both.
+ * or only as their tracks. Albums of a single track are not a grouping and always show as the track only.
  */
 export const ALBUM_DISPLAY_MODES = ['albums-tracks', 'albums', 'tracks'] as const;
 export type AlbumDisplayMode = typeof ALBUM_DISPLAY_MODES[number];
@@ -38,8 +38,9 @@ export function groupedTrackIds(albums: readonly Pick<AlbumInfo, 'trackIds'>[]):
 
 /**
  * Drops what `mode` hides: the tracks of grouping albums ('albums') or the grouping albums
- * themselves ('tracks'). `allAlbums` decides which tracks are grouped, so a track stays hidden
- * even when its album is filtered out.
+ * themselves ('tracks'). Single-track albums are always dropped, in every mode, since their track
+ * shows instead. `allAlbums` decides which tracks are grouped, so a track stays hidden even when
+ * its album is filtered out.
  */
 export function applyAlbumDisplay<A extends Pick<AlbumInfo, 'trackIds'>, T extends Pick<TrackInfo, 'id'>>(
   mode: AlbumDisplayMode,
@@ -47,12 +48,13 @@ export function applyAlbumDisplay<A extends Pick<AlbumInfo, 'trackIds'>, T exten
   tracks: readonly T[],
   allAlbums: readonly Pick<AlbumInfo, 'trackIds'>[],
 ): { albums: A[]; tracks: T[] } {
-  if (mode === 'tracks') return { albums: albums.filter((album) => !isGroupingAlbum(album)), tracks: [...tracks] };
+  if (mode === 'tracks') return { albums: [], tracks: [...tracks] };
+  const grouping = albums.filter(isGroupingAlbum);
   if (mode === 'albums') {
     const grouped = groupedTrackIds(allAlbums);
-    return { albums: [...albums], tracks: tracks.filter((track) => !grouped.has(track.id)) };
+    return { albums: grouping, tracks: tracks.filter((track) => !grouped.has(track.id)) };
   }
-  return { albums: [...albums], tracks: [...tracks] };
+  return { albums: grouping, tracks: [...tracks] };
 }
 
 function sortValue(item: SortableLibraryItem, field: LibrarySortField): string | number {
@@ -158,7 +160,10 @@ export function reachableTags(
 
 export type MediaCounts = { albums: number; tracks: number; playlists: number; videos: number };
 
-/** Counts items per media type matching the plain tags in `activeTags`; artist entries are ignored. */
+/**
+ * Counts items per media type matching the plain tags in `activeTags`; artist entries are ignored.
+ * Single-track albums are not counted as albums, since the library shows them as their track.
+ */
 export function countMediaMatches(
   library: {
     tracks: readonly TrackInfo[];
@@ -171,7 +176,7 @@ export function countMediaMatches(
   const { tags } = splitActiveTags(activeTags);
   const tracksById = new Map([...library.tracks, ...library.videos].map((track) => [track.id, track]));
   return {
-    albums: library.albums.filter((album) => albumMatchesActiveTags(album, tracksById, tags)).length,
+    albums: library.albums.filter((album) => isGroupingAlbum(album) && albumMatchesActiveTags(album, tracksById, tags)).length,
     tracks: library.tracks.filter((track) => trackMatchesActiveTags(track.tags, tags)).length,
     playlists: library.playlists.filter((playlist) => playlistMatchesActiveTags(playlist, tracksById, tags)).length,
     videos: library.videos.filter((video) => trackMatchesActiveTags(video.tags, tags)).length,

@@ -63,12 +63,12 @@ test(`${TAG} filterAvailableTags excludes selected and artist tags and applies q
     assert.deepEqual(filterAvailableTags(all, [], 'st'), ['story']);
 });
 
-test(`${TAG} countMediaMatches counts per media type and ignores artist entries`, () => {
+test(`${TAG} countMediaMatches counts per media type and ignores artist entries and single-track albums`, () => {
     const track = (id: string, tags: string[]) => ({ id, tags, artist: 'A', funscripts: [] }) as never;
     const library = {
         tracks: [track('t1', ['asmr']), track('t2', ['sfw'])],
         videos: [track('v1', ['asmr'])],
-        albums: [{ trackIds: ['t1'] }, { trackIds: ['t2'] }] as never[],
+        albums: [{ trackIds: ['t1', 'v1'] }, { trackIds: ['t2', 'x'] }, { trackIds: ['t1'] }] as never[],
         playlists: [{ entries: [{ trackId: 't2' }] }] as never[],
     };
     assert.deepEqual(countMediaMatches(library, []), { albums: 2, tracks: 2, playlists: 1, videos: 1 });
@@ -149,13 +149,13 @@ test(`${TAG} groupedTrackIds only counts albums of more than one track`, () => {
 
 test(`${TAG} applyAlbumDisplay shows albums and tracks by default`, () => {
     const result = applyAlbumDisplay('albums-tracks', DISPLAY_ALBUMS, DISPLAY_TRACKS, DISPLAY_ALBUMS);
-    assert.deepEqual(ids(result.albums), ['album-ab', 'album-c']);
+    assert.deepEqual(ids(result.albums), ['album-ab']);
     assert.deepEqual(ids(result.tracks), ['a', 'b', 'c', 'd']);
 });
 
 test(`${TAG} applyAlbumDisplay 'albums' hides the tracks of grouping albums`, () => {
     const result = applyAlbumDisplay('albums', DISPLAY_ALBUMS, DISPLAY_TRACKS, DISPLAY_ALBUMS);
-    assert.deepEqual(ids(result.albums), ['album-ab', 'album-c']);
+    assert.deepEqual(ids(result.albums), ['album-ab']);
     assert.deepEqual(ids(result.tracks), ['c', 'd']);
 });
 
@@ -164,9 +164,9 @@ test(`${TAG} applyAlbumDisplay 'albums' hides grouped tracks even when their alb
     assert.deepEqual(ids(result.tracks), ['c', 'd']);
 });
 
-test(`${TAG} applyAlbumDisplay 'tracks' hides grouping albums but keeps all tracks`, () => {
+test(`${TAG} applyAlbumDisplay 'tracks' hides all albums but keeps all tracks`, () => {
     const result = applyAlbumDisplay('tracks', DISPLAY_ALBUMS, DISPLAY_TRACKS, DISPLAY_ALBUMS);
-    assert.deepEqual(ids(result.albums), ['album-c']);
+    assert.deepEqual(ids(result.albums), []);
     assert.deepEqual(ids(result.tracks), ['a', 'b', 'c', 'd']);
 });
 
