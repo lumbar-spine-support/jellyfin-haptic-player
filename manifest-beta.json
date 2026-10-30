@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.6.0.4",
+        "changelog": "Beta build 1.6.0.4 from dev (commit 7d91826). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- feat(library): keep the aspect ratio of album covers on the album page (7d91826)\n- feat(player): cycle the funscript timeline zoom through fixed time windows (4ca8ac8)\n- feat(library): show single-track albums only as their track (c4726fb)",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.6.0.4.zip",
+        "checksum": "e25ea5da98af90015e5469b82081dd67",
+        "timestamp": "2026-10-30T16:11:17Z"
+      },
+      {
         "version": "1.6.0.3",
         "changelog": "Beta build 1.6.0.3 from dev (commit 4ca8ac8). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- feat(player): cycle the funscript timeline zoom through fixed time windows (4ca8ac8)\n- feat(library): show single-track albums only as their track (c4726fb)",
         "targetAbi": "12.1.0.0",
