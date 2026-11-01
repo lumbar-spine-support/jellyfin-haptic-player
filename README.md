@@ -14,16 +14,12 @@
 - Easily added as a plugin to your [Jellyfin](https://jellyfin.org/) server.
 - [Intiface](https://intiface.com/) websocket for wide-ranging haptic toys support.
 - Modern [Video.JS v10](https://videojs.org/blog/videojs-v10-release-candidate) framework for audio and video playback.
-
-🧪 Experimental features:
-
 - [Dungeon Lab](https://www.dungeon-lab.com/) Coyote 3.0 E-stim haptic support
 - Virtual Reality Rendering (VR180 SBS+TB)
 
 🚀 Planned:
 
 - [ ] Full VR Video support for headsets like the Steam Frame.
-- [ ] Playlist/Queue editor and a seperate mount with write-access.
 
 
 ## Quick Start
