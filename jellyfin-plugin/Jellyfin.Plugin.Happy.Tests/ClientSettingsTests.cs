@@ -22,6 +22,8 @@ public class ClientSettingsTests
         Assert.Equal("stroker", settings.FunscriptSuffixes.Stroker);
         Assert.Equal(string.Empty, settings.JellyfinUrl);
         Assert.Equal(1, settings.DescriptionHeadingLimit);
+        Assert.False(settings.CardViewLargePortraitArtwork);
+        Assert.True(settings.CardViewWideLandscapeArtwork);
     }
 
     [Fact]

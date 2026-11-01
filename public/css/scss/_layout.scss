@@ -145,7 +145,7 @@ $settings-font-size: 0.875rem;
   object-fit: cover;
 }
 
-// CSS grid (instead of flex row) so portrait cards can span two rows; dense flow backfills gaps.
+// CSS grid (instead of flex row) so portrait cards can span 2×2 cells; dense flow backfills gaps.
 #track-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -177,12 +177,20 @@ $settings-font-size: 0.875rem;
 }
 
 #track-grid>.track-card-portrait {
+  grid-column: span 2;
   grid-row: span 2;
 }
 
+.track-card-portrait .track-card {
+  max-width: calc(600px + var(--bs-gutter-x, 1rem));
+}
+
 .track-card-portrait .track-art-link {
+  position: relative;
   flex: 1 1 auto;
   min-height: 0;
+  // At least square; the neighbouring cards of both rows decide the rest of the height.
+  aspect-ratio: 1 / 1;
 }
 
 // Keep body at natural height so the art bottom lines up with the second-row square art.
@@ -190,10 +198,19 @@ $settings-font-size: 0.875rem;
   flex: 0 0 auto;
 }
 
+// Out of flow so the tall image does not stretch its rows. It takes the full height of the 2×2 cell
+// and its own width, centred, so the whole portrait shows; contain keeps it whole if that is too wide.
 .track-card-portrait .track-art {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
   height: 100%;
+  max-width: 100%;
   max-height: none;
   aspect-ratio: auto;
+  object-fit: contain;
 }
 
 .track-card-landscape .track-card {

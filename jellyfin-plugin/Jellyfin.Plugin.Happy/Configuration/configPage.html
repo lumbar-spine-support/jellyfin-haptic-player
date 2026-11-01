@@ -180,7 +180,11 @@
                     </div>
                     <div class="checkboxContainer checkboxContainer-withDescription">
                         <label class="emby-checkbox-label"><input id="CardViewLargePortraitArtwork" type="checkbox"
-                                is="emby-checkbox" /><span>Portrait artwork takes two rows</span></label>
+                                is="emby-checkbox" /><span>Portrait artwork takes two rows and two columns (2×2)</span></label>
+                    </div>
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label class="emby-checkbox-label"><input id="CardViewWideLandscapeArtwork" type="checkbox"
+                                is="emby-checkbox" /><span>Landscape artwork takes two columns (1×2)</span></label>
                     </div>
                     <div class="selectContainer">
                         <label class="selectLabel" for="DescriptionHeadingLimit">Largest heading in descriptions</label>
@@ -249,7 +253,8 @@
                     'AutoFunscriptMinFrequency', 'AutoFunscriptMaxFrequency', 'AutoFunscriptMinPower', 'AutoFunscriptFrameMs',
                     'AutoFunscriptMinPositionDelta'];
                 var flags = ['BlurContent', 'FunscriptColorGradient', 'AutoReconnectIntiface', 'DglabEnabled', 'DglabSandboxEnabled',
-                    'AutoReconnectDglab', 'CardViewForceSquareArtwork', 'CardViewLargePortraitArtwork', 'DebugLogging', 'ShowInJellyfinMenu',
+                    'AutoReconnectDglab', 'CardViewForceSquareArtwork', 'CardViewLargePortraitArtwork', 'CardViewWideLandscapeArtwork',
+                    'DebugLogging', 'ShowInJellyfinMenu',
                     'AutoFunscriptEnabled'];
                 var texts = ['ChapterSourcePriority', 'FunscriptInterpolationMethod', 'DglabRelayUrl', 'FunscriptSeparator',
                     'FunscriptSuffixStroker', 'FunscriptSuffixButtplug', 'FunscriptSuffixVibrator', 'FunscriptSuffixEstim',

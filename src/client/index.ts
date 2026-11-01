@@ -72,6 +72,7 @@ const FALLBACK_SETTINGS: ClientSettings = {
   funscriptColorGradient: false,
   cardViewForceSquareArtwork: false,
   cardViewLargePortraitArtwork: true,
+  cardViewWideLandscapeArtwork: true,
   theme: 'oled',
   jellyfinUrl: '',
   funscriptSuffixes: DEFAULT_FUNSCRIPT_SUFFIXES,
@@ -243,6 +244,7 @@ class App {
     this.applySeekInterval();
     this.library.setForceSquareArtwork(this.settings.cardViewForceSquareArtwork);
     this.library.setLargePortraitArtwork(this.settings.cardViewLargePortraitArtwork);
+    this.library.setWideLandscapeArtwork(this.settings.cardViewWideLandscapeArtwork);
     this.library.bindControls();
     bindIntifaceSettings(this.buttplug, this.settings.autoReconnectIntiface);
     bindToggle('#blur-content-toggle', 'happy-blur-content', this.settings.blurContent,

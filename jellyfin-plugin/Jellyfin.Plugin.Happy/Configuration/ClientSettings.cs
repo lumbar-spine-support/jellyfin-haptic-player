@@ -86,9 +86,13 @@ public sealed record ClientSettings
     [JsonPropertyName("cardViewForceSquareArtwork")]
     public bool CardViewForceSquareArtwork { get; init; }
 
-    /// <summary>Gets a value indicating whether portrait artwork takes up two rows.</summary>
+    /// <summary>Gets a value indicating whether portrait artwork takes up two rows and two columns (2×2).</summary>
     [JsonPropertyName("cardViewLargePortraitArtwork")]
     public bool CardViewLargePortraitArtwork { get; init; }
+
+    /// <summary>Gets a value indicating whether landscape artwork takes up two columns (1×2) instead of one (1×1).</summary>
+    [JsonPropertyName("cardViewWideLandscapeArtwork")]
+    public bool CardViewWideLandscapeArtwork { get; init; }
 
     /// <summary>Gets the heading level (1–6) that <c>#</c> headings in track descriptions render at.</summary>
     [JsonPropertyName("descriptionHeadingLimit")]
@@ -146,6 +150,7 @@ public sealed record ClientSettings
             FunscriptColorGradient = config.FunscriptColorGradient,
             CardViewForceSquareArtwork = config.CardViewForceSquareArtwork,
             CardViewLargePortraitArtwork = config.CardViewLargePortraitArtwork,
+            CardViewWideLandscapeArtwork = config.CardViewWideLandscapeArtwork,
             DescriptionHeadingLimit = Math.Clamp(config.DescriptionHeadingLimit, 1, 6),
             AutoFunscriptEnabled = config.AutoFunscriptEnabled,
             Theme = ParseTheme(config.Theme),

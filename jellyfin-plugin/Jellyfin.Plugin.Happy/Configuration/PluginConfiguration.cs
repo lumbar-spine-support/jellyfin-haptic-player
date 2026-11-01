@@ -82,9 +82,14 @@ public class PluginConfiguration : BasePluginConfiguration
     public bool CardViewForceSquareArtwork { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether portrait artwork takes up two rows.
+    /// Gets or sets a value indicating whether portrait artwork takes up two rows and two columns (2×2).
     /// </summary>
     public bool CardViewLargePortraitArtwork { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether landscape artwork takes up two columns (1×2) instead of one (1×1).
+    /// </summary>
+    public bool CardViewWideLandscapeArtwork { get; set; } = true;
 
     /// <summary>
     /// Gets or sets the heading level (1–6) that <c>#</c> headings in track descriptions render at.

@@ -182,7 +182,10 @@ export interface ClientSettings {
   funscriptInterpolationMethod: InterpolationMethod;
   funscriptColorGradient: boolean;
   cardViewForceSquareArtwork: boolean;
+  /** Portrait artwork spans 2×2 grid cells instead of one. */
   cardViewLargePortraitArtwork: boolean;
+  /** Landscape artwork spans two columns (1×2) instead of one (1×1). */
+  cardViewWideLandscapeArtwork: boolean;
   /** Served as `theme.css` by the plugin; the client only mirrors it on `<html data-theme>`. */
   theme: ThemeName;
   /** Unused since the plugin serves HAPPY (the page knows its Jellyfin); always empty. */

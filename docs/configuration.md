@@ -68,7 +68,8 @@ The relay itself is configured with environment variables, see [DG-Lab Coyote 3.
 | Setting | Default | Description |
 | --- | --- | --- |
 | Crop artwork to squares | off | Reduce artwork to a square, for a consistent layout. |
-| Portrait artwork takes two rows | off | Portrait artwork takes up two rows in the card view. |
+| Portrait artwork takes two rows and two columns (2×2) | off | Portrait artwork takes up two rows and two columns in the card view and is shown whole at the height of the two rows. Off: it is cropped to a square card. |
+| Landscape artwork takes two columns (1×2) | on | Landscape artwork takes up two columns in the card view. Off: it is cropped to a square card (1×1). |
 | Largest heading in descriptions | Heading 1 | The level `#` headings in [track descriptions](library.md#tags-and-descriptions) are shown at. Smaller headings move down with it to keep the structure, up to heading 6: with *Heading 2*, `#` is shown as `##` and `##` as `###`; with *Heading 6*, all headings look the same. |
 
 ## Funscript file names

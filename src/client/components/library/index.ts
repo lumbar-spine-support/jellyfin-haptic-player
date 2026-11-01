@@ -148,6 +148,7 @@ export class Library {
     private loaded = false;
     private forceSquareArtwork = false;
     private largePortraitArtwork = true;
+    private wideLandscapeArtwork = true;
     private albumDisplay: AlbumDisplayMode = 'albums-tracks';
 
     constructor(callbacks: LibraryCallbacks) {
@@ -571,6 +572,10 @@ export class Library {
 
     setLargePortraitArtwork(large: boolean): void {
         this.largePortraitArtwork = large;
+    }
+
+    setWideLandscapeArtwork(wide: boolean): void {
+        this.wideLandscapeArtwork = wide;
     }
 
     /** Re-renders a loaded library, since it changes which items are shown. */
@@ -1024,7 +1029,7 @@ export class Library {
         return col;
     }
 
-    /** Widens (landscape) or heightens (portrait) the card once its artwork aspect is known. */
+    /** Widens (landscape, 1×2) or enlarges (portrait, 2×2) the card once its artwork aspect is known. */
     private applyCardAspect(col: HTMLElement): void {
         if (this.forceSquareArtwork) return;
         const img = col.querySelector<HTMLImageElement>('img.track-art');
@@ -1032,7 +1037,7 @@ export class Library {
         const apply = (): void => {
             if (img.src === FALLBACK_ART_DATA_URI) return;
             const aspect = classifyArtAspect(img.naturalWidth, img.naturalHeight);
-            if (aspect === 'landscape') col.className = `${CARD_LANDSCAPE_GRID_CLASSES} track-card-landscape`;
+            if (aspect === 'landscape' && this.wideLandscapeArtwork) col.className = `${CARD_LANDSCAPE_GRID_CLASSES} track-card-landscape`;
             else if (aspect === 'portrait' && this.largePortraitArtwork) col.classList.add('track-card-portrait');
         };
         if (img.complete && img.naturalWidth > 0) apply();

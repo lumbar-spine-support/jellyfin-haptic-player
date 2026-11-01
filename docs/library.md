@@ -127,7 +127,7 @@ The queue lives in the open browser tab and is gone after a reload; save it as a
 
 ## Cover art in the grid view
 
-In the grid view, cards with widescreen cover art (typical for videos) are twice as wide as other cards. Square and portrait covers are cropped to a square. Turn on *Crop artwork to squares* on the plugin's settings page (see [configuration](configuration.md#library)) to show all covers as squares.
+In the grid view, cards with widescreen cover art (typical for videos) are twice as wide as other cards (1×2). Square and portrait covers are cropped to a square. On the plugin's settings page (see [configuration](configuration.md#library)) you can give portrait covers a card twice as wide and high as other cards (2×2), where the whole cover shows at the height of two rows, keep widescreen covers to a single square card (1×1), or turn on *Crop artwork to squares* to show all covers as squares.
 
 On an album's page the cover keeps its shape: a portrait cover is as wide as a square one and
 taller, a landscape cover as high and wider. Playlist covers stay square.
