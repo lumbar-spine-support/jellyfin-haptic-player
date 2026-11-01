@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.6.0.5",
+        "changelog": "Beta build 1.6.0.5 from dev (commit 749aa24). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- chore(vscode): open Chrome without waiting for the client watches (749aa24)\n- test(fixtures): add Big Buck Bunny tags that cover the tags view's letter groups (537947d)\n- feat(library): show portrait artwork at 2x2 and make wide landscape cards configurable (ef25a4c)\n- feat(library): group the tags view by first letter (297de15)\n- feat(library): add a Shuffle sort with a reshuffle button (48e980a)\n- feat(library): keep the aspect ratio of album covers on the album page (7d91826)\n- feat(player): cycle the funscript timeline zoom through fixed time windows (4ca8ac8)\n- feat(library): show single-track albums only as their track (c4726fb)",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.6.0.5.zip",
+        "checksum": "b1672879d1ea7de4fdec86419f6f17b0",
+        "timestamp": "2026-11-01T19:00:58Z"
+      },
+      {
         "version": "1.6.0.4",
         "changelog": "Beta build 1.6.0.4 from dev (commit 7d91826). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- feat(library): keep the aspect ratio of album covers on the album page (7d91826)\n- feat(player): cycle the funscript timeline zoom through fixed time windows (4ca8ac8)\n- feat(library): show single-track albums only as their track (c4726fb)",
         "targetAbi": "12.1.0.0",
