@@ -13,16 +13,17 @@ import {
     countMediaMatches,
     filterAvailableTags,
     isArtistTag,
-    LIBRARY_SORT_FIELDS,
+    LIBRARY_SORT_MODES,
     makeArtistTag,
     playlistMatchesActiveTags,
     playlistMatchesHapticFilters,
     reachableTags,
+    shuffleLibraryItems,
     sortLibraryItems,
     trackMatchesActiveTags,
     trackMatchesHapticFilters,
     type AlbumDisplayMode,
-    type LibrarySortField,
+    type LibrarySortMode,
     type SortableLibraryItem,
 } from '../../../shared/libraryFiltering';
 import type { AlbumInfo, LibraryResponse, PlaylistInfo, TrackInfo, FunscriptType } from '../../../shared/types';
@@ -73,13 +74,16 @@ const CARD_TYPE_FILTERS: Record<CardType, MediaFilterKey> = {
 /** Every file has an Auto script when the plugin generates them, so filtering by it would select nothing. */
 const HAPTIC_TYPES = (Object.keys(ROLE_LABELS) as FunscriptType[]).filter((type) => type !== 'auto');
 
-const SORT_LABELS: Record<LibrarySortField, string> = {
+const SORT_LABELS: Record<LibrarySortMode, string> = {
     title: 'Title',
     artist: 'Artist',
     year: 'Year',
     duration: 'Duration',
     type: 'Type',
+    shuffle: 'Shuffle',
 };
+
+const randomSeed = (): number => Math.floor(Math.random() * 0x100000000);
 
 export interface LibraryCallbacks {
     openTrack(trackId: string): void;
@@ -128,8 +132,10 @@ export class Library {
     private playlists: PlaylistInfo[] = [];
     private searchQuery = '';
     private activeTags: string[] = [];
-    private sortField: LibrarySortField = 'title';
+    private sortField: LibrarySortMode = 'title';
     private sortAsc = true;
+    /** Order of the 'shuffle' sort; a new seed reshuffles. */
+    private shuffleSeed = randomSeed();
     /** Empty means every media type is shown. */
     private mediaFilters = new Set<MediaFilterKey>();
     /** Items must provide every selected haptic type; empty means no haptic filter. */
@@ -230,7 +236,9 @@ export class Library {
             })),
         ];
 
-        const sorted = sortLibraryItems(rows, this.sortField, this.sortAsc);
+        const sorted = this.sortField === 'shuffle'
+            ? shuffleLibraryItems(rows, this.shuffleSeed, (row) => row.morphKey)
+            : sortLibraryItems(rows, this.sortField, this.sortAsc);
         const keyed = (key: string, build: () => HTMLElement) => (): HTMLElement => {
             const el = build();
             el.dataset.morphKey = key;
@@ -637,9 +645,10 @@ export class Library {
         if (this.mediaFilters.size === MEDIA_FILTERS.length) this.mediaFilters.clear();
 
         try {
-            const sort = JSON.parse(localStorage.getItem(LIBRARY_SORT_KEY) ?? '{}') as { field?: unknown; asc?: unknown };
-            if (LIBRARY_SORT_FIELDS.includes(sort.field as LibrarySortField)) this.sortField = sort.field as LibrarySortField;
+            const sort = JSON.parse(localStorage.getItem(LIBRARY_SORT_KEY) ?? '{}') as { field?: unknown; asc?: unknown; seed?: unknown };
+            if (LIBRARY_SORT_MODES.includes(sort.field as LibrarySortMode)) this.sortField = sort.field as LibrarySortMode;
             if (typeof sort.asc === 'boolean') this.sortAsc = sort.asc;
+            if (typeof sort.seed === 'number' && Number.isInteger(sort.seed)) this.shuffleSeed = sort.seed;
         } catch { /* keep default sort */ }
     }
 
@@ -649,7 +658,7 @@ export class Library {
         for (const type of HAPTIC_TYPES) stored[`haptic-${type}`] = this.hapticFilters.has(type);
         stored.favorites = this.favoritesOnly;
         localStorage.setItem(LIBRARY_FILTERS_KEY, JSON.stringify(stored));
-        localStorage.setItem(LIBRARY_SORT_KEY, JSON.stringify({ field: this.sortField, asc: this.sortAsc }));
+        localStorage.setItem(LIBRARY_SORT_KEY, JSON.stringify({ field: this.sortField, asc: this.sortAsc, seed: this.shuffleSeed }));
     }
 
     /** Fills a filter dropdown with one checkbox per option plus a "show all" reset. */
@@ -748,7 +757,7 @@ export class Library {
 
     private bindSortControls(): void {
         const menu = document.querySelector<HTMLElement>('#sort-field-menu');
-        const setSort = (field: LibrarySortField, asc: boolean): void => {
+        const setSort = (field: LibrarySortMode, asc: boolean): void => {
             this.sortField = field;
             this.sortAsc = asc;
             this.saveLibraryFilters();
@@ -758,19 +767,36 @@ export class Library {
 
         if (menu) {
             menu.innerHTML = '';
-            for (const field of LIBRARY_SORT_FIELDS) {
+            for (const field of LIBRARY_SORT_MODES) {
+                if (field === 'shuffle') {
+                    const divider = document.createElement('li');
+                    divider.innerHTML = '<hr class="dropdown-divider">';
+                    menu.appendChild(divider);
+                }
                 const li = document.createElement('li');
                 const item = document.createElement('button');
                 item.type = 'button';
                 item.className = 'dropdown-item';
                 item.dataset.sortOption = field;
                 item.textContent = SORT_LABELS[field];
-                item.addEventListener('click', () => setSort(field, this.sortField === field ? this.sortAsc : true));
+                item.addEventListener('click', () => {
+                    // Picking Shuffle again reshuffles, like the button next to it.
+                    if (field === 'shuffle') this.shuffleSeed = randomSeed();
+                    setSort(field, this.sortField === field ? this.sortAsc : true);
+                });
                 li.appendChild(item);
                 menu.appendChild(li);
             }
         }
-        document.querySelector('#sort-direction')?.addEventListener('click', () => setSort(this.sortField, !this.sortAsc));
+        document.querySelector('#sort-direction')?.addEventListener('click', () => {
+            if (this.sortField !== 'shuffle') {
+                setSort(this.sortField, !this.sortAsc);
+                return;
+            }
+            this.shuffleSeed = randomSeed();
+            this.saveLibraryFilters();
+            this.render();
+        });
 
         this.updateSortControls();
     }
@@ -784,10 +810,12 @@ export class Library {
         });
         const direction = document.querySelector<HTMLElement>('#sort-direction');
         if (direction) {
-            const text = this.sortAsc ? 'Ascending' : 'Descending';
+            const shuffle = this.sortField === 'shuffle';
+            const text = shuffle ? 'Shuffle again' : this.sortAsc ? 'Ascending' : 'Descending';
+            const icon = shuffle ? 'bi-shuffle' : this.sortAsc ? 'bi-sort-up' : 'bi-sort-down';
             direction.title = text;
             direction.setAttribute('aria-label', text);
-            direction.innerHTML = `<i class="bi ${this.sortAsc ? 'bi-sort-up' : 'bi-sort-down'}" aria-hidden="true"></i>`;
+            direction.innerHTML = `<i class="bi ${icon}" aria-hidden="true"></i>`;
         }
     }
 

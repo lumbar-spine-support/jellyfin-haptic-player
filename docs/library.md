@@ -93,7 +93,7 @@ Next to the search box are four controls:
 - **Media type**: a dropdown to limit the library to albums, audio, playlists and/or videos. With nothing selected, everything is shown.
 - **Haptics**: a dropdown to show only items that have scripts for every selected toy type.
 - **Favorites** (heart): show only your favorites (see [Favorites](#favorites)).
-- **Sort**: pick the field (Title, Artist, Year, Duration, Type) and click the arrow button next to it to reverse the order. Items without a value (e.g. playlists have no year) are always listed last.
+- **Sort**: pick the field (Title, Artist, Year, Duration, Type) and click the arrow button next to it to reverse the order. Items without a value (e.g. playlists have no year) are always listed last. Pick **Shuffle** to show the library in a random order; the arrow button becomes a shuffle button that reshuffles. The media type, haptics, favorites and tag filters still apply, and changing them keeps the shuffled order of the remaining items.
 
 Sorting applies to the grid and the list view alike, and all media types are sorted together. Filters and sort order are remembered in the browser.
 

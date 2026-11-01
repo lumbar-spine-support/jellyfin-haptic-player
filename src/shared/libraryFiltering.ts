@@ -2,6 +2,9 @@ import type { AlbumInfo, FunscriptType, PlaylistInfo, TrackInfo } from './types'
 
 export const LIBRARY_SORT_FIELDS = ['title', 'artist', 'year', 'duration', 'type'] as const;
 export type LibrarySortField = typeof LIBRARY_SORT_FIELDS[number];
+/** A sort field, or a random order that is reshuffled on demand. */
+export const LIBRARY_SORT_MODES = [...LIBRARY_SORT_FIELDS, 'shuffle'] as const;
+export type LibrarySortMode = typeof LIBRARY_SORT_MODES[number];
 
 export interface SortableLibraryItem {
   typeLabel: string;
@@ -86,6 +89,31 @@ export function sortLibraryItems<T extends SortableLibraryItem>(
     }
     return cmp !== 0 ? cmp : compareText(a.title, b.title);
   });
+}
+
+/** 32-bit FNV-1a hash of `text`, mixed with `seed`. */
+function seededHash(text: string, seed: number): number {
+  let hash = (0x811c9dc5 ^ seed) >>> 0;
+  for (let i = 0; i < text.length; i++) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193) >>> 0;
+  }
+  // Final avalanche so seeds that differ in few bits still give unrelated orders.
+  hash ^= hash >>> 16;
+  hash = Math.imul(hash, 0x85ebca6b) >>> 0;
+  hash ^= hash >>> 13;
+  return hash >>> 0;
+}
+
+/**
+ * Orders items randomly for `seed`. Each item's place depends only on its key and the seed, so
+ * filtering keeps the remaining items in the same relative order; a new seed reshuffles.
+ */
+export function shuffleLibraryItems<T>(items: readonly T[], seed: number, key: (item: T) => string): T[] {
+  return items
+    .map((item) => ({ item, rank: seededHash(key(item), seed), key: key(item) }))
+    .sort((a, b) => a.rank - b.rank || (a.key < b.key ? -1 : a.key > b.key ? 1 : 0))
+    .map(({ item }) => item);
 }
 
 /** Prefix marking an active filter entry as an artist filter rather than a real file tag. */

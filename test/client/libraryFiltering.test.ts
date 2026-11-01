@@ -13,6 +13,7 @@ import {
     makeArtistTag,
     playlistMatchesActiveTags,
     reachableTags,
+    shuffleLibraryItems,
     sortLibraryItems,
     splitActiveTags,
     trackMatchesActiveTags,
@@ -33,6 +34,17 @@ test(`${TAG} sortLibraryItems mixes media types into one order`, () => {
     ];
     assert.deepEqual(sortLibraryItems(items, 'title', true).map((i) => i.title), ['alpha', 'Beta', 'Track 2', 'Track 10']);
     assert.deepEqual(sortLibraryItems(items, 'title', false).map((i) => i.title), ['Track 10', 'Track 2', 'Beta', 'alpha']);
+});
+
+test(`${TAG} shuffleLibraryItems is stable per seed and keeps relative order when filtering`, () => {
+    const keys = Array.from({ length: 40 }, (_, i) => `track-${i}`);
+    const once = shuffleLibraryItems(keys, 42, (k) => k);
+    assert.deepEqual(shuffleLibraryItems(keys, 42, (k) => k), once);
+    assert.deepEqual([...once].sort(), [...keys].sort());
+    assert.notDeepEqual(once, keys);
+    assert.notDeepEqual(shuffleLibraryItems(keys, 43, (k) => k), once);
+    const even = keys.filter((_, i) => i % 2 === 0);
+    assert.deepEqual(shuffleLibraryItems(even, 42, (k) => k), once.filter((k) => even.includes(k)));
 });
 
 test(`${TAG} sortLibraryItems puts empty values last in both directions`, () => {
