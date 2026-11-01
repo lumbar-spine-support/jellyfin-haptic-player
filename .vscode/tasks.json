@@ -81,15 +81,24 @@
 			}
 		},
 		{
-			// Everything "HAPPY in local Jellyfin" needs: Jellyfin with the plugin and relay, vendor assets, CSS and JS watches.
-			"label": "Local Jellyfin: start with client watch",
+			// Everything "HAPPY in local Jellyfin" needs: Jellyfin with the plugin and relay, vendor assets, CSS and JS.
+			// One-shot builds only: VS Code never treats a compound of watch tasks as done, so Chrome would not open.
+			// Start "Client watch" from Run Task to rebuild on every change.
+			"label": "Local Jellyfin: start with client build",
 			"dependsOrder": "sequence",
 			"dependsOn": [
 				"npm: dev:jellyfin",
 				"npm: build:vendor",
 				"npm: build:css",
-				"Client watch"
+				"Client build (dev)"
 			],
+			"problemMatcher": []
+		},
+		{
+			// Unminified, with source maps, like dev:client but without watching.
+			"label": "Client build (dev)",
+			"type": "shell",
+			"command": "node scripts/build-client.js --sourcemap",
 			"problemMatcher": []
 		},
 		{

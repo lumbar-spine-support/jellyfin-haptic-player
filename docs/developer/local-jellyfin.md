@@ -37,7 +37,7 @@ Open **http://localhost:8097/Happy/Web/** and sign in as `happy-user`. The plugi
 To test what a release serves instead, start with the variables empty: `HAPPY_DEV_WEB_ROOT= HAPPY_DEV_DOCS_ROOT= npm run dev:jellyfin:plugin`. The plugin then serves the copies embedded in the DLL, with ETags and without source maps. Run `npm run build:client` and `build:vendor` first, since the DLL embeds whatever `public/` holds at build time.
 
 VS Code:
-- **HAPPY in local Jellyfin** starts the local Jellyfin, builds the vendor assets and CSS, starts the JS and CSS watches, and opens Chrome at `/Happy/Web/` with breakpoints in the TypeScript sources.
+- **HAPPY in local Jellyfin** starts the local Jellyfin, builds the vendor assets, CSS and JS once, and opens Chrome at `/Happy/Web/` with breakpoints in the TypeScript sources. To rebuild on every change, start the **Client watch** task (*Run Task*; it runs `dev:client` and `dev:css`) and reload the page. The launch does not start the watches itself, because VS Code would wait for them to end before opening Chrome.
 - **Local Jellyfin Integration Tests** runs the integration tests. The tasks `npm: dev:jellyfin:plugin` and `npm: dev:jellyfin:down` are in *Run Task*.
 
 ## What gets set up

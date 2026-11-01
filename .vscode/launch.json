@@ -31,7 +31,7 @@
     },
     {
       // HAPPY as the plugin serves it, from the local dev Jellyfin (docs/developer/local-jellyfin.md).
-      // The client is served straight from public/, so the watch tasks make edits live after a reload.
+      // The client is served straight from public/: run the "Client watch" task to make edits live after a reload.
       "name": "HAPPY in local Jellyfin",
       "request": "launch",
       "type": "chrome",
@@ -44,7 +44,7 @@
       "sourceMapPathOverrides": {
         "http://localhost:8097/Happy/*": "${workspaceFolder}/*"
       },
-      "preLaunchTask": "Local Jellyfin: start with client watch"
+      "preLaunchTask": "Local Jellyfin: start with client build"
     },
     {
       "name": "Local Jellyfin Integration Tests",
