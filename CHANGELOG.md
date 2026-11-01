@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.7.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.6.0...v1.7.0) (2026-11-01)
+
+
+### Features
+
+* **library:** add a Shuffle sort with a reshuffle button ([48e980a](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/48e980a6acc9d794f2dbc7774497f078d286cfa6))
+* **library:** group the tags view by first letter ([297de15](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/297de154208841270d8ee11564df57f42f16defa))
+* **library:** keep the aspect ratio of album covers on the album page ([7d91826](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/7d91826173deff11816da4cdcabcc7cd33570470))
+* **library:** show portrait artwork at 2x2 and make wide landscape cards configurable ([ef25a4c](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/ef25a4cff909db042c0bb57aa5097a5bce01ffca))
+* **library:** show single-track albums only as their track ([c4726fb](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/c4726fbc5fdec1b03e21dc84869c9ce9203f393e))
+* **player:** cycle the funscript timeline zoom through fixed time windows ([4ca8ac8](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/4ca8ac8f7d5f7bd3e7a93f55ce5f5432a66fea7d))
+
 ## [1.6.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.5.0...v1.6.0) (2026-10-30)
 
 
