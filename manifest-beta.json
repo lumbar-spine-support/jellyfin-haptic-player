@@ -9,44 +9,12 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
-        "version": "1.6.0.5",
-        "changelog": "Beta build 1.6.0.5 from dev (commit 749aa24). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- chore(vscode): open Chrome without waiting for the client watches (749aa24)\n- test(fixtures): add Big Buck Bunny tags that cover the tags view's letter groups (537947d)\n- feat(library): show portrait artwork at 2x2 and make wide landscape cards configurable (ef25a4c)\n- feat(library): group the tags view by first letter (297de15)\n- feat(library): add a Shuffle sort with a reshuffle button (48e980a)\n- feat(library): keep the aspect ratio of album covers on the album page (7d91826)\n- feat(player): cycle the funscript timeline zoom through fixed time windows (4ca8ac8)\n- feat(library): show single-track albums only as their track (c4726fb)",
+        "version": "1.7.0.0",
+        "changelog": "## [1.7.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.6.0...v1.7.0) (2026-11-01)\n\n\n### Features\n\n* **library:** add a Shuffle sort with a reshuffle button ([48e980a](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/48e980a6acc9d794f2dbc7774497f078d286cfa6))\n* **library:** group the tags view by first letter ([297de15](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/297de154208841270d8ee11564df57f42f16defa))\n* **library:** keep the aspect ratio of album covers on the album page ([7d91826](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/7d91826173deff11816da4cdcabcc7cd33570470))\n* **library:** show portrait artwork at 2x2 and make wide landscape cards configurable ([ef25a4c](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/ef25a4cff909db042c0bb57aa5097a5bce01ffca))\n* **library:** show single-track albums only as their track ([c4726fb](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/c4726fbc5fdec1b03e21dc84869c9ce9203f393e))\n* **player:** cycle the funscript timeline zoom through fixed time windows ([4ca8ac8](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/4ca8ac8f7d5f7bd3e7a93f55ce5f5432a66fea7d))\n\nInstall or update HAPPY through its Jellyfin plugin repository: https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/jellyfin-plugin-repository/manifest.json (Dashboard → Plugins → Repositories), or download `happy_1.7.0.0.zip` below.",
         "targetAbi": "12.1.0.0",
-        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.6.0.5.zip",
-        "checksum": "b1672879d1ea7de4fdec86419f6f17b0",
-        "timestamp": "2026-11-01T19:00:58Z"
-      },
-      {
-        "version": "1.6.0.4",
-        "changelog": "Beta build 1.6.0.4 from dev (commit 7d91826). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- feat(library): keep the aspect ratio of album covers on the album page (7d91826)\n- feat(player): cycle the funscript timeline zoom through fixed time windows (4ca8ac8)\n- feat(library): show single-track albums only as their track (c4726fb)",
-        "targetAbi": "12.1.0.0",
-        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.6.0.4.zip",
-        "checksum": "e25ea5da98af90015e5469b82081dd67",
-        "timestamp": "2026-10-30T16:11:17Z"
-      },
-      {
-        "version": "1.6.0.3",
-        "changelog": "Beta build 1.6.0.3 from dev (commit 4ca8ac8). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- feat(player): cycle the funscript timeline zoom through fixed time windows (4ca8ac8)\n- feat(library): show single-track albums only as their track (c4726fb)",
-        "targetAbi": "12.1.0.0",
-        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.6.0.3.zip",
-        "checksum": "bf7601d10e146cc1ca80726c6656c220",
-        "timestamp": "2026-10-30T15:56:13Z"
-      },
-      {
-        "version": "1.6.0.2",
-        "changelog": "Beta build 1.6.0.2 from dev (commit c4726fb). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- feat(library): show single-track albums only as their track (c4726fb)",
-        "targetAbi": "12.1.0.0",
-        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.6.0.2.zip",
-        "checksum": "702d9d245422f1ac9de06c3d9fb609a4",
-        "timestamp": "2026-10-30T12:18:38Z"
-      },
-      {
-        "version": "1.6.0.1",
-        "changelog": "Beta build 1.6.0.1 from dev (commit cf66c15). Not released yet, may be unstable.",
-        "targetAbi": "12.1.0.0",
-        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.6.0.1.zip",
-        "checksum": "de840579eefd920b3ec28b98216bfbbb",
-        "timestamp": "2026-10-30T07:25:04Z"
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/v1.7.0/happy_1.7.0.0.zip",
+        "checksum": "89eda10b954bdb4af949e256d93cd601",
+        "timestamp": "2026-11-01T19:12:37Z"
       },
       {
         "version": "1.6.0.0",

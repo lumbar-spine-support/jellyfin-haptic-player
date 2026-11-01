@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.7.0.0",
+        "changelog": "## [1.7.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.6.0...v1.7.0) (2026-11-01)\n\n\n### Features\n\n* **library:** add a Shuffle sort with a reshuffle button ([48e980a](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/48e980a6acc9d794f2dbc7774497f078d286cfa6))\n* **library:** group the tags view by first letter ([297de15](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/297de154208841270d8ee11564df57f42f16defa))\n* **library:** keep the aspect ratio of album covers on the album page ([7d91826](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/7d91826173deff11816da4cdcabcc7cd33570470))\n* **library:** show portrait artwork at 2x2 and make wide landscape cards configurable ([ef25a4c](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/ef25a4cff909db042c0bb57aa5097a5bce01ffca))\n* **library:** show single-track albums only as their track ([c4726fb](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/c4726fbc5fdec1b03e21dc84869c9ce9203f393e))\n* **player:** cycle the funscript timeline zoom through fixed time windows ([4ca8ac8](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/4ca8ac8f7d5f7bd3e7a93f55ce5f5432a66fea7d))\n\nInstall or update HAPPY through its Jellyfin plugin repository: https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/jellyfin-plugin-repository/manifest.json (Dashboard → Plugins → Repositories), or download `happy_1.7.0.0.zip` below.",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/v1.7.0/happy_1.7.0.0.zip",
+        "checksum": "89eda10b954bdb4af949e256d93cd601",
+        "timestamp": "2026-11-01T19:12:37Z"
+      },
+      {
         "version": "1.6.0.0",
         "changelog": "## [1.6.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.5.0...v1.6.0) (2026-10-30)\n\n\n### Features\n\n* **library:** album display setting for albums, tracks or both ([cfbf0e7](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/cfbf0e76158051ad709d3a9b84a8a0875aef1f67))\n* **settings:** one-row layout and one font size in the settings sidebar ([7676195](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/76761957146e72bd48c0c260d9ca798c8242a4ba))\n\nInstall or update HAPPY through its Jellyfin plugin repository: https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/jellyfin-plugin-repository/manifest.json (Dashboard → Plugins → Repositories), or download `happy_1.6.0.0.zip` below.",
         "targetAbi": "12.1.0.0",
