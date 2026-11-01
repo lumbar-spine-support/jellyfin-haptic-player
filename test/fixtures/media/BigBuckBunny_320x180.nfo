@@ -63,4 +63,18 @@ The movie is very funny!
   <tag>soundtrack</tag>
   <tag>clip</tag>
   <tag>sample-video</tag>
+  <!-- Exercise the tags view's letter groups: "#" (digit, symbol, non-Latin), accents, sparse letters. -->
+  <tag>2000s</tag>
+  <tag>#blender</tag>
+  <tag>ウサギ</tag>
+  <tag>épique</tag>
+  <tag>Überraschung</tag>
+  <tag>insects</tag>
+  <tag>jolly</tag>
+  <tag>kids</tag>
+  <tag>lighthearted</tag>
+  <tag>peaceful</tag>
+  <tag>vibrant</tag>
+  <tag>yellow</tag>
+  <tag>zany</tag>
 </movie>
