@@ -154,6 +154,32 @@ export function filterAvailableTags(
     !isArtistTag(tag) && !selected.has(tag.toLowerCase()) && (!q || tag.toLowerCase().includes(q)));
 }
 
+/** Tags that start with anything but a Latin letter (digits, symbols, other scripts) group under this. */
+export const TAG_LETTER_OTHER = '#';
+
+/** The letter a tag is listed under: its first letter without accents, upper-cased, or `#`. */
+export function tagLetter(tag: string): string {
+  const first = tag.trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').charAt(0).toUpperCase();
+  return first >= 'A' && first <= 'Z' ? first : TAG_LETTER_OTHER;
+}
+
+/**
+ * Groups tags by `tagLetter()`: `#` first, then A–Z, keeping the given order inside a group.
+ * Letters without tags get no group.
+ */
+export function groupTagsByLetter(tags: readonly string[]): { letter: string; tags: string[] }[] {
+  const groups = new Map<string, string[]>();
+  for (const tag of tags) {
+    const letter = tagLetter(tag);
+    const group = groups.get(letter);
+    if (group) group.push(tag);
+    else groups.set(letter, [tag]);
+  }
+  return [...groups.entries()]
+    .sort(([a], [b]) => (a === TAG_LETTER_OTHER ? -1 : b === TAG_LETTER_OTHER ? 1 : a < b ? -1 : a > b ? 1 : 0))
+    .map(([letter, list]) => ({ letter, tags: list }));
+}
+
 /**
  * Lower-cased tags that can still be added to the plain tags in `activeTags` with at least one
  * album, track, playlist or video left matching (the items `countMediaMatches` counts). Albums and

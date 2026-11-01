@@ -8,6 +8,7 @@ import {
     countMediaMatches,
     filterAvailableTags,
     groupedTrackIds,
+    groupTagsByLetter,
     isAlbumDisplayMode,
     isArtistTag,
     makeArtistTag,
@@ -185,4 +186,16 @@ test(`${TAG} applyAlbumDisplay 'tracks' hides all albums but keeps all tracks`, 
 test(`${TAG} isAlbumDisplayMode accepts only known modes`, () => {
     assert.ok(isAlbumDisplayMode('albums'));
     assert.ok(!isAlbumDisplayMode('both'));
+});
+
+test(`${TAG} groupTagsByLetter groups by first letter with # first and skips empty letters`, () => {
+    const groups = groupTagsByLetter(['3D', 'anal', 'Ältere', 'ASMR', 'zombie', '#foo', 'été', 'Ölung', 'юмор']);
+    assert.deepEqual(groups, [
+        { letter: '#', tags: ['3D', '#foo', 'юмор'] },
+        { letter: 'A', tags: ['anal', 'Ältere', 'ASMR'] },
+        { letter: 'E', tags: ['été'] },
+        { letter: 'O', tags: ['Ölung'] },
+        { letter: 'Z', tags: ['zombie'] },
+    ]);
+    assert.deepEqual(groupTagsByLetter([]), []);
 });

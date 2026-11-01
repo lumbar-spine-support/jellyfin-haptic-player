@@ -111,7 +111,7 @@
 
 // Full rows stretch to the container edge; the filler soaks up the last row's free space.
 #tag-view-selected,
-#tag-view-available {
+.tag-letter-tags {
   row-gap: 0.5rem !important;
 
   >.tag-chip {
@@ -121,6 +121,56 @@
   &::after {
     content: '';
     flex-grow: 1000000;
+  }
+}
+
+// Available tags, one row group per first letter. The letter sticks to the top while its group
+// is taller than the screen and is pushed away by the end of the group.
+#tag-view-available {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tag-letter-group {
+  display: grid;
+  grid-template-columns: 1.75rem minmax(0, 1fr);
+  column-gap: var(--app-space-2);
+  align-items: start;
+}
+
+.tag-letter {
+  position: sticky;
+  top: 0;
+  // As tall as one row of chips, so the letter lines up with the group's first row.
+  min-height: calc(0.75rem * 1.4 + 0.4rem + 2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--happy-accent);
+  user-select: none;
+}
+
+.tag-letter-group-pending .tag-letter {
+  opacity: 0;
+  transform: translateY(0.75rem) scale(0.6);
+}
+
+.tag-letter-group-shown .tag-letter {
+  animation: tag-letter-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes tag-letter-pop {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.6);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 

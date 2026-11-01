@@ -34,6 +34,7 @@ Playlists are Jellyfin playlists. Create them in Jellyfin, or save a [queue](#qu
   - **Video:** an embedded genre like `sfw; vanilla; funny` is split into separate genres. For Jellyfin's *Tags*, put an NFO file next to the video (`<video name>.nfo` with `<tag>` entries, see below).
   - Tags can also be set by hand in Jellyfin's metadata editor.
   - The tags view combines the tags you pick (all must match) and only offers tags that still leave something to show, so a pick like *anal* hides *no anal* when no item carries both. Albums and playlists count with the tags of all their tracks.
+  - In the tags view the tags are grouped by their first letter, shown on the left (`#` for tags starting with a digit, symbol or non-Latin letter). Letters without tags are left out. While you scroll through a long group, its letter stays at the top of the screen.
 - **Descriptions** are Jellyfin's overview of the item. For audio, put the text into the file's comment tag. Markdown is rendered, so you can use [links](https://github.com), **bold text** and more.
 
 - **Video:** use an NFO file (see [Videos: NFO files](#videos-nfo-files)).

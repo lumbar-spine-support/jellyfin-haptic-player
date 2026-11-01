@@ -12,6 +12,7 @@ import {
     artistTagValue,
     countMediaMatches,
     filterAvailableTags,
+    groupTagsByLetter,
     isArtistTag,
     LIBRARY_SORT_MODES,
     makeArtistTag,
@@ -111,6 +112,7 @@ export class Library {
     private readonly table = qs<HTMLElement>('#track-table');
     private readonly list = qs<HTMLElement>('#track-list');
     private batchObservers: IntersectionObserver[] = [];
+    private tagLetterObserver: IntersectionObserver | null = null;
     private readonly btnGrid = qs<HTMLElement>('#btn-view-grid');
     private readonly btnList = qs<HTMLElement>('#btn-view-list');
     private readonly btnTags = qs<HTMLElement>('#btn-view-tags');
@@ -505,18 +507,46 @@ export class Library {
         const reachable = reachableTags(library, this.activeTags);
         const available = filterAvailableTags(this.getAllTags(), this.activeTags, this.searchQuery)
             .filter((tag) => reachable.has(tag.toLowerCase()));
-        for (const tag of available) {
-            const chip = document.createElement('button');
-            chip.type = 'button';
-            chip.className = 'tag-chip tag-chip-suggestion';
-            chip.textContent = tag;
-            chip.title = `Add tag: ${tag}`;
-            chip.addEventListener('click', () => {
-                if (this.searchInput) this.searchInput.value = '';
-                this.searchQuery = '';
-                this.addTag(tag);
-            });
-            this.tagViewAvailable.appendChild(chip);
+        this.tagLetterObserver?.disconnect();
+        const animate = typeof IntersectionObserver === 'function'
+            && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        // A letter pops in once its group's first row scrolls into view.
+        this.tagLetterObserver = animate ? new IntersectionObserver((entries, observer) => {
+            for (const entry of entries) {
+                if (!entry.isIntersecting) continue;
+                entry.target.classList.replace('tag-letter-group-pending', 'tag-letter-group-shown');
+                observer.unobserve(entry.target);
+            }
+        }, { rootMargin: '0px 0px -24px 0px' }) : null;
+        for (const { letter, tags } of groupTagsByLetter(available)) {
+            const group = document.createElement('section');
+            group.className = 'tag-letter-group';
+            group.setAttribute('aria-label', letter);
+            const label = document.createElement('div');
+            label.className = 'tag-letter';
+            label.setAttribute('aria-hidden', 'true');
+            label.textContent = letter;
+            const chips = document.createElement('div');
+            chips.className = 'tag-letter-tags d-flex align-items-center flex-wrap gap-1';
+            for (const tag of tags) {
+                const chip = document.createElement('button');
+                chip.type = 'button';
+                chip.className = 'tag-chip tag-chip-suggestion';
+                chip.textContent = tag;
+                chip.title = `Add tag: ${tag}`;
+                chip.addEventListener('click', () => {
+                    if (this.searchInput) this.searchInput.value = '';
+                    this.searchQuery = '';
+                    this.addTag(tag);
+                });
+                chips.appendChild(chip);
+            }
+            group.append(label, chips);
+            this.tagViewAvailable.appendChild(group);
+            if (this.tagLetterObserver) {
+                group.classList.add('tag-letter-group-pending');
+                this.tagLetterObserver.observe(group);
+            }
         }
 
         const counts = countMediaMatches(library, this.activeTags);
