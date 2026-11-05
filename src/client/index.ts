@@ -159,10 +159,7 @@ class App {
       },
       tags: (tags) => this.library.setActiveTags(tags),
       docs: (page) => this.showDocs(page),
-      player: (id) => {
-        resetScrollPosition();
-        return this.openTrack(id, false, undefined, false);
-      },
+      player: (id) => this.openTrack(id, false, undefined, false),
       playlist: async (id) => this.showPlaylistDetail(id, false),
       album: async (id) => this.showAlbumDetail(id, false),
       library: () => this.showLibrary(false),
@@ -562,12 +559,19 @@ class App {
     document.title = 'HAPPY';
     this.detail.clear();
     // Restore scroll position when returning to library view
+    this.library.renderUntilScrollable(this.savedLibraryScrollPosition);
     window.scrollTo(0, this.savedLibraryScrollPosition);
+  }
+
+  /** Call before leaving the library: other pages share its window scroll position. */
+  private rememberLibraryScroll(): void {
+    const onLibrary = !this.libraryView?.classList.contains('d-none') && this.detailView?.classList.contains('d-none');
+    if (onLibrary) this.savedLibraryScrollPosition = window.scrollY;
   }
 
   /** Shows the detail page over the (hidden) library grid, remembering where the grid was scrolled to. */
   private enterDetailView(state: object, href: string, pushState: boolean): void {
-    this.savedLibraryScrollPosition = window.scrollY;
+    this.rememberLibraryScroll();
     if (pushState) history.pushState(state, '', href);
     this.library.setControlsVisible(false);
     this.libraryView?.classList.remove('d-none');
@@ -665,13 +669,15 @@ class App {
   }
 
   private async openTrack(trackId: string, pushState: boolean, source?: QueueSource, autoplay = false, index?: number): Promise<void> {
-    resetScrollPosition();
+    this.rememberLibraryScroll();
     const track = this.allMedia().find((item) => item.id === trackId);
     if (!track) {
       this.navigateTo(buildUrl('library'));
       return;
     }
+    // pushState stores the page's scroll position for Back, so it has to come before the reset.
     if (pushState) history.pushState({ trackId }, '', trackHref(trackId));
+    resetScrollPosition();
     this.libraryView?.classList.add('d-none');
     this.playerView?.classList.remove('d-none');
     this.detailView?.classList.add('d-none');

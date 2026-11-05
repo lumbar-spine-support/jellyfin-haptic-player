@@ -22,6 +22,9 @@ $dark: #000;
 $body-bg: #000;
 $body-color: #fff;
 
+// View changes jump to their scroll position; a smooth scroll would animate through the library.
+$enable-smooth-scroll: false;
+
 // 3. Import Bootstrap configuration imports (must follow variable overrides)
 @import "../../../node_modules/bootstrap/scss/variables";
 @import "../../../node_modules/bootstrap/scss/variables-dark";

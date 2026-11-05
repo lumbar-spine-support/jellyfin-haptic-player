@@ -425,6 +425,38 @@ test(`${TAG} an empty favorites-only result says the filters hide everything`, (
     assert.match(grid.innerHTML, /No media files found/);
 });
 
+test(`${TAG} renderUntilScrollable appends batches of the active view until the page reaches the position`, () => {
+    const library = new Library(makeCallbacks());
+    const grid = new FakeElement('div');
+    const list = new FakeElement('tbody');
+    (library as any).grid = grid;
+    (library as any).list = list;
+    (library as any).currentViewMode = 'grid';
+    const root = { scrollHeight: 1000 };
+    (globalThis as any).document.documentElement = root;
+    (globalThis as any).window.innerHeight = 500;
+    let gridBatches = 0;
+    let listBatches = 0;
+    const appender = (count: () => number) => () => { root.scrollHeight += 1000; return count() < 5; };
+    (library as any).batchAppenders.set(grid, appender(() => ++gridBatches));
+    (library as any).batchAppenders.set(list, appender(() => ++listBatches));
+
+    library.renderUntilScrollable(400);
+    assert.equal(gridBatches, 0, 'the page already reaches the position');
+
+    library.renderUntilScrollable(2400);
+    assert.equal(gridBatches, 2, 'stops once the position fits in the viewport');
+    assert.equal(listBatches, 0);
+
+    library.renderUntilScrollable(100_000);
+    assert.equal(gridBatches, 5, 'stops when no batches are left');
+
+    (library as any).currentViewMode = 'tags';
+    library.renderUntilScrollable(200_000);
+    assert.equal(gridBatches, 5, 'the tags view has no batches');
+    assert.equal(listBatches, 0);
+});
+
 test(`${TAG} rows end with the queue menu, after a favorite heart for tracks and playlists`, () => {
     const library = new Library(makeCallbacks());
     const tracksById = new Map<string, TrackInfo>();

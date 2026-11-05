@@ -112,6 +112,8 @@ export class Library {
     private readonly table = qs<HTMLElement>('#track-table');
     private readonly list = qs<HTMLElement>('#track-list');
     private batchObservers: IntersectionObserver[] = [];
+    /** Per container, appends its next batch and returns whether more are left. */
+    private readonly batchAppenders = new Map<HTMLElement, () => boolean>();
     private tagLetterObserver: IntersectionObserver | null = null;
     private readonly btnGrid = qs<HTMLElement>('#btn-view-grid');
     private readonly btnList = qs<HTMLElement>('#btn-view-list');
@@ -184,6 +186,7 @@ export class Library {
         if (!this.grid || !this.list) return;
         this.batchObservers.forEach((o) => o.disconnect());
         this.batchObservers = [];
+        this.batchAppenders.clear();
         this.grid.innerHTML = '';
         this.list.innerHTML = '';
         const isSearching = this.searchQuery.length > 0;
@@ -318,7 +321,7 @@ export class Library {
             if (isTable && this.currentViewMode !== 'list') return;
             if (entries.some((e) => e.isIntersecting)) appendBatch();
         }, { rootMargin: '800px' });
-        const appendBatch = (): void => {
+        const appendBatch = (): boolean => {
             const frag = document.createDocumentFragment();
             const end = Math.min(next + RENDER_BATCH_SIZE, builders.length);
             for (; next < end; next++) frag.appendChild(builders[next]());
@@ -331,9 +334,20 @@ export class Library {
                 // Re-observing fires a fresh callback if the sentinel is still in view.
                 observer.observe(sentinel);
             }
+            return next < builders.length;
         };
         this.batchObservers.push(observer);
+        this.batchAppenders.set(container, appendBatch);
         appendBatch();
+    }
+
+    /** Renders batches of the active view until the page is tall enough to scroll to `top`. */
+    renderUntilScrollable(top: number): void {
+        const container = this.currentViewMode === 'grid' ? this.grid : this.currentViewMode === 'list' ? this.list : null;
+        const appendBatch = container && this.batchAppenders.get(container);
+        if (!appendBatch) return;
+        const root = document.documentElement;
+        while (root.scrollHeight < top + window.innerHeight && appendBatch());
     }
 
     bindControls(): void {

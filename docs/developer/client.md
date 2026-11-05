@@ -157,6 +157,8 @@ flowchart TD
   V -- "none" --> LibV["showLibrary"]
 ```
 
+`App` keeps the library's scroll position across views: `rememberLibraryScroll()` saves it when the grid is what's leaving the screen, and `showLibrary()` restores it. Scrolling between views is instant (`$enable-smooth-scroll: false` in `_bootstrap-theme.scss`). Two details make that work: `render()` rebuilds the library in batches, so `showLibrary()` calls `Library.renderUntilScrollable()` to make the page tall enough first, or the scroll would clamp to the first batch. And the browser's own restore on Back uses the position `pushState` stored, so `openTrack()` pushes before it resets the scroll.
+
 | URL | View |
 | --- | --- |
 | `./` | Library grid or list, filters and sort in `localStorage` |
