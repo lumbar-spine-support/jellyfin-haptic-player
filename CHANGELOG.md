@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.1](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.7.0...v1.7.1) (2026-11-05)
+
+
+### Bug Fixes
+
+* **library:** jump to the scroll position when changing views ([3f95a4c](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/3f95a4cf3692743c5752d80db1f6c5d3347f4211))
+
 ## [1.7.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.6.0...v1.7.0) (2026-11-01)
 
 
