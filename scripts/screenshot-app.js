@@ -313,6 +313,7 @@ async function captureDocs(browser) {
         viewport: LANDSCAPE_VIEWPORT,
         screen: LANDSCAPE_VIEWPORT,
         isMobile: true,
+        reducedMotion: 'reduce',
     });
 
     const page = await context.newPage();
