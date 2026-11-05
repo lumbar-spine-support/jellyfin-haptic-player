@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.7.0.3",
+        "changelog": "Beta build 1.7.0.3 from dev (commit 96aa98c). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- chore(vscode): mount claude directory and config to devcontainer (96aa98c)\n- fix(library): jump to the scroll position when changing views (3f95a4c)\n- docs: update screenshots for the new funscript fixtures (e08d9ab)\n- test(fixtures): give each funscript channel its own pattern (1fd7e2a)",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.7.0.3.zip",
+        "checksum": "a5c03fc334f640ee4dc5cab516e83b13",
+        "timestamp": "2026-11-05T19:08:17Z"
+      },
+      {
         "version": "1.7.0.2",
         "changelog": "Beta build 1.7.0.2 from dev (commit 4f7a3a5). Not released yet, may be unstable.",
         "targetAbi": "12.1.0.0",
