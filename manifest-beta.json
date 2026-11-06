@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.7.1.2",
+        "changelog": "Beta build 1.7.1.2 from dev (commit 0971984). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- fix(playlists): hide add to queue in edit mode and stop the row jump (0971984)\n- feat(playlists): Edit mode for playlists to rename, reorder or remove elements more quickly. (5dccd76)",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.7.1.2.zip",
+        "checksum": "950cb0b43929ba120a39ff956087e10f",
+        "timestamp": "2026-11-06T14:02:04Z"
+      },
+      {
         "version": "1.7.1.1",
         "changelog": "Beta build 1.7.1.1 from dev (commit 5dccd76). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- feat(playlists): Edit mode for playlists to rename, reorder or remove elements more quickly. (5dccd76)",
         "targetAbi": "12.1.0.0",
