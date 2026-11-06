@@ -239,7 +239,8 @@ $settings-font-size: 0.875rem;
 @include media-breakpoint-down(md) {
 
   // Title (1.5rem) + two small lines (2 x 1.3125rem) + title cell padding (1rem) - art cell padding (.5rem).
-  .track-art-thumb {
+  .track-art-thumb,
+  .track-art-thumb.placeholder {
     height: 4.625rem;
   }
 }

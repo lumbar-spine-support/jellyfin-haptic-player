@@ -135,7 +135,6 @@ export class DetailView {
     private trackIds(): string[] {
         const context = this.context;
         if (!context) return [];
-        if (this.draft) return this.draft.trackIds;
         return context.type === 'playlist' ? context.playlist.entries.map((entry) => entry.trackId) : [...context.album.trackIds];
     }
 
