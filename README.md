@@ -39,7 +39,7 @@ Then install **HAPPY** from the plugin *Catalog* and restart Jellyfin. Jellyfin 
 
 ### 2. Library Setup
 
-Put your funscripts next to the media files in your Jellyfin libraries:
+Put your audio in a Jellyfin library of type **Books** and your videos in one of type **Music Videos**, each in its own folder, with the funscripts next to the media files:
 
 ```
 audio/

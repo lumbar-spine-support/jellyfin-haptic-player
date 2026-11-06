@@ -6,7 +6,7 @@ HAPPY plays media from a [Jellyfin](https://jellyfin.org/) server and runs insid
 
 You need:
 
-1. A Jellyfin server (currently 12.1) with your audio and video in its libraries (see [Media Library](library.md)).
+1. A Jellyfin server (currently 12.1) with your audio in a **Books** library and your videos in a **Music Videos** library (see [Media Library](library.md)).
 2. The HAPPY plugin installed in that Jellyfin server (below).
 3. Optionally, for the DG-Lab Coyote only: the [DG-Lab relay](dg-lab.md#the-relay).
 
