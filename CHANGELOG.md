@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.8.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.7.1...v1.8.0) (2026-11-06)
+
+
+### Features
+
+* **library:** clearer icons for the tiles and table views ([85fc79a](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/85fc79a7e3082f07574a926bc4e1bf0c5575cff6))
+* **playlists:** Edit mode for playlists to rename, reorder or remove elements more quickly. ([753a558](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/753a558cf4baf8977d1311b8e8bc4b25cd7c9418))
+
+
+### Bug Fixes
+
+* **playlists:** hide add to queue in edit mode and stop the row jump ([613fbba](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/613fbba6dc1bff7d20b2aed500e825920fbd7707))
+
 ## [1.7.1](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.7.0...v1.7.1) (2026-11-05)
 
 
