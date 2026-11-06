@@ -4,6 +4,7 @@
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/lumbar-spine-support/jellyfin-haptic-player/.github%2Fworkflows%2Ftest.yml?branch=main&logo=github&label=tests)
 [![npm audit](https://img.shields.io/github/actions/workflow/status/lumbar-spine-support/jellyfin-haptic-player/npm-audit.yml?label=npm%20audit)](https://github.com/lumbar-spine-support/jellyfin-haptic-player/actions/workflows/npm-audit.yml)
 ![Codecov](https://img.shields.io/codecov/c/github/lumbar-spine-support/jellyfin-haptic-player)
+[![Jellyfin](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fraw.githubusercontent.com%2Flumbar-spine-support%2Fjellyfin-haptic-player%2Fmain%2Fdev%2Fjellyfin%2Fcompose.yaml&search=image%3A%20jellyfin%2Fjellyfin%3A%28.%2B%29&replace=%241&label=Jellyfin&logo=jellyfin&color=00A4DC)](docs/developer/local-jellyfin.md)
 
 ![Preview](./docs/social.png)
 
