@@ -4,19 +4,21 @@
 
 For haptic support install [Intiface Central](https://intiface.com/#intiface-central). It connects to your toys directly and provides a generic API for haptic control, so HAPPY works with arbitrary haptic toys.
 
-If below description does not help, you can find a more detailed tutorial here: [Intiface Central Quickstart Guide](https://intiface.com/docs/intiface-central/quickstart).
+For a more detailed tutorial, see the [Intiface Central Quickstart Guide](https://intiface.com/docs/intiface-central/quickstart).
 
 ## Connecting
 
 1. In Intiface Central, start the server with the big "play" button.
 2. Press "start scan" with your devices in pairing mode.
-3. In HAPPY, open the settings panel, enter the Intiface address (default `ws://localhost:12345`) and press **Connect**. Pick `wss://` in the dropdown when Intiface is reachable only through a TLS proxy, for example when HAPPY itself is served over `https://` and Intiface is not on `localhost`.
+3. In HAPPY, open the settings panel, enter the Intiface address (default `ws://localhost:12345`) and press **Connect**.
 
-Use the address of the machine running Intiface as seen from the device running the browser. `localhost` only works when browser and Intiface run on the same machine.
+`localhost` only works when your browser and Intiface run on the same device. Otherwise, enter the address of the device running Intiface. If you open HAPPY over `https://` and Intiface is on another device, Intiface must be behind a TLS proxy: pick `wss://` in the dropdown.
 
 HAPPY reconnects on page load if Intiface was connected last time and you did not press **Disconnect**. To turn this off, use *Reconnect to Intiface on page load* (see [Configuration](configuration.md#haptics)).
 
-If the connection drops on its own, HAPPY retries in the background (1 s, doubling up to 15 s) and right away when you return to the tab. On mobile, a turned-off screen freezes the browser tab, and Intiface closes connections that stop answering its pings. HAPPY therefore keeps the screen on while media plays (**Keep Screen On During Playback** under *Appearance* in the settings, on by default); this needs the page to be served over HTTPS or from `localhost`.
+If the connection drops, HAPPY keeps retrying in the background.
+
+On phones, turning off the screen freezes the browser tab and Intiface drops the connection. HAPPY therefore keeps the screen on while media plays (**Keep Screen On During Playback** under *Appearance* in the settings, on by default). This needs HTTPS or `localhost`.
 
 ## Device Assignment
 
@@ -24,10 +26,7 @@ Each device exposes features like "linear", "vibrate" or "rotate". Strokers are 
 
 Each stroker has its own position limits on its device card, so a long and a short stroker can use different ranges. New devices start at 0–100 %.
 
-See [docs/library.md#funscripts](library.md#funscripts) for how funscripts must be stored in your library for HAPPY to connect them with your audio or video file.
-
-When the plugin generates [Auto funscripts](library.md#auto-funscript) from the audio, features can
-also be assigned to *Auto*, which every media file then has.
+See [Funscripts](library.md#funscripts) for how to store funscripts so that HAPPY finds them. Features can also be assigned to [Auto funscripts](library.md#auto-funscript), if they are turned on.
 
 The status badge above each funscript shows whether a device will play it; click it for details.
 
