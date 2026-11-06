@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.8.0.0",
+        "changelog": "## [1.8.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.7.1...v1.8.0) (2026-11-06)\n\n\n### Features\n\n* **library:** clearer icons for the tiles and table views ([85fc79a](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/85fc79a7e3082f07574a926bc4e1bf0c5575cff6))\n* **playlists:** Edit mode for playlists to rename, reorder or remove elements more quickly. ([753a558](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/753a558cf4baf8977d1311b8e8bc4b25cd7c9418))\n\n\n### Bug Fixes\n\n* **playlists:** hide add to queue in edit mode and stop the row jump ([613fbba](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/613fbba6dc1bff7d20b2aed500e825920fbd7707))\n\nInstall or update HAPPY through its Jellyfin plugin repository: https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/jellyfin-plugin-repository/manifest.json (Dashboard → Plugins → Repositories), or download `happy_1.8.0.0.zip` below.",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/v1.8.0/happy_1.8.0.0.zip",
+        "checksum": "43d40fe319de5c8338b253bd9b7c354d",
+        "timestamp": "2026-11-06T15:50:28Z"
+      },
+      {
         "version": "1.7.1.0",
         "changelog": "## [1.7.1](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.7.0...v1.7.1) (2026-11-05)\n\n\n### Bug Fixes\n\n* **library:** jump to the scroll position when changing views ([3f95a4c](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/3f95a4cf3692743c5752d80db1f6c5d3347f4211))\n\nInstall or update HAPPY through its Jellyfin plugin repository: https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/jellyfin-plugin-repository/manifest.json (Dashboard → Plugins → Repositories), or download `happy_1.7.1.0.zip` below.",
         "targetAbi": "12.1.0.0",
