@@ -138,7 +138,7 @@ HAPPY_JELLYFIN_PASSWORD=…
 
 | Library | Jellyfin type | What it shows |
 | --- | --- | --- |
-| Videos | *Mixed movies and shows* (or *Movies*), NFO metadata reader on | `<name>.nfo` sidecars give Jellyfin **Tags** (`<tag>`), genres and a Markdown overview (`<plot>`); `VR180_*` clips test both VR layouts; `BigBuckBunny_320x180.*.funscript` cover all script types including subcategories |
+| Videos | *Music Videos*, NFO metadata reader on | `<name>.nfo` sidecars (`<musicvideo>`) give Jellyfin **Tags** (`<tag>`), artists (`<artist>`), genres and a Markdown overview (`<plot>`); `VR180_*` clips test both VR layouts; `BigBuckBunny_320x180.*.funscript` cover all script types including subcategories |
 | Audio | *Books* | `BigBuckBunny_dummy1-3.mp3` carry multi-value ID3v2.4 genres (HAPPY shows them as tags), a Markdown comment (the overview, audiobooks only), track numbers for album grouping and cover art |
 
 Give each library its own path to the folder, for example two mounts of it. Libraries that share one path share their items, and the audio library then retypes the videos. Jellyfin's own *Tags* section stays empty for the audio files: no Jellyfin metadata reader fills Tags from audio files, which is why HAPPY also counts genres as tags. If you add or change an NFO after the first scan, use *Refresh metadata → Replace all metadata* on the item or library.

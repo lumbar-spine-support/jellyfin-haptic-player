@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <!-- HAPPY test fixture: Jellyfin reads <tag> into Tags and <plot> into Overview (rendered as Markdown by HAPPY). -->
-<movie>
+<musicvideo>
   <title>Big Buck Bunny (H.265)</title>
+  <artist>Blender Foundation</artist>
   <plot><![CDATA[The same short film, encoded with **H.265** to test codec support.
 ]]></plot>
   <year>2008</year>
@@ -9,4 +10,4 @@
   <tag>bunny</tag>
   <tag>sfw</tag>
   <tag>h265</tag>
-</movie>
+</musicvideo>

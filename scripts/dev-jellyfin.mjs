@@ -30,7 +30,7 @@ const AUTH = 'MediaBrowser Client="HAPPY dev", Device="dev-jellyfin", DeviceId="
 
 const LIBRARIES = [
     // NFO sidecars give tags, genres and Markdown overviews; trickplay feeds the storyboards.
-    { name: 'Videos', collectionType: 'mixed', path: '/media/videos' },
+    { name: 'Videos', collectionType: 'musicvideos', path: '/media/videos' },
     // Audiobooks: overview from the ID3 comment, genres as tags, albums from track numbers.
     { name: 'Audio', collectionType: 'books', path: '/media/audio' },
 ];
