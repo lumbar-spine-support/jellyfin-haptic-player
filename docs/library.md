@@ -69,8 +69,6 @@ Put an NFO file named like the video (`<video name>.nfo`) next to it:
 </musicvideo>
 ```
 
-Older versions of HAPPY read `<name>.md` files next to the media. These are ignored now; move their contents into NFO files (video) or file tags (audio).
-
 ## Filtering and sorting
 
 The controls next to the search box limit the library by media type, by toy type (only items with scripts for all selected toys) and to your favorites, and sort it. **Shuffle** in the sort menu shows the library in a random order. Items without a value, such as playlists without a year, are always listed last. HAPPY remembers your choices in the browser.

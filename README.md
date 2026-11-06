@@ -92,6 +92,6 @@ Note: All docs are also available in HAPPY itself (*Documentation* at the bottom
 
 Copyright (c) 2025 jellyfin-haptic-player (HAPPY) contributors.
 
-This project is licensed under the GNU General Public License v3.0 or later — see [LICENSE](LICENSE). Releases up to and including 0.12.0 were published under the MIT License.
+This project is licensed under the GNU General Public License v3.0 or later — see [LICENSE](LICENSE).
 
 Test media included in this repository may be subject to different licenses. See [LICENSES.md](LICENSES.md) for details on third-party content and attribution requirements.

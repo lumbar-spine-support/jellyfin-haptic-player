@@ -1,6 +1,6 @@
 # Jellyfin plugin
 
-HAPPY uses Jellyfin for the library, metadata, artwork, trickplay, chapters, users and streaming. The HAPPY plugin in [jellyfin-plugin/](../../jellyfin-plugin/) adds everything else HAPPY needs from a server: it serves the built web app, the client settings (edited on its dashboard page), the version and the user docs, and, since Jellyfin has no idea what a funscript is, it indexes `.funscript` files next to the media and serves them to signed-in users. Optionally it also generates an *Auto* funscript per media file from its audio. There is no other HAPPY server; only the optional [DG-Lab relay](../../dglab-relay/README.md) runs separately.
+HAPPY uses Jellyfin for the library, metadata, artwork, trickplay, chapters, users and streaming. The HAPPY plugin in [jellyfin-plugin/](../../jellyfin-plugin/) adds everything else HAPPY needs from a server: it serves the built web app, the client settings (edited on its dashboard page), the version and the user docs, and, since Jellyfin has no idea what a funscript is, it indexes `.funscript` files next to the media and serves them to signed-in users. Optionally it also generates an *Auto* funscript per media file from its audio. Only the optional [DG-Lab relay](../../dglab-relay/README.md) runs separately.
 
 The plugin is deliberately dumb. It serves files and settings, maps scripts to items and checks access. Parsing the script type and subcategory, funscript chapters and VR detection stay in the TypeScript client, where they are already tested.
 
@@ -50,7 +50,7 @@ The client never sends a path back. A key is a hash of the script's absolute pat
 `FunscriptMatcher` needs no list of type suffixes. A script `a.b.c.funscript` belongs to the media whose file stem is the longest separator-bounded prefix of `a.b.c` (`a.b.c`, then `a.b`, then `a`). Stems compare case-insensitively.
 
 1. A media file with that stem **in the script's own directory** wins.
-2. Otherwise the script is attached to **every** media file with that stem in the same library folder. This matches the old server's "basename anywhere" behaviour without crossing library boundaries.
+2. Otherwise the script is attached to **every** media file with that stem in the same library folder, never across libraries.
 
 The separator defaults to `.` and is `FunscriptSeparator` in the plugin configuration (*Separator* on the settings page). The client gets the same value as `funscriptSuffixes.separator` from `/Happy/Config`, so matching and parsing always agree. A changed separator takes effect with the next index rebuild.
 
@@ -76,7 +76,7 @@ With `AutoFunscriptEnabled` on (*Generate an Auto funscript from the audio*), `/
 3. `SpectrumAnalyzer` is a streaming Hann-windowed STFT (~4 Hz bins, one frame per `FrameMs`). Each bin of the band is scaled to its own loudest moment; bins that stay below −60 dBFS are ignored. The per-frame mean is scaled again so the loudest moment is 100, cut to 0 below `MinPower`, and thinned to changes of at least `MinPositionDelta`, keeping every turning point.
 4. The script is written to a temporary file and moved into place, so a request never reads half of it.
 
-Failures (a video without audio, a broken file) are remembered in memory until Jellyfin restarts, so a client polling them does not restart ffmpeg. The analysis is ported from the old Node server (`feature/auto-funscript-from-audio`); unlike there, it no longer renders a debug spectrogram.
+Failures (a video without audio, a broken file) are remembered in memory until Jellyfin restarts, so a client polling them does not restart ffmpeg.
 
 ## Build, test, install
 

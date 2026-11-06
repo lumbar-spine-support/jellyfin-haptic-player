@@ -1,7 +1,7 @@
 # Documentation
 
 - [Installation](installation.md)
-  <br>The HAPPY plugin for Jellyfin, opening HAPPY, moving from the old container
+  <br>The HAPPY plugin for Jellyfin, opening HAPPY
 - [Configuration](configuration.md)
   <br>Settings on the plugin's settings page in Jellyfin
 - [Authentication](authentication.md)
