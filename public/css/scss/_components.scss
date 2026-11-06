@@ -315,6 +315,17 @@
   vertical-align: middle;
 }
 
+// Custom glyph sized and aligned like a Bootstrap Icons font glyph.
+.icon-view-table {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em;
+  background-color: currentColor;
+  -webkit-mask: url('../img/icon-view-table.svg') center / contain no-repeat;
+  mask: url('../img/icon-view-table.svg') center / contain no-repeat;
+}
+
 .device-role-icon {
   display: inline-block;
   width: 1.25rem;
