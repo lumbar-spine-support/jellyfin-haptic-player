@@ -176,6 +176,13 @@ Writing back is refused unless the user may edit the playlist and Jellyfin still
 holds exactly the entries HAPPY loaded, since HAPPY drops entries from libraries
 it does not load and overwriting would delete them.
 
+Editing a playlist on its page follows the same rules. `DetailView` keeps edits in
+a `PlaylistDraft` (`components/library/playlistDraft.ts`) and sends them on Save, as
+one request with the full list; leaving the page drops the draft. Edit mode never
+touches the queue: a queue started from the playlist keeps its entries. A rename
+alone skips the overwrite check, since it cannot lose entries. A draft cannot be
+saved empty, because the library hides empty playlists.
+
 ## State management and synchronization flow
 
 Client state is coordinated by the `App` class in `src/client/index.ts` together
@@ -301,9 +308,9 @@ Media elements cannot send headers, so stream and trickplay sheet URLs carry the
 - favorites are Jellyfin's per-user `UserData.IsFavorite` (requested with `EnableUserData=true`) on
   tracks, videos and playlists; client-side albums have none. HAPPY writes them back with
   `POST`/`DELETE /UserFavoriteItems/{id}` (`setFavorite()`), optimistically
-- besides favorites, the client only writes playlists, when the user saves the queue
-  (`playlists.ts`: `POST /Playlists` with `IsPublic: false`, `POST /Playlists/{id}` with the full
-  `Ids` list; see [Playback queue](#playback-queue))
+- besides favorites, the client only writes playlists, when the user saves the queue or a playlist
+  edit (`playlists.ts`: `POST /Playlists` with `IsPublic: false`, `POST /Playlists/{id}` with the
+  full `Ids` list and/or `Name`; see [Playback queue](#playback-queue))
 
 ### Generated WebVTT and origins
 

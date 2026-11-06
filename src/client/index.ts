@@ -1,4 +1,4 @@
-import { fetchFunscript, trackFunscripts, fetchDoc, docAssetUrl, fetchVersion, fetchClientSettings, logout, artworkUrl, chaptersVttUrl, useJellyfin, createJellyfinPlaylist, overwriteJellyfinPlaylist, deleteJellyfinPlaylist } from './api';
+import { fetchFunscript, trackFunscripts, fetchDoc, docAssetUrl, fetchVersion, fetchClientSettings, logout, artworkUrl, chaptersVttUrl, useJellyfin, createJellyfinPlaylist, updateJellyfinPlaylist, deleteJellyfinPlaylist } from './api';
 import { JellyfinRequestError } from './jellyfin/library';
 import { JellyfinConnection } from './jellyfin/connection';
 import { ensureSignedIn, showMissingServerNotice } from './jellyfin/signIn';
@@ -28,6 +28,7 @@ import { Visualization } from './components/haptic/visualization';
 import { Markdown } from './components/markdown';
 import { Library } from './components/library';
 import { DetailView } from './components/library/detail';
+import type { PlaylistChanges } from './components/library/playlistDraft';
 import { toggleFavorite } from './components/library/favorites';
 import { setQueueActions } from './components/library/queueMenu';
 import { showToast } from './utils/toast';
@@ -178,6 +179,7 @@ class App {
       openTrack: (id, source, autoplay, index) => { void this.openTrack(id, true, source, autoplay, index); },
       playCollection: (source, shuffle) => { void this.playCollection(source, shuffle); },
       enqueue: (ids) => this.enqueue(ids),
+      savePlaylist: (playlist, changes) => this.savePlaylist(playlist, changes),
     });
     this.playback = new PlaybackController(this.library, this.queue, session);
     publishQueue(this.queue, this.playback, this.library, (request) => this.saveQueue(request));
@@ -641,7 +643,7 @@ class App {
         const source = this.queue.source;
         const current = source.type === 'playlist' ? this.library.getPlaylist(source.id) : undefined;
         if (!current) throw new Error('This queue did not come from a playlist.');
-        const saved = await overwriteJellyfinPlaylist(current, ids, tracksById);
+        const saved = await updateJellyfinPlaylist(current, { trackIds: ids }, tracksById);
         if (!saved) {
           throw new Error('This playlist holds media HAPPY does not show, changed elsewhere, or is not yours to edit. '
             + 'Save the queue as a new playlist instead.');
@@ -659,6 +661,32 @@ class App {
     this.library.upsertPlaylist(playlist);
     this.queue.markSaved({ type: 'playlist', id: playlist.id });
     return `Saved “${playlist.name}” (${playlist.entries.length} media).`;
+  }
+
+  /** Stores what edit mode changed; a refused save leaves the page in edit mode with the changes intact. */
+  private async savePlaylist(playlist: PlaylistInfo, changes: PlaylistChanges): Promise<void> {
+    const tracksById = new Map(this.allMedia().map((track) => [track.id, track]));
+    let saved: PlaylistInfo | null;
+    try {
+      saved = await updateJellyfinPlaylist(playlist, changes, tracksById);
+    } catch (err) {
+      const refused = err instanceof JellyfinRequestError && (err.status === 401 || err.status === 403);
+      showToast(refused ? `Jellyfin did not let you edit “${playlist.name}”` : `Could not save “${playlist.name}”`);
+      console.error('[playlists] save failed', err);
+      return;
+    }
+    if (!saved) {
+      showToast(`“${playlist.name}” holds media HAPPY does not show, changed elsewhere, or is not yours to edit`);
+      return;
+    }
+    this.library.upsertPlaylist(saved);
+    // The queue panel shows the playlist's name.
+    notifyQueueChanged();
+    showToast(`Saved “${saved.name}”`);
+    if (this.detail.isShowing(saved.id)) {
+      this.detail.showPlaylist(saved);
+      document.title = `${saved.name} — HAPPY`;
+    }
   }
 
   /** Play/Shuffle on an album or playlist page: the queue is replaced and its first track's page opens. */
