@@ -1,14 +1,19 @@
 # Documentation
 
-- [Installation](installation.md)
-  <br>The HAPPY plugin for Jellyfin, opening HAPPY
+## Start here
+
+1. [Installation](installation.md)
+   <br>Installing the plugin and opening HAPPY
+2. [Media Library](library.md)
+   <br>Setting up your libraries, funscripts, tags, chapters and VR
+3. [Intiface Central](intiface.md)
+   <br>Connecting your haptic toys
+
+## More
+
+- [DG-Lab Coyote 3.0 (experimental)](dg-lab.md)
+  <br>Connecting the Coyote e-stim device
 - [Configuration](configuration.md)
-  <br>Settings on the plugin's settings page in Jellyfin
+  <br>All settings on the plugin's settings page in Jellyfin
 - [Authentication](authentication.md)
-  <br>Signing in with your Jellyfin account
-- [Media Library](library.md)
-  <br>Jellyfin libraries, funscripts, tags, descriptions, chapters and VR
-- [Intiface Central Integration](intiface.md)
-  <br>Connecting haptic toys
-- [*(Experimental)* Dungeon Lab](dg-lab.md)
-  <br>Connecting vendor-specific e-stim toys like the Coyote 3.0
+  <br>Signing in, and who can see what

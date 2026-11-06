@@ -57,7 +57,7 @@ Changing any of the values generates new scripts the next time each file is open
 | Show the waveform sandbox | on | Show the [sandbox](dg-lab.md#sandbox) page for testing waveform patterns without media. |
 | Reconnect to the relay on page load | on | Reconnect to the relay on page load if it was connected and last seen less than 5 minutes ago. |
 
-The relay itself is configured with environment variables, see [DG-Lab Coyote 3.0](dg-lab.md#the-relay).
+The relay itself is configured with environment variables, see [DG-Lab relay](dg-lab.md#the-relay).
 
 ## Appearance
 
