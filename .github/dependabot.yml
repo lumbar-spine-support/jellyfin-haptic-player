@@ -40,7 +40,7 @@ updates:
       include: "scope"
 
   # Jellyfin plugin. Jellyfin.Controller/Jellyfin.Model set the supported server version
-  # (targetAbi in build.yaml, the dev Jellyfin image), so only take patch releases automatically.
+  # (targetAbi in build.yaml), so only take patch releases automatically.
   - package-ecosystem: "nuget"
     directory: "/jellyfin-plugin"
     schedule:
@@ -55,7 +55,7 @@ updates:
       nuget-minor-patch:
         update-types: ["minor", "patch"]
 
-  # Local dev Jellyfin; keep its minor version in step with Jellyfin.Controller.
+  # Local dev Jellyfin; follows the latest release, so HAPPY gets checked against it.
   - package-ecosystem: "docker-compose"
     directory: "/dev/jellyfin"
     schedule:
@@ -63,9 +63,6 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
-    ignore:
-      - dependency-name: "jellyfin/jellyfin"
-        update-types: ["version-update:semver-major", "version-update:semver-minor"]
 
   - package-ecosystem: "github-actions"
     directory: "/"

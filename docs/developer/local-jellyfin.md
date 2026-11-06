@@ -6,7 +6,7 @@
 flowchart LR
   Script["scripts/dev-jellyfin.mjs"] -- "compose run plugin-build" --> SDK["dotnet/sdk:10.0<br/>package.sh (Debug)"]
   SDK -- "jellyfin-plugin/artifacts/dev" --> JF
-  Script -- "compose up jellyfin" --> JF["jellyfin/jellyfin:12.1<br/>localhost:8097"]
+  Script -- "compose up jellyfin" --> JF["jellyfin/jellyfin<br/>localhost:8097"]
   Script -- "wizard, libraries, users, scan" --> JF
   Fixtures["test/fixtures/media"] -- "/media/videos, /media/audio (ro)" --> JF
   Script -- "credentials" --> Env["config/dev-jellyfin.env"]
@@ -42,7 +42,7 @@ VS Code:
 
 ## What gets set up
 
-- **Jellyfin**: Docker image `jellyfin/jellyfin:12.1`. Keep the minor version in step with `Jellyfin.Controller` in the plugin's csproj. It is published on port **8097**, so it can run next to a real Jellyfin on 8096; change it with `HAPPY_DEV_JELLYFIN_PORT`. Data lives in the Docker volumes `happy-dev_config` and `happy-dev_cache`.
+- **Jellyfin**: Docker image `jellyfin/jellyfin`, pinned in [compose.yaml](../../dev/jellyfin/compose.yaml). Dependabot opens a PR for every new release, so the image can be newer than the `Jellyfin.Controller` version the plugin is built against. It is published on port **8097**, so it can run next to a real Jellyfin on 8096; change it with `HAPPY_DEV_JELLYFIN_PORT`. Data lives in the Docker volumes `happy-dev_config` and `happy-dev_cache`.
 - **Libraries**:
   - **Videos**: *Music Videos* over `/media/videos`, NFO reader, trickplay during the scan. A library's type cannot change, so a Jellyfin set up with an older type needs `npm run dev:jellyfin:reset` first.
   - **Audio**: *Books* over `/media/audio`.

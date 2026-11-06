@@ -6,7 +6,7 @@ HAPPY runs inside your [Jellyfin](https://jellyfin.org/) server as a plugin. Jel
 
 You need:
 
-1. A Jellyfin server (currently 12.1) with your audio in a **Books** library and your videos in a **Music Videos** library (see [Media Library](library.md)).
+1. A Jellyfin server with your audio in a **Books** library and your videos in a **Music Videos** library (see [Media Library](library.md)).
 2. The HAPPY plugin installed in that Jellyfin server (below).
 3. Optionally, for the DG-Lab Coyote only: the [DG-Lab relay](dg-lab.md#the-relay).
 
@@ -22,7 +22,7 @@ Add HAPPY's plugin repository to Jellyfin once. After that, Jellyfin installs th
 
 Jellyfin installs new versions automatically; restart it to load an update. You can turn automatic updates off on the plugin's page.
 
-The plugin is built for one Jellyfin version (currently 12.1). After a Jellyfin upgrade, Jellyfin installs the matching plugin version once it is released.
+The plugin is built for one Jellyfin version. After a Jellyfin upgrade, Jellyfin installs the matching plugin version once it is released.
 
 ## Open HAPPY
 

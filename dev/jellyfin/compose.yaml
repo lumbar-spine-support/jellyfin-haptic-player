@@ -13,8 +13,8 @@ x-no-selinux-relabel: &no-selinux-relabel
 services:
   jellyfin:
     <<: *no-selinux-relabel
-    # Keep the minor in step with Jellyfin.Controller in the plugin's csproj (targetAbi in build.yaml).
-    image: jellyfin/jellyfin:12.1
+    # The latest Jellyfin, bumped by Dependabot. Can be newer than Jellyfin.Controller in the plugin's csproj.
+    image: jellyfin/jellyfin:12.4
     ports:
       # Not 8096, so it can run next to a real Jellyfin. All interfaces: the devcontainer reaches it through the Docker bridge gateway, phones through the LAN.
       - "${HAPPY_DEV_JELLYFIN_PORT:-8097}:8096"
