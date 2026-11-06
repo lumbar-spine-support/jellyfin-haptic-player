@@ -91,7 +91,7 @@ sh jellyfin-plugin/package.sh        # → jellyfin-plugin/artifacts/HAPPY_<vers
 
 To install by hand, copy the `HAPPY_<version>` folder into Jellyfin's `plugins/` directory (inside the Jellyfin config/data volume) and restart Jellyfin. Afterwards, *Dashboard → Plugins* lists **HAPPY**.
 
-CI runs the tests and uploads the packaged folder as a build artifact (`jellyfin-plugin` job in `.github/workflows/test.yml`).
+CI runs the tests and uploads the packaged folder as the `jellyfin-plugin-happy` build artifact (`jellyfin-plugin` job in `.github/workflows/test.yml`).
 
 ## Releases and the plugin repository
 
