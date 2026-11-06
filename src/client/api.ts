@@ -5,7 +5,7 @@ import { buildChaptersVtt } from '../shared/webvtt';
 import type { JellyfinConnection } from './jellyfin/connection';
 import { loadLibrary, setFavorite, type LoadOptions } from './jellyfin/library';
 import { toPlaylist } from './jellyfin/mapper';
-import { canOverwritePlaylist, createPlaylist, deletePlaylist, loadPlaylist, replacePlaylistItems } from './jellyfin/playlists';
+import { canOverwritePlaylist, createPlaylist, deletePlaylist, loadPlaylist, updatePlaylist } from './jellyfin/playlists';
 import { imageUrl, streamUrl, trickplayVtt } from './jellyfin/urls';
 import { versionFromPluginInfo, type PluginInfo } from './utils/formatVersion';
 import { markImageLoading } from './utils/imagePlaceholders';
@@ -45,16 +45,16 @@ export async function createJellyfinPlaylist(
 }
 
 /**
- * Replaces a playlist's entries with `trackIds`. Resolves to `null` without touching it when that
- * would lose entries HAPPY does not show, or the user may not edit it (see `canOverwritePlaylist`).
+ * Renames a playlist and/or replaces its entries with `trackIds`. Resolves to `null` without touching it
+ * when replacing would lose entries HAPPY does not show, or the user may not edit it (see `canOverwritePlaylist`).
  */
-export async function overwriteJellyfinPlaylist(
-  playlist: PlaylistInfo, trackIds: readonly string[], tracksById: Map<string, TrackInfo>,
+export async function updateJellyfinPlaylist(
+  playlist: PlaylistInfo, changes: { name?: string; trackIds?: readonly string[] }, tracksById: Map<string, TrackInfo>,
 ): Promise<PlaylistInfo | null> {
   const api = requireJellyfin();
   const loaded = playlist.entries.map((entry) => entry.trackId);
-  if (!(await canOverwritePlaylist(api, playlist.id, loaded))) return null;
-  await replacePlaylistItems(api, playlist.id, trackIds);
+  if (changes.trackIds && !(await canOverwritePlaylist(api, playlist.id, loaded))) return null;
+  await updatePlaylist(api, playlist.id, { name: changes.name, itemIds: changes.trackIds });
   return toPlaylist(await loadPlaylist(api, playlist.id), tracksById);
 }
 
@@ -186,6 +186,8 @@ export function renderTrackArt(track: TrackInfo | null | undefined): string {
 
 const COLLAGE_SIZE = 400;
 const collageCache = new Map<string, Promise<string>>();
+/** The latest cover asked of each image; a collage still rendering for an older one is dropped. */
+const coverRequests = new WeakMap<HTMLImageElement, object>();
 
 function loadImage(src: string): Promise<HTMLImageElement | null> {
     return new Promise((resolve) => {
@@ -234,11 +236,13 @@ export function playlistCoverArt(tracks: (TrackInfo | null | undefined)[]): Prom
 /** Sets the first item's art immediately, then swaps in the collage once rendered. */
 export function applyPlaylistCover(img: HTMLImageElement | null, tracks: (TrackInfo | null | undefined)[]): void {
     if (!img) return;
+    const request = {};
+    coverRequests.set(img, request);
     img.src = renderTrackArt(tracks[0]);
     markImageLoading(img);
     if (tracks.length < 4) return;
     const expected = img.src;
     void playlistCoverArt(tracks).then((src) => {
-        if (img.src === expected) img.src = src;
+        if (coverRequests.get(img) === request && img.src === expected) img.src = src;
     });
 }

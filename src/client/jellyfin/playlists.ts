@@ -2,7 +2,7 @@ import type { JellyfinItemDto, JellyfinItemsResult, JellyfinPlaylist } from './d
 import { JellyfinRequestError, type JellyfinApi } from './library';
 
 /**
- * Writing playlists, for "save the queue as a playlist".
+ * Writing playlists, for "save the queue as a playlist" and the playlist page's edit mode.
  *
  * Saves always send the whole list in order. Jellyfin's per-entry calls (move,
  * remove) address entries by an id that two copies of the same item share, so
@@ -28,9 +28,12 @@ export async function createPlaylist(api: JellyfinApi, name: string, itemIds: re
     return Id;
 }
 
-/** Replaces the entries of a playlist with `itemIds`, in order. */
-export async function replacePlaylistItems(api: JellyfinApi, playlistId: string, itemIds: readonly string[]): Promise<void> {
-    await send(api, `/Playlists/${encodeURIComponent(playlistId)}`, 'POST', { Ids: itemIds }, 'Saving a playlist');
+/** Renames a playlist and/or replaces its entries with `itemIds`, in order; what is left out stays. */
+export async function updatePlaylist(
+    api: JellyfinApi, playlistId: string, changes: { name?: string; itemIds?: readonly string[] },
+): Promise<void> {
+    await send(api, `/Playlists/${encodeURIComponent(playlistId)}`, 'POST',
+        { Name: changes.name, Ids: changes.itemIds }, 'Saving a playlist');
 }
 
 /**

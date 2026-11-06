@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { login, skip, type JellyfinSession } from './session';
 import { loadLibrary } from '../../../src/client/jellyfin/library';
 import { toPlaylist } from '../../../src/client/jellyfin/mapper';
-import { canOverwritePlaylist, createPlaylist, deletePlaylist, loadPlaylist, replacePlaylistItems } from '../../../src/client/jellyfin/playlists';
+import { canOverwritePlaylist, createPlaylist, deletePlaylist, loadPlaylist, updatePlaylist } from '../../../src/client/jellyfin/playlists';
 import { DEFAULT_FUNSCRIPT_SUFFIXES } from '../../../src/shared/funscriptNames';
 import type { TrackInfo } from '../../../src/shared/types';
 
@@ -15,6 +15,7 @@ const created: string[] = [];
 /**
  * Jellyfin finishes creating a playlist after `POST /Playlists` returns; a delete that
  * arrives before that is undone and leaves an ownerless playlist only an admin can remove.
+ * An update arriving that early is undone too.
  */
 const settle = () => new Promise((resolve) => setTimeout(resolve, 2000));
 
@@ -66,10 +67,25 @@ test('[jellyfin-playlists] a queue saves as a playlist and can be written back',
     assert.equal(await canOverwritePlaylist(session, id, queued.slice(1)), false,
         'a playlist that differs from what HAPPY loaded is left alone');
 
+    // Updates that land before the playlist settled are undone as well, name and entries alike.
+    await settle();
     const reordered = [...queued].reverse().slice(1);
-    await replacePlaylistItems(session, id, reordered);
+    await updatePlaylist(session, id, { itemIds: reordered });
     const rewritten = toPlaylist(await loadPlaylist(session, id), tracksById);
     assert.deepEqual(rewritten.entries.map((entry) => entry.trackId), reordered);
+
+    await updatePlaylist(session, id, { name: 'HAPPY integration test renamed' });
+    const renamed = toPlaylist(await loadPlaylist(session, id), tracksById);
+    assert.equal(renamed.name, 'HAPPY integration test renamed');
+    assert.deepEqual(renamed.entries.map((entry) => entry.trackId), reordered, 'renaming leaves the entries alone');
+
+    const both = [...reordered].reverse();
+    await updatePlaylist(session, id, { name: 'HAPPY integration test both', itemIds: both });
+    const edited = toPlaylist(await loadPlaylist(session, id), tracksById);
+    assert.equal(edited.name, 'HAPPY integration test both');
+    assert.deepEqual(edited.entries.map((entry) => entry.trackId), both);
+    const unshared = await (await session.request(`/Playlists/${id}`)).json() as { OpenAccess?: boolean };
+    assert.equal(unshared.OpenAccess, false, 'an edit keeps the playlist private');
 });
 
 test('[jellyfin-playlists] the owner can delete a saved playlist', { skip }, async (t) => {

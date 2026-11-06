@@ -1,6 +1,7 @@
 import { PlayerController, UIElement, playerContext } from '@videojs/html';
 import { selectControls } from '@videojs/core/dom';
 import { getQueueTarget, subscribeQueue, upcomingOf, type QueueItem, type QueueSave, type QueueState } from '../features/queue';
+import { startRowDrag } from './row-drag';
 import './queue.css';
 
 /** Played entries shown above the current one; older ones stay in the queue but out of the list. */
@@ -264,7 +265,7 @@ class QueuePanelElement extends UIElement {
             handle.className = 'btn btn-sm btn-link media-queue-icon-button media-queue-handle';
             handle.setAttribute('aria-label', `Move ${item.title} (Alt+Arrow keys)`);
             handle.innerHTML = '<i class="bi bi-grip-vertical" aria-hidden="true"></i>';
-            handle.addEventListener('pointerdown', (event) => this.#startDrag(event, row, index));
+            handle.addEventListener('pointerdown', (event) => this.#startDrag(event, index));
             row.addEventListener('keydown', (event) => {
                 if (!event.altKey || (event.key !== 'ArrowUp' && event.key !== 'ArrowDown')) return;
                 event.preventDefault();
@@ -340,75 +341,22 @@ class QueuePanelElement extends UIElement {
         }
     }
 
-    /**
-     * Pointer drag on a row's handle. The row follows the pointer and the rows it
-     * passes slide out of its way; nothing leaves the DOM, so pointer capture holds
-     * for the whole gesture and a row can travel any distance. The queue changes on release.
-     */
-    #startDrag(event: PointerEvent, row: HTMLElement, from: number): void {
+    #startDrag(event: PointerEvent, from: number): void {
         const list = this.#list;
         if (!list || event.button !== 0) return;
-        event.preventDefault();
-        const handle = event.currentTarget as HTMLElement;
-        handle.setPointerCapture(event.pointerId);
         this.#dragging = true;
-        row.dataset.dragging = '';
-
-        const rows = this.#upcomingRows();
-        const rects = rows.map((other) => other.getBoundingClientRect());
-        const step = rects.length > 1 ? rects[1].top - rects[0].top : rects[0].height;
-        const startY = event.clientY;
-        const startScroll = list.scrollTop;
-        let to = from;
-        let pointerY = startY;
-        let scrollTimer: ReturnType<typeof setInterval> | null = null;
-        const abort = new AbortController();
-
-        const place = (): void => {
-            const offset = pointerY - startY + (list.scrollTop - startScroll);
-            row.style.transform = `translateY(${offset}px)`;
-            const centre = rects[from].top + rects[from].height / 2 + offset;
-            to = from;
-            while (to < rows.length - 1 && centre > rects[to + 1].top + rects[to + 1].height / 2) to++;
-            while (to > 0 && centre < rects[to - 1].top + rects[to - 1].height / 2) to--;
-            rows.forEach((other, i) => {
-                if (other === row) return;
-                const shift = from < to && i > from && i <= to ? -step : to < from && i >= to && i < from ? step : 0;
-                other.style.transform = shift ? `translateY(${shift}px)` : '';
-            });
-        };
-        // Near the list's edges it scrolls, so a row can reach entries that are out of view.
-        const edgeScroll = (): void => {
-            const bounds = list.getBoundingClientRect();
-            const speed = pointerY < bounds.top + 32 ? -8 : pointerY > bounds.bottom - 32 ? 8 : 0;
-            if (speed && !scrollTimer) {
-                scrollTimer = setInterval(() => {
-                    list.scrollTop += pointerY < list.getBoundingClientRect().top + 32 ? -8 : 8;
-                    place();
-                }, 16);
-            } else if (!speed && scrollTimer) {
-                clearInterval(scrollTimer);
-                scrollTimer = null;
-            }
-        };
-
-        handle.addEventListener('pointermove', (move) => {
-            pointerY = move.clientY;
-            place();
-            edgeScroll();
-        }, { signal: abort.signal });
-
-        const finish = (): void => {
-            abort.abort();
-            if (scrollTimer) clearInterval(scrollTimer);
-            delete row.dataset.dragging;
-            this.#dragging = false;
-            // The rows already show the new order; re-rendering from there slides nothing.
-            if (to !== from) getQueueTarget()?.moveUpcoming(from, to);
-            else this.#render(getQueueTarget()?.getState() ?? null);
-        };
-        handle.addEventListener('pointerup', finish, { signal: abort.signal });
-        handle.addEventListener('pointercancel', finish, { signal: abort.signal });
+        startRowDrag({
+            event,
+            rows: this.#upcomingRows(),
+            from,
+            scroller: list,
+            onEnd: (to) => {
+                this.#dragging = false;
+                // The rows already show the new order; re-rendering from there slides nothing.
+                if (to !== from) getQueueTarget()?.moveUpcoming(from, to);
+                else this.#render(getQueueTarget()?.getState() ?? null);
+            },
+        });
     }
 }
 

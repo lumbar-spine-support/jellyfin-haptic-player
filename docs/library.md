@@ -25,7 +25,7 @@ Add your folders as libraries in Jellyfin (*Dashboard → Libraries*). HAPPY sho
   - If your videos carry an artist, prefer **Music Videos**. Jellyfin keeps artists only for audio and music videos; in the other video library types the artist tag is dropped and HAPPY shows *Unknown*. Set the artist in your tagger (e.g. *Artist* or *Album Artist* in Kid3; HAPPY shows the album artist when both are set) or in the NFO (`<artist>`). A library's type cannot be changed later, so create a new library for it.
 - Media plays as the original file, never transcoded. Your browser must be able to decode it (see [Video codecs](#video-codecs)).
 
-Playlists are Jellyfin playlists. Create them in Jellyfin, or save a [queue](#queue) from HAPPY; `.m3u` files in your media folders are not read by HAPPY.
+Playlists are Jellyfin playlists. Create them in Jellyfin, or save a [queue](#queue) from HAPPY, and [edit your own](#edit-a-playlist) on their page; `.m3u` files in your media folders are not read by HAPPY.
 
 ## Tags and descriptions
 
@@ -121,9 +121,23 @@ What plays next is the queue. Playing an album or a playlist (its **Play** or **
 - **Add to the queue**: the **⋯** menu on a card, a list row or a row of an album/playlist page has **Play next** and **Add to queue**. Album and playlist pages also have a **+** button that queues all of it.
 - **See and change the queue**: the queue button in the player's control bar (next to the settings button) opens the list with what plays now at the top and what is up next below it; scroll up to see the last ten played. Drag an entry by its handle to any place (or use Alt+↑/↓ on the handle), remove it with ×, or click it to play it. The buttons at the top switch repeat (off → repeat the queue → repeat the current file), and shuffle or clear what is up next. Entries slide to their new place, so you can follow what moved.
 - **Save the queue**: *Save as…* stores the whole queue, in order, as a new Jellyfin playlist that only you can see. A queue that came from one of your playlists can be written back with *Save* once you changed it. HAPPY refuses to overwrite a playlist that holds media from libraries HAPPY does not show, or that was changed elsewhere in the meantime, so nothing gets lost; save it as a new playlist instead. Saved playlists appear in the library right away and in Jellyfin's other apps too.
+- **Edit a playlist**: see [Edit a playlist](#edit-a-playlist).
 - **Delete a playlist**: the **⋯** menu of one of your own playlists in the library has *Delete playlist*. After you confirm, the playlist is removed from Jellyfin, for all apps; the media in it stays.
 
 The queue lives in the open browser tab and is gone after a reload; save it as a playlist to keep it. The bar at the bottom of the page shows what is playing while you browse; click it to get back to the player and its queue. If you build a queue before playing anything, the bar shows its first file; press play there to start the queue.
+
+## Edit a playlist
+
+The pen button next to **+** on the page of one of your own playlists starts edit mode. Nothing reaches Jellyfin until you save.
+
+- **Reorder**: drag a file by the handle at the start of its row, or focus the row and press Alt+↑/↓.
+- **Remove**: tick the round checkboxes (or click the rows), then press the bin. The media itself stays in your library.
+- **Rename**: press the rename button and type the new name in the title; Enter accepts it, Esc takes it back.
+- **Save**: the big button in the middle stores your changes and ends edit mode. The cover follows the first four files while you edit.
+
+The pen button leaves edit mode and asks first if you have unsaved changes. Going to another page drops them without asking.
+
+New files still come from the library: use **⋯** to add to the queue, then save the queue. A playlist needs at least one file; to get rid of it, use *Delete playlist*. As with saving the queue, HAPPY refuses to change the order or files of a playlist that holds media from libraries HAPPY does not show, or that was changed elsewhere in the meantime. Renaming still works there.
 
 ## Cover art in the grid view
 

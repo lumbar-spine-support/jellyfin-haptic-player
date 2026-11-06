@@ -152,3 +152,14 @@ test(`${TAG} applyPlaylistCover glows until a new cover loads`, () => {
     artwork.applyPlaylistCover(shown, [track('g1')]);
     assert.equal(shown.classList.contains('placeholder'), false);
 });
+
+test(`${TAG} a collage still rendering does not replace a newer cover of the same image`, async () => {
+    const img = { src: '', classList: { toggle: () => { } } } as unknown as HTMLImageElement;
+    const slow = [track('s1'), track('s2'), track('s3'), track('s4')];
+    artwork.applyPlaylistCover(img, slow);
+    // The same first item, so the placeholder art is identical; only the entries behind it moved away.
+    artwork.applyPlaylistCover(img, slow.slice(0, 3));
+    await artwork.playlistCoverArt(slow);
+    await new Promise((resolve) => setTimeout(resolve));
+    assert.equal(img.src, artwork.renderTrackArt(slow[0]));
+});

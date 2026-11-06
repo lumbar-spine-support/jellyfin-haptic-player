@@ -98,7 +98,7 @@ sequenceDiagram
   else Save (queue came from a playlist, edited)
     U->>P: Save
     P->>A: save({ mode: 'overwrite' })
-    A->>API: overwriteJellyfinPlaylist(playlist, queue.trackIds)
+    A->>API: updateJellyfinPlaylist(playlist, { trackIds: queue.trackIds })
     API->>J: GET /Playlists/{id} (ItemIds) + GET /Playlists/{id}/Users/{me} (CanEdit)
     Note over API,J: refused unless CanEdit and ItemIds equal the entries HAPPY loaded
     API->>J: POST /Playlists/{id} { Ids }
