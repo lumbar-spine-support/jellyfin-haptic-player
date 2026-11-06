@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.7.1.6",
+        "changelog": "Beta build 1.7.1.6 from dev (commit ee0ed14). Not released yet, may be unstable.",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.7.1.6.zip",
+        "checksum": "5201987fd772c38812f819efe5df84c7",
+        "timestamp": "2026-11-06T15:45:23Z"
+      },
+      {
         "version": "1.7.1.5",
         "changelog": "Beta build 1.7.1.5 from dev (commit ee0ed14). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- feat(library): clearer icons for the tiles and table views (ee0ed14)\n- docs: remove codecov badge (nobody cares) and reorder jellyfin badge (de43eee)\n- docs: update Jellyfin version references and clarify plugin compatibility (6e6e8d0)\n- test(fixtures): use a Music Videos library in the dev Jellyfin (0bda74b)\n- docs: use one name per page and a start-here order (6ac291b)\n- docs(configuration): shorten the settings tables (7146530)\n- docs(authentication): separate everyday use from security details (000d3e6)\n- docs(dg-lab): add an overview and a troubleshooting section (4a190b4)\n- docs(installation): put the common path first (2b960d0)\n- docs(intiface): drop technical details users do not need (0e13d4c)\n- docs(readme): make the Quick Start easier to follow (679f577)\n- docs: remove leftovers from the standalone container versions (65ef62b)\n- docs(library): simplify the library setup guide (1f0c97b)\n- fix(playlists): hide add to queue in edit mode and stop the row jump (54f0972)\n- feat(playlists): Edit mode for playlists to rename, reorder or remove elements more quickly. (97a7f41)\n- docs(readme): add badge with the tested Jellyfin version (cff8153)",
         "targetAbi": "12.1.0.0",
@@ -39,14 +47,6 @@
         "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.7.1.2.zip",
         "checksum": "950cb0b43929ba120a39ff956087e10f",
         "timestamp": "2026-11-06T14:02:04Z"
-      },
-      {
-        "version": "1.7.1.1",
-        "changelog": "Beta build 1.7.1.1 from dev (commit 5dccd76). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- feat(playlists): Edit mode for playlists to rename, reorder or remove elements more quickly. (5dccd76)",
-        "targetAbi": "12.1.0.0",
-        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.7.1.1.zip",
-        "checksum": "f95d9f7fcd9111f5cfb0032540d9312e",
-        "timestamp": "2026-11-06T12:19:56Z"
       },
       {
         "version": "1.7.1.0",
