@@ -33,7 +33,9 @@ In Jellyfin, open *Dashboard → Plugins → Repositories* and add HAPPY's plugi
 https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/refs/heads/jellyfin-plugin-repository/manifest.json
 ```
 
-Then install **HAPPY** from the plugin *Catalog* and restart Jellyfin. Jellyfin keeps the plugin up to date from now on. Open HAPPY at `<your Jellyfin address>/Happy/Web/` (or *Open HAPPY* on the plugin's settings page) and sign in with your Jellyfin account. Server-wide settings are on the plugin's settings page (*Dashboard → Plugins → HAPPY*).
+Then install **HAPPY** from the plugin *Catalog* and restart Jellyfin, which keeps the plugin up to date from now on. Open HAPPY at `<your Jellyfin address>/Happy/Web/` and sign in with your Jellyfin account.
+
+Server-wide settings are on the plugin's settings page (*Dashboard → Plugins → HAPPY*).
 
 →  [docs/installation.md](docs/installation.md), [docs/configuration.md](docs/configuration.md)
 
@@ -54,9 +56,9 @@ video/
 
 ### 3. Intiface Central (Required for Haptic Support)
 
-Install [Intiface Central](https://intiface.com/#intiface-central). It is recommended to install it on the device you are using to listen/watch your files.
+Install [Intiface Central](https://intiface.com/#intiface-central), ideally on the device you listen or watch on, such as your phone. Start its server and connect your toys.
 
-Once Intiface server is running and your toys are connected, find the IP-address of the device running Intiface. If you are running Intiface on the same device as your HAPPY client will be running (ideally your phone), you can leave the IP-address in HAPPY as `localhost`. Open the settings panel in HAPPY and enter the IP-address, then press connect. You should now see a list of your toys and their features. You can now assign individual features of each toy to a funscript.
+In HAPPY, open the settings panel, enter the IP address of the device running Intiface and press **Connect**. If HAPPY and Intiface run on the same device, keep `localhost`. Your toys and their features now appear, and you can assign each feature to a funscript.
 
 →  [docs/intiface.md](docs/intiface.md)
 
