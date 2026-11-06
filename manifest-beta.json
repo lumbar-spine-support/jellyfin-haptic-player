@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.7.1.1",
+        "changelog": "Beta build 1.7.1.1 from dev (commit 5dccd76). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- feat(playlists): Edit mode for playlists to rename, reorder or remove elements more quickly. (5dccd76)",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.7.1.1.zip",
+        "checksum": "f95d9f7fcd9111f5cfb0032540d9312e",
+        "timestamp": "2026-11-06T12:19:56Z"
+      },
+      {
         "version": "1.7.1.0",
         "changelog": "## [1.7.1](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.7.0...v1.7.1) (2026-11-05)\n\n\n### Bug Fixes\n\n* **library:** jump to the scroll position when changing views ([3f95a4c](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/3f95a4cf3692743c5752d80db1f6c5d3347f4211))\n\nInstall or update HAPPY through its Jellyfin plugin repository: https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/jellyfin-plugin-repository/manifest.json (Dashboard → Plugins → Repositories), or download `happy_1.7.1.0.zip` below.",
         "targetAbi": "12.1.0.0",
