@@ -39,7 +39,7 @@ Server-wide settings are on the plugin's settings page (*Dashboard → Plugins �
 
 →  [docs/installation.md](docs/installation.md), [docs/configuration.md](docs/configuration.md)
 
-### 2. Library Setup
+### 2. Media Library
 
 Put your audio in a Jellyfin library of type **Books** and your videos in one of type **Music Videos**, each in its own folder, with the funscripts next to the media files:
 
@@ -54,15 +54,15 @@ video/
 
 →  [docs/library.md](docs/library.md)
 
-### 3. Intiface Central (Required for Haptic Support)
+### 3. Intiface Central
 
-Install [Intiface Central](https://intiface.com/#intiface-central), ideally on the device you listen or watch on, such as your phone. Start its server and connect your toys.
+To drive your toys, install [Intiface Central](https://intiface.com/#intiface-central), ideally on the device you listen or watch on, such as your phone. Start its server and connect your toys.
 
 In HAPPY, open the settings panel, enter the IP address of the device running Intiface and press **Connect**. If HAPPY and Intiface run on the same device, keep `localhost`. Your toys and their features now appear, and you can assign each feature to a funscript.
 
 →  [docs/intiface.md](docs/intiface.md)
 
-### 4. DG-Lab Relay (Optional, for the Coyote 3.0)
+### 4. DG-Lab Coyote 3.0 (optional)
 
 The experimental DG-Lab Coyote support needs a small relay between HAPPY and the DG-Lab app. It ships as its own image; run it next to Jellyfin, then enable DG-Lab and enter the relay's address on the plugin's settings page.
 
@@ -83,12 +83,12 @@ services:
 
 Note: All docs are also available in HAPPY itself (*Documentation* at the bottom of the settings panel).
 
-- [Overview](docs/index.md)
 - [Installation](docs/installation.md)
+- [Media Library](docs/library.md)
 - [Intiface Central](docs/intiface.md)
 - [DG-Lab Coyote 3.0 (experimental)](docs/dg-lab.md)
-- [Library Setup](docs/library.md)
 - [Configuration](docs/configuration.md)
+- [Authentication](docs/authentication.md)
 
 ## License
 
