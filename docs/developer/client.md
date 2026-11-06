@@ -2,7 +2,7 @@
 
 # Client
 
-The client is a single-page app bundled from [src/client/index.ts](../../src/client/index.ts). It uses no framework: plain TypeScript classes, Bootstrap for layout and Video.js 10 (`<video-player>`) for the players. The HAPPY Jellyfin plugin serves it at `<jellyfin>/Happy/Web/`, so it shares Jellyfin's origin. Signing in happens inside the app (the Jellyfin sign-in card); there is no separate login page.
+The client is a single-page app bundled from [src/client/index.ts](../../src/client/index.ts). It uses no framework: plain TypeScript classes, Bootstrap for layout and Video.js 10 (`<video-player>`) for the players. The HAPPY Jellyfin plugin serves it at `<jellyfin>/Happy/Web/`, so it shares Jellyfin's origin. Signing in happens inside the app (the Jellyfin sign-in card).
 
 ## Object graph
 

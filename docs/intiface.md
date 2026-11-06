@@ -14,7 +14,7 @@ If below description does not help, you can find a more detailed tutorial here: 
 
 Use the address of the machine running Intiface as seen from the device running the browser. `localhost` only works when browser and Intiface run on the same machine.
 
-With `AUTO_RECONNECT_INTIFACE=true`, HAPPY reconnects on page load if Intiface was connected last time and you did not press **Disconnect**.
+HAPPY reconnects on page load if Intiface was connected last time and you did not press **Disconnect**. To turn this off, use *Reconnect to Intiface on page load* (see [Configuration](configuration.md#haptics)).
 
 If the connection drops on its own, HAPPY retries in the background (1 s, doubling up to 15 s) and right away when you return to the tab. On mobile, a turned-off screen freezes the browser tab, and Intiface closes connections that stop answering its pings. HAPPY therefore keeps the screen on while media plays (**Keep Screen On During Playback** under *Appearance* in the settings, on by default); this needs the page to be served over HTTPS or from `localhost`.
 

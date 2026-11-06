@@ -2,7 +2,7 @@
 
 # Installation
 
-HAPPY plays media from a [Jellyfin](https://jellyfin.org/) server and runs inside it as a plugin. Jellyfin scans your files and provides metadata, artwork, chapters, timeline thumbnails, users and streaming. The HAPPY plugin adds the funscripts and serves HAPPY itself. There is no separate HAPPY server or container.
+HAPPY plays media from a [Jellyfin](https://jellyfin.org/) server and runs inside it as a plugin. Jellyfin scans your files and provides metadata, artwork, chapters, timeline thumbnails, users and streaming. The HAPPY plugin adds the funscripts and serves HAPPY itself.
 
 You need:
 
@@ -56,14 +56,3 @@ Jellyfin's web client also lists **HAPPY** in its menu for every user: in the si
 The settings panel's *Back to Jellyfin* button returns to Jellyfin's web client. Jellyfin's apps for TVs and phones don't show the menu entry; open HAPPY in a browser there. Playback, VR and haptics always happen in HAPPY's own player. HAPPY shows the libraries that user can see in Jellyfin. HAPPY has no accounts of its own: who may see what is decided by Jellyfin's users and their library access, see [Authentication](authentication.md).
 
 Server-wide defaults (seek interval, haptic delay, DG-Lab, funscript file names and more) are set by a Jellyfin administrator on the plugin's settings page, see [Configuration](configuration.md).
-
-## Moving from the HAPPY container
-
-Earlier versions of HAPPY ran as their own Docker container (`ghcr.io/lumbar-spine-support/docker-haptic-player`). That image gets no more releases. To move over:
-
-1. Install the plugin as described above.
-2. Enter the values from your `settings.yaml` or container environment on the plugin's settings page. `JELLYFIN_URL` is no longer needed, since HAPPY now runs on Jellyfin's own address.
-3. If you use the DG-Lab Coyote, run the [DG-Lab relay](dg-lab.md#the-relay) and enter its address on the settings page.
-4. Stop and remove the old container, and remove it from your reverse proxy.
-
-Settings you changed in HAPPY itself (haptic delays, device assignments and strengths, the Intiface address, blur and similar toggles) are stored in the browser per address. HAPPY now has a different address, so they do not carry over; set them again once. Bookmarks and home screen shortcuts need the new address as well.

@@ -2,7 +2,7 @@
 
 # Architecture overview
 
-HAPPY is a single-page app that runs inside a Jellyfin server. The HAPPY plugin serves the app at `<jellyfin>/Happy/Web/`, together with its settings, version, docs and the funscripts; Jellyfin owns the media library and streams it. There is no HAPPY server of its own. The only separate process is the optional DG-Lab relay, for Coyote owners. **Everything that happens in real time runs in the browser**: playback, funscript interpolation and device output. Neither Jellyfin nor the relay ever talks to a toy.
+HAPPY is a single-page app that runs inside a Jellyfin server. The HAPPY plugin serves the app at `<jellyfin>/Happy/Web/`, together with its settings, version, docs and the funscripts; Jellyfin owns the media library and streams it. The only separate process is the optional DG-Lab relay, for Coyote owners. **Everything that happens in real time runs in the browser**: playback, funscript interpolation and device output. Neither Jellyfin nor the relay ever talks to a toy.
 
 ## System context
 
