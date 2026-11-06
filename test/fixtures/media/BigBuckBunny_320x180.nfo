@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <!-- HAPPY test fixture: Jellyfin reads <tag> into Tags and <plot> into Overview (rendered as Markdown by HAPPY). -->
-<movie>
+<musicvideo>
   <title>Big Buck Bunny</title>
+  <artist>Blender Foundation</artist>
   <plot><![CDATA[**Don't Mess With The Bunny!**
 
 You can download it from [here](https://peach.blender.org/).
@@ -77,4 +78,4 @@ The movie is very funny!
   <tag>vibrant</tag>
   <tag>yellow</tag>
   <tag>zany</tag>
-</movie>
+</musicvideo>

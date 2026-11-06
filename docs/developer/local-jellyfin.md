@@ -44,7 +44,7 @@ VS Code:
 
 - **Jellyfin**: Docker image `jellyfin/jellyfin:12.1`. Keep the minor version in step with `Jellyfin.Controller` in the plugin's csproj. It is published on port **8097**, so it can run next to a real Jellyfin on 8096; change it with `HAPPY_DEV_JELLYFIN_PORT`. Data lives in the Docker volumes `happy-dev_config` and `happy-dev_cache`.
 - **Libraries**:
-  - **Videos**: *Mixed movies and shows* over `/media/videos`, NFO reader, trickplay during the scan.
+  - **Videos**: *Music Videos* over `/media/videos`, NFO reader, trickplay during the scan. A library's type cannot change, so a Jellyfin set up with an older type needs `npm run dev:jellyfin:reset` first.
   - **Audio**: *Books* over `/media/audio`.
   - Both are the same fixture folder, mounted read-only twice. Two libraries over one path would share their items, and the audio library would retype the videos.
 - **Users**:
