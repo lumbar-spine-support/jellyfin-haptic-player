@@ -10,7 +10,9 @@ Settings marked *(user)* are only starting values: each user can change them in 
 
 | Setting | Default | Description |
 | --- | --- | --- |
-| Libraries | none (all) | The Jellyfin libraries HAPPY shows and finds funscripts in, e.g. only your haptics library and not your movies and TV shows. With none selected, HAPPY uses all libraries. Playlists only show entries from the selected libraries. This narrows what HAPPY shows; it does not grant access: users still only see the libraries Jellyfin gives them access to. A deleted library drops out of the selection; if none of the selected libraries are left, HAPPY uses all of them again. |
+| Libraries | none (all) | The Jellyfin libraries HAPPY shows and finds funscripts in, e.g. only your haptics libraries. With none selected, or when all selected libraries are deleted, HAPPY uses all libraries. |
+
+This only narrows what HAPPY shows, playlists included. It does not grant access: users still only see the libraries Jellyfin gives them access to.
 
 ## Playback
 
@@ -27,7 +29,7 @@ Settings marked *(user)* are only starting values: each user can change them in 
 | Intiface update rate (Hz) *(user)* | `30` | How often HAPPY sends commands to Intiface. Smaller values are usually more stable but less precise. |
 | Haptic delay (ms) *(user)* | `0` | Shifts the haptics against the media to keep them in sync. |
 | Delay slider range (ms) | `500` | The delay sliders in HAPPY go from minus to plus this value. |
-| Interpolation between funscript points | Smooth (pchip) | How positions between funscript points are computed for haptics and the timeline: smooth, linear, or none (hold each position until the next point). Strokers follow smooth as linear. |
+| Interpolation between funscript points | Smooth (pchip) | How haptics and the timeline move between funscript points: smooth, linear, or none (hold each position until the next point). Strokers treat smooth as linear. |
 | Colour the timeline by speed *(user)* | off | Colour the timeline graph on a heat scale by movement speed (blue = slow, red = fast). |
 | Reconnect to Intiface on page load | on | Reconnect to Intiface on page load if it was connected when the page was last used. |
 
@@ -37,7 +39,7 @@ An extra funscript for every media file, generated from its audio. See [Auto fun
 
 | Setting | Default | Description |
 | --- | --- | --- |
-| Generate an Auto funscript from the audio | off | Give every media file an *Auto* script that follows how loud the frequency band below is. It is generated with Jellyfin's ffmpeg the first time someone opens the file and cached afterwards. |
+| Generate an Auto funscript from the audio | off | Give every media file an *Auto* script that follows how loud the frequency band below is. |
 | Lowest frequency (Hz) | `20` | Lower edge of the frequency band the script follows. |
 | Highest frequency (Hz) | `200` | Upper edge of the band. 20–200 Hz follows bass and kick drums; voices sit around 100–1000 Hz. |
 | Threshold (%) | `5` | Below this share of the band's loudest moment in the file, the position stays at 0. |
@@ -61,16 +63,16 @@ The relay itself is configured with environment variables, see [DG-Lab Coyote 3.
 
 | Setting | Default | Description |
 | --- | --- | --- |
-| Theme | OLED | The look of HAPPY for everyone. *OLED (pure black)* is black with white accents, which saves power on OLED screens. *Jellyfin* uses the dark greys and blue accent of Jellyfin's default theme. Open HAPPY tabs show the new theme after a reload. |
+| Theme | OLED | The look of HAPPY for everyone: *OLED (pure black)* or the greys and blue of *Jellyfin*'s default theme. Open tabs change after a reload. |
 
 ## Library
 
 | Setting | Default | Description |
 | --- | --- | --- |
 | Crop artwork to squares | off | Reduce artwork to a square, for a consistent layout. |
-| Portrait artwork takes two rows and two columns (2×2) | off | Portrait artwork takes up two rows and two columns in the card view and is shown whole at the height of the two rows. Off: it is cropped to a square card. |
-| Landscape artwork takes two columns (1×2) | on | Landscape artwork takes up two columns in the card view. Off: it is cropped to a square card (1×1). |
-| Largest heading in descriptions | Heading 1 | The level `#` headings in [track descriptions](library.md#tags-and-descriptions) are shown at. Smaller headings move down with it to keep the structure, up to heading 6: with *Heading 2*, `#` is shown as `##` and `##` as `###`; with *Heading 6*, all headings look the same. |
+| Portrait artwork takes two rows and two columns (2×2) | off | Show portrait artwork whole on a large card. Off: it is cropped to a square card. |
+| Landscape artwork takes two columns (1×2) | on | Show landscape artwork on a wide card. Off: it is cropped to a square card. |
+| Largest heading in descriptions | Heading 1 | The size of `#` headings in [track descriptions](library.md#tags-and-descriptions). Smaller headings move down with it: with *Heading 2*, `#` shows as `##` and `##` as `###`. |
 
 ## Funscript file names
 
@@ -89,7 +91,7 @@ A script belongs to the media file with the same name: `clip.mp4` + `clip.stroke
 
 | Setting | Default | Description |
 | --- | --- | --- |
-| Show HAPPY in Jellyfin's menu | on | Adds a HAPPY link to the menu of Jellyfin's web client for every user. It opens HAPPY in a new tab. Takes effect when the Jellyfin page is reloaded. |
+| Show HAPPY in Jellyfin's menu | on | Add a link to HAPPY to the menu of Jellyfin's web client, for every user. Takes effect after reloading the Jellyfin page. |
 | Menu text | `HAPPY` | Text of the link. |
 | Menu icon | `happy` | `happy` shows HAPPY's logo; any other value is a [Material icon](https://fonts.google.com/icons) name, such as `vibration`. |
 
