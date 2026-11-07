@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/dglab-relay-v1.1.0...dglab-relay-v1.1.1) (2026-11-07)
+
+
+### Bug Fixes
+
+* **deps:** Bump ws in /dglab-relay in the dglab-relay-minor-patch group ([cc4af06](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/cc4af0648220e180e22eceeca04029775be6cada))
+
 ## [1.1.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/dglab-relay-v1.0.0...dglab-relay-v1.1.0) (2026-10-10)
 
 
