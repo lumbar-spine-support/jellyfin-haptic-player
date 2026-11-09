@@ -27,7 +27,7 @@
     "test:plugin": "node scripts/dev-jellyfin.mjs test-plugin"
   },
   "dependencies": {
-    "@videojs/html": "^10.2.0",
+    "@videojs/html": "^10.3.0",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.13.2",
     "buttplug": "^5.0.2",
@@ -43,8 +43,8 @@
     "@types/ws": "^8.18.2",
     "esbuild": "^0.28.2",
     "js-yaml": "^5.5.0",
-    "playwright": "^1.64.1",
-    "sass": "^1.107.1",
+    "playwright": "^1.65.0",
+    "sass": "^1.108.0",
     "source-map-js": ">=1.2.2",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2",
