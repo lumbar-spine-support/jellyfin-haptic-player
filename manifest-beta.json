@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.8.1.1",
+        "changelog": "Beta build 1.8.1.1 from dev (commit 8f0ae0a). Not released yet, may be unstable.",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.8.1.1.zip",
+        "checksum": "8943332e7a199c1c7d26da35842e31f2",
+        "timestamp": "2026-11-09T22:48:47Z"
+      },
+      {
         "version": "1.8.1.0",
         "changelog": "## [1.8.1](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.8.0...v1.8.1) (2026-11-09)\n\n\n### Bug Fixes\n\n* **deps:** Bump the npm-minor-patch group with 3 updates ([2a436c6](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/2a436c6574212e7e3f0d781d5baee0f84d04f027))\n\nInstall or update HAPPY through its Jellyfin plugin repository: https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/jellyfin-plugin-repository/manifest.json (Dashboard → Plugins → Repositories), or download `happy_1.8.1.0.zip` below.",
         "targetAbi": "12.1.0.0",
