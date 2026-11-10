@@ -172,6 +172,13 @@
                         </select>
                         <div class="fieldDescription">Reload open HAPPY tabs to see a new theme.</div>
                     </div>
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label class="emby-checkbox-label"><input id="ShowLogoutButton" type="checkbox"
+                                is="emby-checkbox" /><span>Show the sign-out button</span></label>
+                        <div class="fieldDescription checkboxFieldDescription">The button in HAPPY's top bar that signs
+                            the user out of Jellyfin. Hide it when users sign in and out through Jellyfin
+                            itself.</div>
+                    </div>
 
                     <h3>Library</h3>
                     <div class="checkboxContainer checkboxContainer-withDescription">
@@ -254,7 +261,7 @@
                     'AutoFunscriptMinPositionDelta'];
                 var flags = ['BlurContent', 'FunscriptColorGradient', 'AutoReconnectIntiface', 'DglabEnabled', 'DglabSandboxEnabled',
                     'AutoReconnectDglab', 'CardViewForceSquareArtwork', 'CardViewLargePortraitArtwork', 'CardViewWideLandscapeArtwork',
-                    'DebugLogging', 'ShowInJellyfinMenu',
+                    'DebugLogging', 'ShowInJellyfinMenu', 'ShowLogoutButton',
                     'AutoFunscriptEnabled'];
                 var texts = ['ChapterSourcePriority', 'FunscriptInterpolationMethod', 'DglabRelayUrl', 'FunscriptSeparator',
                     'FunscriptSuffixStroker', 'FunscriptSuffixButtplug', 'FunscriptSuffixVibrator', 'FunscriptSuffixEstim',

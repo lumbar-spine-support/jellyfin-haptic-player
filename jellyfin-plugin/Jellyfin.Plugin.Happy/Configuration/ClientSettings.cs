@@ -74,6 +74,10 @@ public sealed record ClientSettings
     [JsonPropertyName("debugLogging")]
     public bool DebugLogging { get; init; }
 
+    /// <summary>Gets a value indicating whether the navbar shows the sign-out button.</summary>
+    [JsonPropertyName("showLogoutButton")]
+    public bool ShowLogoutButton { get; init; } = true;
+
     /// <summary>Gets the funscript interpolation method.</summary>
     [JsonPropertyName("funscriptInterpolationMethod")]
     public string FunscriptInterpolationMethod { get; init; } = DefaultInterpolationMethod;
@@ -146,6 +150,7 @@ public sealed record ClientSettings
             AutoReconnectIntiface = config.AutoReconnectIntiface,
             AutoReconnectDglab = config.AutoReconnectDglab,
             DebugLogging = config.DebugLogging,
+            ShowLogoutButton = config.ShowLogoutButton,
             FunscriptInterpolationMethod = InterpolationMethods.Contains(method) ? method : DefaultInterpolationMethod,
             FunscriptColorGradient = config.FunscriptColorGradient,
             CardViewForceSquareArtwork = config.CardViewForceSquareArtwork,

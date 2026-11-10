@@ -179,6 +179,8 @@ export interface ClientSettings {
   autoReconnectDglab: boolean;
   /** Debug output in the browser console, switched on the plugin's settings page. */
   debugLogging: boolean;
+  /** The navbar shows the sign-out button. */
+  showLogoutButton: boolean;
   funscriptInterpolationMethod: InterpolationMethod;
   funscriptColorGradient: boolean;
   cardViewForceSquareArtwork: boolean;

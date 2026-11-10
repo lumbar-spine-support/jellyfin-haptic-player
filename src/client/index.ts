@@ -69,6 +69,7 @@ const FALLBACK_SETTINGS: ClientSettings = {
   autoReconnectIntiface: false,
   autoReconnectDglab: false,
   debugLogging: false,
+  showLogoutButton: true,
   funscriptInterpolationMethod: 'pchip',
   funscriptColorGradient: false,
   cardViewForceSquareArtwork: false,
@@ -379,7 +380,7 @@ class App {
   }
 
   private bindLogout(): void {
-    if (!this.logoutBtn || !this.jellyfin?.signedIn) return;
+    if (!this.logoutBtn || !this.settings.showLogoutButton || !this.jellyfin?.signedIn) return;
     if (this.jellyfin.userName) this.logoutBtn.title = `Sign out ${this.jellyfin.userName}`;
     this.logoutBtn.classList.remove('d-none');
     this.logoutBtn.addEventListener('click', () => {

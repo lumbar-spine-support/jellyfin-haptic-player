@@ -64,6 +64,7 @@ The relay itself is configured with environment variables, see [DG-Lab relay](dg
 | Setting | Default | Description |
 | --- | --- | --- |
 | Theme | OLED | The look of HAPPY for everyone: *OLED (pure black)* or the greys and blue of *Jellyfin*'s default theme. Open tabs change after a reload. |
+| Show the sign-out button | on | Show the button in HAPPY's top bar that signs the user out of Jellyfin. Turn it off when users sign in and out through Jellyfin itself. Open tabs change after a reload. |
 
 ## Library
 

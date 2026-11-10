@@ -176,6 +176,11 @@ public class PluginConfiguration : BasePluginConfiguration
     public bool DebugLogging { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether HAPPY's navbar shows the sign-out button.
+    /// </summary>
+    public bool ShowLogoutButton { get; set; } = true;
+
+    /// <summary>
     /// Gets or sets a value indicating whether Jellyfin's web client lists HAPPY in its menu
     /// (a <c>menuLinks</c> entry added to <c>/web/config.json</c>).
     /// </summary>
