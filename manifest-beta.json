@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.8.1.2",
+        "changelog": "Beta build 1.8.1.2 from dev (commit 02d0988). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- feat(plugin): setting to show or hide the sign-out button (02d0988)",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.8.1.2.zip",
+        "checksum": "dae06094602d6d8f1ade39affa28c5b4",
+        "timestamp": "2026-11-10T18:43:04Z"
+      },
+      {
         "version": "1.8.1.1",
         "changelog": "Beta build 1.8.1.1 from dev (commit 8f0ae0a). Not released yet, may be unstable.",
         "targetAbi": "12.1.0.0",
