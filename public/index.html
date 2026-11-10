@@ -17,7 +17,7 @@
 
 <body>
 
-  <header class="navbar navbar-dark bg-surface border-bottom border-secondary">
+  <header class="navbar navbar-dark bg-surface">
     <div class="container-fluid gap-2">
       <a id="navbar-home" href="./"
         class="navbar-brand fw-bold mb-0 flex-grow-1 text-decoration-none d-flex align-items-center gap-2">
@@ -32,15 +32,15 @@
         <button id="btn-view-tags" class="btn btn-outline-primary" title="Tag view"><i
             class="bi bi-tags-fill"></i></button>
       </div>
-      <button id="btn-logout" class="btn btn-outline-primary d-none" type="button" title="Sign out" aria-label="Sign out"><i
-          class="bi bi-box-arrow-right"></i></button>
+      <button id="btn-logout" class="btn btn-outline-primary d-none" type="button" title="Sign out"
+        aria-label="Sign out"><i class="bi bi-box-arrow-right"></i></button>
       <button id="btn-settings" class="btn btn-outline-primary" type="button" data-bs-toggle="offcanvas"
         data-bs-target="#settings-panel" aria-controls="settings-panel" title="Settings"><i
           class="bi bi-gear-fill"></i></button>
     </div>
   </header>
 
-  <main class="container-fluid py-3">
+  <main class="container-fluid pb-3">
     <section id="library-view">
       <div id="error-msg" class="alert alert-danger d-none" role="alert"></div>
       <div id="library-controls" class="mb-3">
@@ -77,8 +77,8 @@
               <ul class="dropdown-menu dropdown-menu-dark library-filter-menu" data-filter-menu="haptic"></ul>
             </div>
             <button id="filter-favorites-toggle"
-              class="btn btn-sm btn-outline-primary library-filter-btn library-icon-btn library-favorites-toggle" type="button"
-              aria-pressed="false" aria-label="Favorites only" title="Show favorites only">
+              class="btn btn-sm btn-outline-primary library-filter-btn library-icon-btn library-favorites-toggle"
+              type="button" aria-pressed="false" aria-label="Favorites only" title="Show favorites only">
               <i class="bi bi-heart" aria-hidden="true"></i>
             </button>
             <div class="btn-group library-sort-group" role="group" aria-label="Sort">
@@ -138,23 +138,25 @@
           </table>
           <div class="detail-actions mt-3">
             <div class="d-flex gap-3">
-              <button id="btn-detail-favorite" type="button" class="btn btn-outline-primary favorite-toggle d-none detail-browse-only">
+              <button id="btn-detail-favorite" type="button"
+                class="btn btn-outline-primary favorite-toggle d-none detail-browse-only">
                 <i class="bi bi-heart" aria-hidden="true"></i>
               </button>
-              <button id="btn-detail-shuffle" class="btn btn-outline-primary detail-browse-only" type="button" title="Shuffle"
-                aria-label="Shuffle">
+              <button id="btn-detail-shuffle" class="btn btn-outline-primary detail-browse-only" type="button"
+                title="Shuffle" aria-label="Shuffle">
                 <i class="bi bi-shuffle" aria-hidden="true"></i>
               </button>
-              <button id="btn-detail-rename" class="btn btn-outline-primary detail-edit-only" type="button" title="Rename playlist"
-                aria-label="Rename playlist">
+              <button id="btn-detail-rename" class="btn btn-outline-primary detail-edit-only" type="button"
+                title="Rename playlist" aria-label="Rename playlist">
                 <i class="bi bi-input-cursor-text" aria-hidden="true"></i>
               </button>
-              <button id="btn-detail-remove" class="btn btn-outline-primary detail-edit-only" type="button" title="Remove selected files"
-                aria-label="Remove selected files" disabled>
+              <button id="btn-detail-remove" class="btn btn-outline-primary detail-edit-only" type="button"
+                title="Remove selected files" aria-label="Remove selected files" disabled>
                 <i class="bi bi-trash3" aria-hidden="true"></i>
               </button>
             </div>
-            <button id="btn-detail-play" class="btn btn-primary detail-browse-only" type="button" title="Play" aria-label="Play">
+            <button id="btn-detail-play" class="btn btn-primary detail-browse-only" type="button" title="Play"
+              aria-label="Play">
               <i class="bi bi-play-fill" aria-hidden="true"></i>
             </button>
             <button id="btn-detail-save" class="btn btn-primary detail-edit-only" type="button" title="Save changes"
@@ -162,8 +164,8 @@
               <i class="bi bi-floppy" aria-hidden="true"></i>
             </button>
             <div class="d-flex gap-3">
-              <button id="btn-detail-enqueue" class="btn btn-outline-primary detail-browse-only" type="button" title="Add to queue"
-                aria-label="Add to queue">
+              <button id="btn-detail-enqueue" class="btn btn-outline-primary detail-browse-only" type="button"
+                title="Add to queue" aria-label="Add to queue">
                 <i class="bi bi-plus-lg" aria-hidden="true"></i>
               </button>
               <button id="btn-detail-edit" class="btn btn-outline-primary d-none" type="button" title="Edit playlist"
@@ -212,8 +214,8 @@
           <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
             <h2 class="h6 mb-2">Funscripts</h2>
             <div class="d-flex align-items-center gap-2">
-              <button id="viz-window" type="button" class="btn btn-outline-primary" aria-label="Time shown in the timelines: all"
-                title="Zoom the timelines">
+              <button id="viz-window" type="button" class="btn btn-outline-primary"
+                aria-label="Time shown in the timelines: all" title="Zoom the timelines">
                 <i class="bi bi-zoom-in" aria-hidden="true"></i>
                 <span class="viz-window-label">All</span>
               </button>
@@ -407,10 +409,10 @@
       </div>
 
       <div class="mt-auto pt-3 d-flex flex-column align-items-center gap-2">
-        <a id="btn-docs" class="btn btn-sm btn-outline-primary w-100" href="?view=docs&amp;id=index" title="Documentation"
-          data-bs-dismiss="offcanvas"><i class="bi bi-journal-text me-2"></i>Documentation</a>
-        <a id="btn-jellyfin" class="btn btn-sm btn-outline-primary w-100" href="../../web/" title="Jellyfin's web client"><i
-            class="bi bi-box-arrow-up-left me-2"></i>Back to Jellyfin</a>
+        <a id="btn-docs" class="btn btn-sm btn-outline-primary w-100" href="?view=docs&amp;id=index"
+          title="Documentation" data-bs-dismiss="offcanvas"><i class="bi bi-journal-text me-2"></i>Documentation</a>
+        <a id="btn-jellyfin" class="btn btn-sm btn-outline-primary w-100" href="../../web/"
+          title="Jellyfin's web client"><i class="bi bi-box-arrow-up-left me-2"></i>Back to Jellyfin</a>
         <span id="app-version" class="badge bg-secondary" title="Application version">v…</span>
       </div>
     </div>

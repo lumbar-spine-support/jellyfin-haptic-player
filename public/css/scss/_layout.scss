@@ -125,6 +125,11 @@ $settings-font-size: 0.875rem;
 .media-table {
   border-collapse: separate;
   border-spacing: 0;
+
+  // The first row sits flush with whatever is above the table.
+  >tbody>tr:first-child>td {
+    padding-top: 0 !important; // beats the art cell's .p-2
+  }
 }
 
 .d-md-table-cell {
@@ -500,6 +505,7 @@ $settings-font-size: 0.875rem;
     overflow: hidden;
   }
 }
+
 // Grid ↔ list switch (Library.morphView): an item's art morphs between its card and its row.
 [data-morph='art'] {
   view-transition-class: morph-art;
