@@ -32,12 +32,22 @@ body>main {
   margin-inline: auto;
 }
 
+// Blur only the picture: the player's controls live inside media-container and stay sharp.
 body.blur-content .track-art,
 body.blur-content #detail-cover,
 body.blur-content .player-footer-art,
 body.blur-content .track-art-thumb,
-body.blur-content media-container {
+body.blur-content media-container video,
+body.blur-content .media-poster,
+body.blur-content .media-vr-canvas, // inline VR180 view draws the video onto a canvas
+body.blur-content .media-slider-thumbnail { // storyboard preview shows video frames
   filter: blur(20px);
+}
+
+// Clip the blur to the image's own (rounded) box instead of letting it bleed into the row or footer.
+body.blur-content .player-footer-art,
+body.blur-content .track-art-thumb {
+  clip-path: inset(0 round var(--bs-border-radius));
 }
 
 // Square by default; an album cover keeps its aspect ratio: portrait grows taller, landscape wider.
@@ -130,10 +140,6 @@ $settings-font-size: 0.875rem;
   >tbody>tr:first-child>td {
     padding-top: 0 !important; // beats the art cell's .p-2
   }
-}
-
-.d-md-table-cell {
-  overflow: hidden; // Contain blur in table view
 }
 
 .track-card {
