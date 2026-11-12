@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.9.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.8.1...v1.9.0) (2026-11-12)
+
+
+### Features
+
+* **plugin:** setting to show or hide the sign-out button ([02d0988](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/02d0988e0139935832f90a99efd2dbe79c8b9c88))
+
+
+### Bug Fixes
+
+* **ui:** enhance blur effect for media elements and adjust clipping for better visuals ([66abacf](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/66abacfa30c47d6be8ad6afe9596eec6582c2e5f))
+* **ui:** minor ui changes to spacing and navbar for cleaner look ([4fa655a](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/4fa655a12b795500272999a246454d1d04ac40ba))
+
 ## [1.8.1](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.8.0...v1.8.1) (2026-11-09)
 
 
