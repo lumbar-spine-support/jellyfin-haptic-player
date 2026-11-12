@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.9.0.2",
+        "changelog": "Beta build 1.9.0.2 from dev (commit 711c0ab). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- fix(ui): route user to plugin settings page instead of jellyfin main menu (711c0ab)",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.9.0.2.zip",
+        "checksum": "bacc08efb73683377c362cfb5408e862",
+        "timestamp": "2026-11-12T18:43:44Z"
+      },
+      {
         "version": "1.9.0.1",
         "changelog": "Beta build 1.9.0.1 from dev (commit 5649bdf). Not released yet, may be unstable.",
         "targetAbi": "12.1.0.0",
