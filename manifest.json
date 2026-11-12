@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.9.0.0",
+        "changelog": "## [1.9.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.8.1...v1.9.0) (2026-11-12)\n\n\n### Features\n\n* **plugin:** setting to show or hide the sign-out button ([02d0988](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/02d0988e0139935832f90a99efd2dbe79c8b9c88))\n\n\n### Bug Fixes\n\n* **ui:** enhance blur effect for media elements and adjust clipping for better visuals ([66abacf](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/66abacfa30c47d6be8ad6afe9596eec6582c2e5f))\n* **ui:** minor ui changes to spacing and navbar for cleaner look ([4fa655a](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/4fa655a12b795500272999a246454d1d04ac40ba))\n\nInstall or update HAPPY through its Jellyfin plugin repository: https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/jellyfin-plugin-repository/manifest.json (Dashboard → Plugins → Repositories), or download `happy_1.9.0.0.zip` below.",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/v1.9.0/happy_1.9.0.0.zip",
+        "checksum": "0bd02b0f243a9cf09e82e00984846d14",
+        "timestamp": "2026-11-12T17:45:13Z"
+      },
+      {
         "version": "1.8.1.0",
         "changelog": "## [1.8.1](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.8.0...v1.8.1) (2026-11-09)\n\n\n### Bug Fixes\n\n* **deps:** Bump the npm-minor-patch group with 3 updates ([2a436c6](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/2a436c6574212e7e3f0d781d5baee0f84d04f027))\n\nInstall or update HAPPY through its Jellyfin plugin repository: https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/jellyfin-plugin-repository/manifest.json (Dashboard → Plugins → Repositories), or download `happy_1.8.1.0.zip` below.",
         "targetAbi": "12.1.0.0",

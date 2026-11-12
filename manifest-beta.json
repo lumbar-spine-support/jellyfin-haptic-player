@@ -9,36 +9,12 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
-        "version": "1.8.1.4",
-        "changelog": "Beta build 1.8.1.4 from dev (commit 66abacf). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- fix(ui): enhance blur effect for media elements and adjust clipping for better visuals (66abacf)\n- fix(ui): minor ui changes to spacing and navbar for cleaner look (4fa655a)\n- feat(plugin): setting to show or hide the sign-out button (02d0988)",
+        "version": "1.9.0.0",
+        "changelog": "## [1.9.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.8.1...v1.9.0) (2026-11-12)\n\n\n### Features\n\n* **plugin:** setting to show or hide the sign-out button ([02d0988](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/02d0988e0139935832f90a99efd2dbe79c8b9c88))\n\n\n### Bug Fixes\n\n* **ui:** enhance blur effect for media elements and adjust clipping for better visuals ([66abacf](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/66abacfa30c47d6be8ad6afe9596eec6582c2e5f))\n* **ui:** minor ui changes to spacing and navbar for cleaner look ([4fa655a](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/4fa655a12b795500272999a246454d1d04ac40ba))\n\nInstall or update HAPPY through its Jellyfin plugin repository: https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/jellyfin-plugin-repository/manifest.json (Dashboard → Plugins → Repositories), or download `happy_1.9.0.0.zip` below.",
         "targetAbi": "12.1.0.0",
-        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.8.1.4.zip",
-        "checksum": "cf7d7c2e937adca544c804712e5caf3d",
-        "timestamp": "2026-11-12T17:40:57Z"
-      },
-      {
-        "version": "1.8.1.3",
-        "changelog": "Beta build 1.8.1.3 from dev (commit 4fa655a). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- fix(ui): minor ui changes to spacing and navbar for cleaner look (4fa655a)\n- feat(plugin): setting to show or hide the sign-out button (02d0988)",
-        "targetAbi": "12.1.0.0",
-        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.8.1.3.zip",
-        "checksum": "afdcfa6aa332d2b6a5dade97edda3595",
-        "timestamp": "2026-11-10T19:43:56Z"
-      },
-      {
-        "version": "1.8.1.2",
-        "changelog": "Beta build 1.8.1.2 from dev (commit 02d0988). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- feat(plugin): setting to show or hide the sign-out button (02d0988)",
-        "targetAbi": "12.1.0.0",
-        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.8.1.2.zip",
-        "checksum": "dae06094602d6d8f1ade39affa28c5b4",
-        "timestamp": "2026-11-10T18:43:04Z"
-      },
-      {
-        "version": "1.8.1.1",
-        "changelog": "Beta build 1.8.1.1 from dev (commit 8f0ae0a). Not released yet, may be unstable.",
-        "targetAbi": "12.1.0.0",
-        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.8.1.1.zip",
-        "checksum": "8943332e7a199c1c7d26da35842e31f2",
-        "timestamp": "2026-11-09T22:48:47Z"
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/v1.9.0/happy_1.9.0.0.zip",
+        "checksum": "0bd02b0f243a9cf09e82e00984846d14",
+        "timestamp": "2026-11-12T17:45:13Z"
       },
       {
         "version": "1.8.1.0",
