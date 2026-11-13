@@ -122,6 +122,13 @@ public sealed record ClientSettings
     [JsonPropertyName("libraryIds")]
     public IReadOnlyList<string> LibraryIds { get; init; } = [];
 
+    /// <summary>
+    /// Gets a value indicating whether libraries are selected but the user can access none of them, so
+    /// the empty <see cref="LibraryIds"/> means no library rather than all.
+    /// </summary>
+    [JsonPropertyName("noAccessibleLibraries")]
+    public bool NoAccessibleLibraries { get; init; }
+
     /// <summary>Gets the chapter sources in order of precedence.</summary>
     [JsonPropertyName("chapterSourcePriority")]
     public required IReadOnlyList<string> ChapterSourcePriority { get; init; }
@@ -171,6 +178,27 @@ public sealed record ClientSettings
             ChapterSourcePriority = ParseChapterSources(config.ChapterSourcePriority),
             LibraryIds = ParseLibraryIds(config.LibraryIds).Select(id => id.ToString("N")).ToArray(),
         };
+    }
+
+    /// <summary>
+    /// Narrows the selected libraries to those that still exist and the user can access. The selection
+    /// is a filter on top of the user's Jellyfin access, never a grant. With no selected library left
+    /// (none selected, or all deleted) HAPPY uses all libraries; when the user can access none of the
+    /// selected ones, it uses none.
+    /// </summary>
+    /// <param name="existing">Ids (32 hex digits) of the libraries that exist.</param>
+    /// <param name="canAccess">Whether the user can access the library with this id.</param>
+    /// <returns>The settings for that user.</returns>
+    internal ClientSettings ForUser(IReadOnlySet<string> existing, Func<string, bool> canAccess)
+    {
+        var selected = LibraryIds.Where(existing.Contains).ToArray();
+        if (selected.Length == 0)
+        {
+            return this with { LibraryIds = [] };
+        }
+
+        var accessible = selected.Where(canAccess).ToArray();
+        return this with { LibraryIds = accessible, NoAccessibleLibraries = accessible.Length == 0 };
     }
 
     /// <summary>

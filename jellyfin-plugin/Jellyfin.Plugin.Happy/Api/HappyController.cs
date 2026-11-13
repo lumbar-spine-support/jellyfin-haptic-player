@@ -76,25 +76,35 @@ public class HappyController : ControllerBase
     }
 
     /// <summary>
-    /// Gets the HAPPY client settings configured on the plugin's dashboard page.
+    /// Gets the HAPPY client settings configured on the plugin's dashboard page, with the selected
+    /// libraries narrowed to those the current user can access.
     /// </summary>
     /// <returns>The client settings.</returns>
     [HttpGet("Config")]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public ActionResult<ClientSettings> GetConfig()
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<ClientSettings>> GetConfig()
     {
+        var user = (await _authorizationContext.GetAuthorizationInfo(Request).ConfigureAwait(false)).User;
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
         var settings = ClientSettings.From(Plugin.Instance?.Configuration ?? new PluginConfiguration());
         if (settings.LibraryIds.Count == 0)
         {
             return settings;
         }
 
-        // Libraries deleted since they were selected would make HAPPY ask Jellyfin for unknown parents.
+        // Libraries deleted since they were selected, or ones the user may not open, would make Jellyfin
+        // refuse HAPPY's item requests for them (a 401 for an inaccessible library).
         var existing = _libraryManager.GetVirtualFolders()
             .Select(f => Guid.TryParse(f.ItemId, out var id) ? id.ToString("N") : null)
+            .OfType<string>()
             .ToHashSet(StringComparer.Ordinal);
-        return settings with { LibraryIds = settings.LibraryIds.Where(existing.Contains).ToArray() };
+        return settings.ForUser(existing, id => _libraryManager.GetItemById<BaseItem>(Guid.Parse(id), user) is not null);
     }
 
     /// <summary>

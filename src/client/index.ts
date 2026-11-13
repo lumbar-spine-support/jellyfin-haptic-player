@@ -84,6 +84,7 @@ const FALLBACK_SETTINGS: ClientSettings = {
   funscriptSuffixes: DEFAULT_FUNSCRIPT_SUFFIXES,
   chapterSourcePriority: ['embedded', 'funscript'],
   libraryIds: [],
+  noAccessibleLibraries: false,
   descriptionHeadingLimit: 1,
   autoFunscriptEnabled: false,
 };
@@ -242,10 +243,12 @@ class App {
         funscriptSuffixes: this.settings.funscriptSuffixes,
         chapterSourcePriority: this.settings.chapterSourcePriority,
         libraryIds: this.settings.libraryIds,
+        noAccessibleLibraries: this.settings.noAccessibleLibraries,
       });
     }
     this.applyTheme();
     this.applySeekInterval();
+    this.library.setNoAccessibleLibraries(this.settings.noAccessibleLibraries);
     this.library.setForceSquareArtwork(this.settings.cardViewForceSquareArtwork);
     this.library.setLargePortraitArtwork(this.settings.cardViewLargePortraitArtwork);
     this.library.setWideLandscapeArtwork(this.settings.cardViewWideLandscapeArtwork);
@@ -325,6 +328,7 @@ class App {
       funscriptSuffixes: this.settings.funscriptSuffixes,
       chapterSourcePriority: this.settings.chapterSourcePriority,
       libraryIds: this.settings.libraryIds,
+      noAccessibleLibraries: this.settings.noAccessibleLibraries,
     });
     return true;
   }

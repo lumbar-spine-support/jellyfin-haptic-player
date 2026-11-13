@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text.Json;
 using Jellyfin.Plugin.Happy.Configuration;
 using Xunit;
@@ -123,5 +124,41 @@ public class ClientSettingsTests
         });
 
         Assert.Equal(["6f2c1b5e0f4d4c779a4b2b1e1a9f3d10", "a1b2c3d4e5f60718293a4b5c6d7e8f90"], settings.LibraryIds);
+    }
+
+    private const string Videos = "6f2c1b5e0f4d4c779a4b2b1e1a9f3d10";
+    private const string Family = "a1b2c3d4e5f60718293a4b5c6d7e8f90";
+    private const string Audio = "0123456789abcdef0123456789abcdef";
+
+    private static ClientSettings Selecting(params string[] ids)
+        => ClientSettings.From(new PluginConfiguration { LibraryIds = ids });
+
+    [Fact]
+    public void KeepsOnlySelectedLibrariesTheUserCanAccess()
+    {
+        var settings = Selecting(Videos, Family).ForUser(new HashSet<string> { Videos, Family, Audio }, id => id != Family);
+
+        Assert.Equal([Videos], settings.LibraryIds);
+        Assert.False(settings.NoAccessibleLibraries);
+    }
+
+    [Fact]
+    public void FlagsASelectionTheUserCannotAccessAtAll()
+    {
+        var settings = Selecting(Family).ForUser(new HashSet<string> { Videos, Family }, id => id != Family);
+
+        Assert.Empty(settings.LibraryIds);
+        Assert.True(settings.NoAccessibleLibraries);
+        using var doc = JsonDocument.Parse(JsonSerializer.Serialize(settings));
+        Assert.True(doc.RootElement.GetProperty("noAccessibleLibraries").GetBoolean());
+    }
+
+    [Fact]
+    public void FallsBackToAllLibrariesWhenEverySelectedLibraryIsDeleted()
+    {
+        var settings = Selecting(Family).ForUser(new HashSet<string> { Videos }, _ => false);
+
+        Assert.Empty(settings.LibraryIds);
+        Assert.False(settings.NoAccessibleLibraries);
     }
 }

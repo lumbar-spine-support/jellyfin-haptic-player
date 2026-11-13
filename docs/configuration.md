@@ -12,7 +12,7 @@ Settings marked *(user)* are only starting values: each user can change them in 
 | --- | --- | --- |
 | Libraries | none (all) | The Jellyfin libraries HAPPY shows and finds funscripts in, e.g. only your haptics libraries. With none selected, or when all selected libraries are deleted, HAPPY uses all libraries. |
 
-This only narrows what HAPPY shows, playlists included. It does not grant access: users still only see the libraries Jellyfin gives them access to.
+This only narrows what HAPPY shows, playlists included. It does not grant access: each user sees the selected libraries that Jellyfin gives them access to, and a selected library a user cannot open is simply left out. Leave a library unselected (family videos, say) to keep it out of HAPPY for everyone. It stays available in Jellyfin itself, so this is not access control. A user who can open none of the selected libraries still signs in, and sees an empty library with a note to ask the admin.
 
 ## Playback
 

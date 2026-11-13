@@ -133,6 +133,45 @@ test(`${TAG} without selected libraries one request loads all of them`, async ()
     assert.ok(!itemCalls[0].includes('ParentId'));
 });
 
+test(`${TAG} a selected library the user may not open stays empty without signing out`, async () => {
+    const routes = libraryRoutes();
+    const api = fakeApi((path, init) => {
+        if (path.includes('ParentId=family')) return json('happy-user is not permitted to access Library Family.', 401);
+        if (path.includes('ParentId=gone')) return json('not found', 404);
+        if (path.includes('ParentId=only-video')) return json({ Items: [VIDEO] });
+        return routes(path, init);
+    });
+    const refusable: boolean[] = [];
+    const recording: JellyfinApi = {
+        userId: api.userId,
+        request(path, init, options) {
+            if (path.includes('ParentId=')) refusable.push(options?.refusable === true);
+            return api.request(path, init);
+        },
+    };
+    const library = await loadLibrary(recording, { ...OPTIONS, libraryIds: ['family', 'gone', 'only-video'] });
+
+    assert.deepEqual(library.videos.map((t) => t.id), ['v1']);
+    assert.deepEqual(refusable, [true, true, true]);
+});
+
+test(`${TAG} other library errors still fail the load`, async () => {
+    const routes = libraryRoutes();
+    const api = fakeApi((path, init) => path.includes('ParentId=') ? json('boom', 500) : routes(path, init));
+    await assert.rejects(loadLibrary(api, { ...OPTIONS, libraryIds: ['lib'] }), JellyfinRequestError);
+});
+
+test(`${TAG} without access to any selected library no items are requested`, async () => {
+    const api = fakeApi(libraryRoutes());
+    const library = await loadLibrary(api, { ...OPTIONS, libraryIds: [], noAccessibleLibraries: true });
+
+    const itemCalls = api.calls.map((c) => c.path).filter((p) => p.startsWith('/Items?') && !p.includes('Playlist'));
+    assert.deepEqual(itemCalls, []);
+    assert.deepEqual(library.tracks, []);
+    assert.deepEqual(library.videos, []);
+    assert.ok(library.playlists.every((p) => p.entries.length === 0));
+});
+
 test(`${TAG} without the HAPPY plugin the library loads without funscripts`, async () => {
     warnings.length = 0;
     const api = fakeApi(libraryRoutes({ '/Happy/Funscripts': new Response('', { status: 404 }) }));

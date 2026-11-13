@@ -46,6 +46,7 @@ and hands it to the tab when it returns. A newly connecting app likewise replace
 - Serve the client settings (`/Happy/Config`) and the version (`/Happy/Info`) to signed-in users
 - Let admins edit the client settings on its dashboard page
 - Index funscripts next to the media of the selected libraries (`LibraryIds`, all when empty) and serve them only for items the signed-in user can see
+- Narrow the library selection per user in `/Happy/Config`: HAPPY shows the selected libraries the user can access in Jellyfin. The selection is a filter on top of Jellyfin's access control, never a grant
 - Optionally generate an *Auto* funscript per media file from a frequency band of its audio (Jellyfin's ffmpeg + an FFT in `AutoFunscripts/`), on first request, cached in Jellyfin's cache folder
 - List HAPPY in Jellyfin's web client by adding a `menuLinks` entry to `/web/config.json` (`Web/WebConfigStartupFilter.cs`)
 
@@ -295,7 +296,7 @@ Media elements cannot send headers, so stream and trickplay sheet URLs carry the
 
 `loadLibrary()` (`library.ts`) loads everything once and the client keeps it in memory:
 
-- one `/Items` request for all playable items, or one per library with `ParentId` when the plugin settings select libraries (`libraryIds`; merged, duplicates once) (`Audio`, `AudioBook`, `Video`, `Movie`, `MusicVideo`, `Episode`) with `Fields=Path,Tags,Genres,Overview,Chapters,Trickplay,People`; `MediaType` decides audio vs video
+- one `/Items` request for all playable items, or one per library with `ParentId` when the plugin settings select libraries (`libraryIds`, already narrowed to the libraries the user can access; merged, duplicates once; a library Jellyfin still refuses with 401/403/404 stays empty and, being a `refusable` request, does not sign the user out; with `noAccessibleLibraries` no items are requested at all) (`Audio`, `AudioBook`, `Video`, `Movie`, `MusicVideo`, `Episode`) with `Fields=Path,Tags,Genres,Overview,Chapters,Trickplay,People`; `MediaType` decides audio vs video
 - `GET /Happy/Funscripts` from the plugin (a missing plugin logs a warning and the library loads without funscripts)
 - Jellyfin playlists and their entries (entries outside the loaded items are dropped, so playlists follow the library selection)
 

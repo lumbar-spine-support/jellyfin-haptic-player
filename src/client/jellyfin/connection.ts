@@ -1,5 +1,5 @@
 import type { JellyfinAuthResult } from './dto';
-import type { JellyfinApi } from './library';
+import type { JellyfinApi, JellyfinRequestOptions } from './library';
 import type { JellyfinEndpoint } from './urls';
 
 const SESSION_KEY = 'happy-jellyfin-session';
@@ -142,11 +142,11 @@ export class JellyfinConnection implements JellyfinApi {
         writeStorage(SESSION_KEY, null);
     }
 
-    async request(path: string, init: RequestInit = {}): Promise<Response> {
+    async request(path: string, init: RequestInit = {}, options: JellyfinRequestOptions = {}): Promise<Response> {
         const headers = new Headers(init.headers);
         headers.set('Authorization', this.authorization());
         const res = await fetch(`${this.serverUrl}${path}`, { ...init, headers });
-        if (res.status === 401 && this.session) {
+        if (res.status === 401 && this.session && !options.refusable) {
             console.error('[jellyfin] Access token rejected (401); signing in again.');
             this.forget();
             this.onUnauthorized();

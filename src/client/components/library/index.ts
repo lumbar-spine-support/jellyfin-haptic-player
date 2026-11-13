@@ -150,6 +150,8 @@ export class Library {
     private forceSquareArtwork = false;
     private largePortraitArtwork = true;
     private wideLandscapeArtwork = true;
+    /** The plugin selects libraries, but the signed-in user may open none of them. */
+    private noAccessibleLibraries = false;
     private albumDisplay: AlbumDisplayMode = 'albums-tracks';
     private seasonDisplay: AlbumDisplayMode = 'albums-tracks';
 
@@ -202,7 +204,9 @@ export class Library {
 
         if (visibleMedia.length === 0 && visibleAlbums.length === 0 && visiblePlaylists.length === 0) {
             const hasActiveFilter = this.mediaFilters.size > 0 || this.hapticFilters.size > 0 || this.favoritesOnly;
-            const msg = (isSearching || hasActiveFilter) ? 'No items match your search or filters.' : 'No media files found in the media directory.';
+            const msg = this.noAccessibleLibraries
+                ? 'You have no access to the libraries HAPPY uses. Ask your Jellyfin admin.'
+                : (isSearching || hasActiveFilter) ? 'No items match your search or filters.' : 'No media files found in the media directory.';
             this.grid.innerHTML = emptyStateHtml({ message: msg });
             return;
         }
@@ -573,6 +577,10 @@ export class Library {
         const url = buildUrl('library', undefined, this.activeTags);
         history.pushState({}, '', url);
         this.callbacks.showLibrary();
+    }
+
+    setNoAccessibleLibraries(none: boolean): void {
+        this.noAccessibleLibraries = none;
     }
 
     setForceSquareArtwork(force: boolean): void {

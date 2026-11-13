@@ -5,12 +5,22 @@ import { buildLibrary, type MapOptions } from './mapper';
 /** What the loader needs from a signed-in Jellyfin session; the browser connection and the integration tests both provide it. */
 export interface JellyfinApi {
     readonly userId: string;
-    request(path: string, init?: RequestInit): Promise<Response>;
+    request(path: string, init?: RequestInit, options?: JellyfinRequestOptions): Promise<Response>;
+}
+
+export interface JellyfinRequestOptions {
+    /**
+     * Jellyfin may refuse this one resource with a 401 (a library the user may not open), so a 401
+     * does not mean the token was rejected and must not sign the user out.
+     */
+    refusable?: boolean;
 }
 
 export interface LoadOptions extends MapOptions {
-    /** Jellyfin libraries to load, from the plugin settings; empty or absent for all. */
+    /** Jellyfin libraries to load, from the plugin settings narrowed to the user's access; empty or absent for all. */
     libraryIds?: readonly string[];
+    /** Libraries are selected but the user can access none of them: load no items at all. */
+    noAccessibleLibraries?: boolean;
 }
 
 /** Item types that can be played; `MediaType` then decides between audio and video. */
@@ -61,11 +71,25 @@ async function loadItems(api: JellyfinApi, libraryIds: readonly string[]): Promi
         + `&Fields=${ITEM_FIELDS}&SortBy=SortName&EnableImageTypes=Primary&ImageTypeLimit=1&EnableUserData=true`
         + '&EnableTotalRecordCount=false';
     if (libraryIds.length === 0) return (await getJson<JellyfinItemsResult>(api, query, 'Library fetch')).Items;
-    const results = await Promise.all(libraryIds.map((id) =>
-        getJson<JellyfinItemsResult>(api, `${query}&ParentId=${encodeURIComponent(id)}`, 'Library fetch')));
+    const results = await Promise.all(libraryIds.map((id) => loadLibraryItems(api, `${query}&ParentId=${encodeURIComponent(id)}`)));
     const items = new Map<string, JellyfinItemDto>();
-    for (const { Items } of results) for (const item of Items) if (!items.has(item.Id)) items.set(item.Id, item);
+    for (const item of results.flat()) if (!items.has(item.Id)) items.set(item.Id, item);
     return [...items.values()];
+}
+
+/**
+ * The plugin only lists libraries the user can access, but access can change before HAPPY asks:
+ * Jellyfin then refuses that library (401 "not permitted to access Library", or 403/404), and it
+ * stays empty instead of failing the whole library or signing the user out.
+ */
+async function loadLibraryItems(api: JellyfinApi, path: string): Promise<JellyfinItemDto[]> {
+    const res = await api.request(path, {}, { refusable: true });
+    if (res.status === 401 || res.status === 403 || res.status === 404) {
+        console.warn(`[jellyfin] A selected library is not accessible (HTTP ${res.status}); skipping it.`);
+        return [];
+    }
+    if (!res.ok) throw new JellyfinRequestError(res.status, 'Library fetch');
+    return ((await res.json()) as JellyfinItemsResult).Items;
 }
 
 /**
@@ -74,7 +98,7 @@ async function loadItems(api: JellyfinApi, libraryIds: readonly string[]): Promi
  */
 export async function loadLibrary(api: JellyfinApi, options: LoadOptions): Promise<LibraryResponse> {
     const [items, funscripts, playlists] = await Promise.all([
-        loadItems(api, options.libraryIds ?? []),
+        options.noAccessibleLibraries ? [] : loadItems(api, options.libraryIds ?? []),
         loadFunscripts(api),
         loadPlaylists(api),
     ]);

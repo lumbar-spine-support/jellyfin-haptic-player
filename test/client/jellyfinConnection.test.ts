@@ -267,3 +267,16 @@ test(`${TAG} a rejected token signs out and asks to sign in again`, async () => 
     await conn.request('/Items');
     assert.equal(unauthorized, 1);
 });
+
+test(`${TAG} a refusable request keeps the session on 401`, async () => {
+    storeSession({ serverUrl: SERVER, token: 'tok', userId: 'u1', userName: 'Alice' });
+    let unauthorized = 0;
+    const conn = new JellyfinConnection(SERVER, () => { unauthorized++; });
+    // Jellyfin's answer for a library the user may not open.
+    respond = () => new Response('"Alice is not permitted to access Library Family."', { status: 401 });
+    const res = await conn.request('/Items?ParentId=family', {}, { refusable: true });
+    assert.equal(res.status, 401);
+    assert.equal(unauthorized, 0);
+    assert.equal(conn.signedIn, true);
+    assert.equal(storage.data.has(SESSION_KEY), true);
+});
