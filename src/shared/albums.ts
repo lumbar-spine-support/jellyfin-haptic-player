@@ -1,4 +1,4 @@
-import type { AlbumInfo, TrackInfo } from './types';
+import type { AlbumInfo, EpisodeInfo, TrackInfo } from './types';
 
 function compareTrackEntries(a: TrackInfo, b: TrackInfo): number {
   const aTrackNumber = a.trackNumber ?? Number.MAX_SAFE_INTEGER;
@@ -38,7 +38,8 @@ export function buildAlbums(tracks: TrackInfo[]): AlbumInfo[] {
   const albumMap = new Map<string, TrackInfo[]>();
 
   for (const track of tracks) {
-    if (!track.album.trim()) continue;
+    // Episodes group by season (buildSeasons), whatever album tag they carry.
+    if (track.kind === 'episode' || !track.album.trim()) continue;
     const key = `${track.artist}\u0000${track.album}`;
     const bucket = albumMap.get(key) ?? [];
     bucket.push(track);
@@ -66,4 +67,61 @@ export function buildAlbums(tracks: TrackInfo[]): AlbumInfo[] {
       } satisfies AlbumInfo;
     })
     .sort((a, b) => a.title.localeCompare(b.title));
+}
+
+/** Stable, URL-safe album id of a TV season. */
+export function seasonAlbumId(seasonKey: string): string {
+  return albumId('\u0000season', seasonKey);
+}
+
+/** `Series – Season 2`; Jellyfin's season name when it has one (e.g. `Specials`). */
+export function seasonTitle(episode: EpisodeInfo): string {
+  const season = episode.seasonName || (episode.season !== null ? `Season ${episode.season}` : '');
+  return [episode.seriesName, season].filter(Boolean).join(' – ') || 'Unknown series';
+}
+
+/** Up to this many distinct directors are named on a season; more end in an ellipsis. */
+const SEASON_ARTIST_LIMIT = 3;
+
+/**
+ * Groups the episodes of each TV season into an album (`kind: 'season'`), ordered by episode
+ * number. A season shows its series poster; its artist is the episodes' directors.
+ */
+export function buildSeasons(tracks: TrackInfo[]): AlbumInfo[] {
+  const seasons = new Map<string, TrackInfo[]>();
+  for (const track of tracks) {
+    const episode = track.episode;
+    if (track.kind !== 'episode' || !episode) continue;
+    const key = episode.seasonId || `${episode.seriesId || episode.seriesName}\u0000${episode.season ?? ''}`;
+    const bucket = seasons.get(key) ?? [];
+    bucket.push(track);
+    seasons.set(key, bucket);
+  }
+
+  return [...seasons.entries()]
+    .map(([key, episodes]) => {
+      const sorted = [...episodes].sort(compareTrackEntries);
+      const first = sorted[0].episode!;
+      const title = seasonTitle(first);
+      const artists = [...new Set(sorted.flatMap((track) => track.artist.split(', ')).filter(Boolean))];
+      const artist = artists.length > SEASON_ARTIST_LIMIT
+        ? `${artists.slice(0, SEASON_ARTIST_LIMIT).join(', ')}, …`
+        : artists.join(', ');
+      const coverTrack = sorted.find((track) => track.hasArtwork) ?? null;
+      return {
+        id: seasonAlbumId(key),
+        type: 'album',
+        kind: 'season',
+        album: title,
+        artist,
+        year: sorted.map((track) => track.year).find(Boolean) ?? '',
+        durationSeconds: sorted.reduce((sum, track) => sum + track.durationSeconds, 0),
+        title,
+        trackIds: sorted.map((track) => track.id),
+        trackCount: sorted.length,
+        coverTrackId: coverTrack?.id ?? null,
+        ...(first.seriesId && first.seriesArtworkTag ? { artwork: { itemId: first.seriesId, tag: first.seriesArtworkTag } } : {}),
+      } satisfies AlbumInfo;
+    })
+    .sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
 }

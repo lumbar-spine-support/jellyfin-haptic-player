@@ -84,8 +84,8 @@ test(`${TAG} countMediaMatches counts per media type and ignores artist entries 
         albums: [{ trackIds: ['t1', 'v1'] }, { trackIds: ['t2', 'x'] }, { trackIds: ['t1'] }] as never[],
         playlists: [{ entries: [{ trackId: 't2' }] }] as never[],
     };
-    assert.deepEqual(countMediaMatches(library, []), { albums: 2, tracks: 2, playlists: 1, videos: 1 });
-    assert.deepEqual(countMediaMatches(library, ['asmr', 'artist:Nobody']), { albums: 1, tracks: 1, playlists: 0, videos: 1 });
+    assert.deepEqual(countMediaMatches(library, []), { albums: 2, tracks: 2, playlists: 1, videos: 1, movies: 0, series: 0 });
+    assert.deepEqual(countMediaMatches(library, ['asmr', 'artist:Nobody']), { albums: 1, tracks: 1, playlists: 0, videos: 1, movies: 0, series: 0 });
 });
 
 test(`${TAG} reachableTags keeps only tags that still leave a match`, () => {

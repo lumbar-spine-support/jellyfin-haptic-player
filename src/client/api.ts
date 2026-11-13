@@ -1,4 +1,4 @@
-import type { Chapter, ClientSettings, Funscript, FunscriptInfo, LibraryResponse, PlaylistInfo, TrackInfo, VersionInfo } from '../shared/types';
+import type { AlbumInfo, Chapter, ClientSettings, Funscript, FunscriptInfo, LibraryResponse, PlaylistInfo, TrackInfo, VersionInfo } from '../shared/types';
 import { DEFAULT_FUNSCRIPT_SUFFIXES } from '../shared/funscriptNames';
 import { parseVrFormat } from '../shared/vrFormat';
 import { buildChaptersVtt } from '../shared/webvtt';
@@ -182,6 +182,12 @@ export const FALLBACK_ART_DATA_URI = `data:image/svg+xml,${encodeURIComponent(FA
 /** Cover URL for a track, or the inline placeholder when there is nothing to fetch. */
 export function renderTrackArt(track: TrackInfo | null | undefined): string {
     return track?.hasArtwork ? artworkUrl(track.id, track.artworkTag) : FALLBACK_ART_DATA_URI;
+}
+
+/** Cover of an album: its own artwork (a season's series poster) or else its cover track's. */
+export function renderAlbumArt(album: Pick<AlbumInfo, 'artwork' | 'coverTrackId'>, tracksById: Map<string, TrackInfo>): string {
+    if (album.artwork) return artworkUrl(album.artwork.itemId, album.artwork.tag);
+    return renderTrackArt(album.coverTrackId ? tracksById.get(album.coverTrackId) : null);
 }
 
 const COLLAGE_SIZE = 400;

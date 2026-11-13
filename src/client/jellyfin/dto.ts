@@ -22,7 +22,13 @@ export interface JellyfinUserDataDto {
     IsFavorite?: boolean | null;
 }
 
-/** `BaseItemDto`, requested with `Fields=Path,Tags,Genres,Overview,Chapters,Trickplay`. */
+/** One entry of an item's `People` (`Fields=People`); `Type` is e.g. `Director`, `Producer`, `Actor`. */
+export interface JellyfinPersonDto {
+    Name?: string | null;
+    Type?: string | null;
+}
+
+/** `BaseItemDto`, requested with `Fields=Path,Tags,Genres,Overview,Chapters,Trickplay,People`. */
 export interface JellyfinItemDto {
     Id: string;
     Name?: string | null;
@@ -36,7 +42,16 @@ export interface JellyfinItemDto {
     AlbumArtist?: string | null;
     Artists?: string[] | null;
     ProductionYear?: number | null;
+    /** Track number, or the episode number of an episode. */
     IndexNumber?: number | null;
+    /** Season number of an episode. */
+    ParentIndexNumber?: number | null;
+    SeriesName?: string | null;
+    SeriesId?: string | null;
+    SeriesPrimaryImageTag?: string | null;
+    SeasonId?: string | null;
+    SeasonName?: string | null;
+    People?: JellyfinPersonDto[] | null;
     /** 100 ns ticks. */
     RunTimeTicks?: number | null;
     ImageTags?: Record<string, string> | null;
