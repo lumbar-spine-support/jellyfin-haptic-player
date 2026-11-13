@@ -33,6 +33,9 @@ const LIBRARIES = [
     { name: 'Videos', collectionType: 'musicvideos', path: '/media/videos' },
     // Audiobooks: overview from the ID3 comment, genres as tags, albums from track numbers.
     { name: 'Audio', collectionType: 'books', path: '/media/audio' },
+    // Movies and series: HAPPY's Movies / TV series filters, directors as artist, seasons as albums.
+    { name: 'Movies', collectionType: 'movies', path: '/media/movies' },
+    { name: 'Shows', collectionType: 'tvshows', path: '/media/tvshows' },
 ];
 
 function log(message) {

@@ -29,6 +29,8 @@ services:
       # The same fixtures twice: libraries sharing one path would share (and retype) the items.
       - ../../test/fixtures/media:/media/videos:ro
       - ../../test/fixtures/media:/media/audio:ro
+      - ../../test/fixtures/movies:/media/movies:ro
+      - ../../test/fixtures/tvshows:/media/tvshows:ro
       - ../../jellyfin-plugin/artifacts/dev:/config/plugins/HAPPY_dev
       - ../../public:/happy/web:ro
       - ../../docs:/happy/docs:ro
