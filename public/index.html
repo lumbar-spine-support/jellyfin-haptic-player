@@ -105,6 +105,10 @@
                 class="bi bi-music-note-list" aria-hidden="true"></i> <span data-count="playlists">0</span></span>
             <span class="badge text-bg-secondary tag-view-count-badge" title="Videos"><i class="bi bi-play-btn"
                 aria-hidden="true"></i> <span data-count="videos">0</span></span>
+            <span class="badge text-bg-secondary tag-view-count-badge d-none" title="Movies"><i class="bi bi-film"
+                aria-hidden="true"></i> <span data-count="movies">0</span></span>
+            <span class="badge text-bg-secondary tag-view-count-badge d-none" title="TV episodes"><i class="bi bi-tv"
+                aria-hidden="true"></i> <span data-count="series">0</span></span>
           </div>
         </div>
         <div id="active-tags" class="d-none mt-2 d-flex align-items-center flex-wrap gap-1"></div>
@@ -405,6 +409,18 @@
             <option value="albums">Albums only</option>
             <option value="tracks">Tracks only</option>
           </select>
+        </div>
+        <div class="settings-row">
+          <label class="settings-row-label" for="season-display-select">TV Season Display</label>
+          <select id="season-display-select" class="form-select form-select-sm text-light border-secondary">
+            <option value="albums-tracks" selected>Seasons + Episodes</option>
+            <option value="albums">Seasons only</option>
+            <option value="tracks">Episodes only</option>
+          </select>
+        </div>
+        <div class="settings-row form-switch">
+          <label class="settings-row-label" for="episode-series-name-toggle">Append Series Name to Episodes</label>
+          <input class="form-check-input" type="checkbox" role="switch" id="episode-series-name-toggle" />
         </div>
       </div>
 

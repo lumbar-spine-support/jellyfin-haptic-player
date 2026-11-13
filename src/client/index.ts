@@ -30,6 +30,7 @@ import { Library } from './components/library';
 import { DetailView } from './components/library/detail';
 import type { PlaylistChanges } from './components/library/playlistDraft';
 import { toggleFavorite } from './components/library/favorites';
+import { setAppendSeriesName } from './components/library/titles';
 import { setQueueActions } from './components/library/queueMenu';
 import { jellyfinLoader } from './components/player/stream';
 import { mountPlaybackInfo } from './components/player/playbackInfo';
@@ -256,6 +257,12 @@ class App {
     bindToggle('#keep-screen-on-toggle', 'happy-keep-screen-on', true, this.setKeepScreenOn);
     bindSelect('#album-display-select', 'happy-album-display', 'albums-tracks', isAlbumDisplayMode,
       (mode) => this.library.setAlbumDisplay(mode));
+    bindSelect('#season-display-select', 'happy-season-display', 'albums-tracks', isAlbumDisplayMode,
+      (mode) => this.library.setSeasonDisplay(mode));
+    bindToggle('#episode-series-name-toggle', 'happy-episode-series-name', true, (append) => {
+      setAppendSeriesName(append);
+      this.library.refreshTitles();
+    });
     this.bindTimelineControls();
     whenIdle(() => {
       void this.showVersion();

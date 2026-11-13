@@ -15,7 +15,8 @@ export interface LoadOptions extends MapOptions {
 
 /** Item types that can be played; `MediaType` then decides between audio and video. */
 const PLAYABLE_TYPES = 'Audio,AudioBook,Video,Movie,MusicVideo,Episode';
-const ITEM_FIELDS = 'Path,Tags,Genres,Overview,Chapters,Trickplay';
+// People is only filled for movies and episodes (cast and crew), which need it for their directors.
+const ITEM_FIELDS = 'Path,Tags,Genres,Overview,Chapters,Trickplay,People';
 
 export class JellyfinRequestError extends Error {
     constructor(readonly status: number, what: string) {

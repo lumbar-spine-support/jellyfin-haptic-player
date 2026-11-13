@@ -1,12 +1,13 @@
 import { FALLBACK_ART_DATA_URI, renderTrackArt } from '../../api';
 import { renderHapticIcons } from '../haptic/icons';
 import { formatHoursMinutes } from '../../utils/formatTime';
-import type { TrackInfo } from '../../../shared/types';
+import type { AlbumInfo, TrackInfo } from '../../../shared/types';
+import { trackTitle } from './titles';
 import { mediaRowHtml } from './templates';
 import { createFavoriteButton, type FavoriteItem } from './favorites';
 import { createQueueMenu } from './queueMenu';
 
-export type MediaType = 'audio' | 'video' | 'album' | 'playlist';
+export type MediaType = 'audio' | 'video' | 'album' | 'playlist' | 'movie' | 'episode' | 'season';
 
 /** One icon per kind of item, for cards, list rows and the media filter. */
 export const MEDIA_TYPE_ICONS: Record<MediaType, string> = {
@@ -14,9 +15,24 @@ export const MEDIA_TYPE_ICONS: Record<MediaType, string> = {
     audio: 'bi bi-music-note',
     playlist: 'bi bi-music-note-list',
     video: 'bi bi-play-btn',
+    movie: 'bi bi-film',
+    episode: 'bi bi-tv',
+    season: 'bi bi-collection-play',
 };
 
-const MEDIA_TYPE_LABELS: Record<MediaType, string> = { album: 'Album', audio: 'Audio', playlist: 'Playlist', video: 'Video' };
+export const MEDIA_TYPE_LABELS: Record<MediaType, string> = {
+    album: 'Album', audio: 'Audio', playlist: 'Playlist', video: 'Video', movie: 'Movie', episode: 'Episode', season: 'Season',
+};
+
+/** The type a track is shown as. */
+export function trackMediaType(track: Pick<TrackInfo, 'type' | 'kind'>): MediaType {
+    return track.type === 'audio' ? 'audio' : track.kind ?? 'video';
+}
+
+/** The type an album is shown as: a TV season or a music album. */
+export function albumMediaType(album: Pick<AlbumInfo, 'kind'>): MediaType {
+    return album.kind === 'season' ? 'season' : 'album';
+}
 
 /** The type column's icon and its accessible name. */
 export function mediaTypeCell(type: MediaType): { typeIcon: string; typeLabel: string } {
@@ -65,9 +81,9 @@ function trackRowValues(track: TrackInfo): Parameters<typeof mediaRowHtml>[0] {
     return {
         artSrc: renderTrackArt(track),
         fallbackArt: FALLBACK_ART_DATA_URI,
-        title: track.title,
+        title: trackTitle(track),
         artist: track.artist,
-        ...mediaTypeCell(track.type === 'video' ? 'video' : 'audio'),
+        ...mediaTypeCell(trackMediaType(track)),
         year: track.year,
         duration: formatHoursMinutes(track.durationSeconds),
         hapticIcons: renderHapticIcons(track.funscripts.map((f) => f.type)),
@@ -76,7 +92,7 @@ function trackRowValues(track: TrackInfo): Parameters<typeof mediaRowHtml>[0] {
 
 /** A row for one audio file or video. */
 export function createTrackRow(track: TrackInfo, onClick: () => void): HTMLTableRowElement {
-    return createMediaRow(trackRowValues(track), onClick, { item: track, trackIds: () => [track.id], label: track.title });
+    return createMediaRow(trackRowValues(track), onClick, { item: track, trackIds: () => [track.id], label: trackTitle(track) });
 }
 
 export interface EditRowActions {
@@ -94,7 +110,7 @@ export function createEditTrackRow(track: TrackInfo, actions: EditRowActions): H
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.className = 'form-check-input rounded-circle playlist-edit-check d-block m-0 ms-auto';
-    checkbox.setAttribute('aria-label', `Select ${track.title}`);
+    checkbox.setAttribute('aria-label', `Select ${trackTitle(track)}`);
     checkbox.addEventListener('click', (event) => event.stopPropagation());
     checkbox.addEventListener('change', () => {
         tr.classList.toggle('table-active', checkbox.checked);
@@ -112,7 +128,7 @@ export function createEditTrackRow(track: TrackInfo, actions: EditRowActions): H
     const handle = document.createElement('button');
     handle.type = 'button';
     handle.className = 'btn btn-link btn-sm lh-1 playlist-edit-handle';
-    handle.setAttribute('aria-label', `Move ${track.title} (Alt+Arrow keys)`);
+    handle.setAttribute('aria-label', `Move ${trackTitle(track)} (Alt+Arrow keys)`);
     handle.innerHTML = '<i class="bi bi-grip-vertical" aria-hidden="true"></i>';
     handle.addEventListener('click', (event) => event.stopPropagation());
     handle.addEventListener('pointerdown', (event) => actions.onDragStart(event));

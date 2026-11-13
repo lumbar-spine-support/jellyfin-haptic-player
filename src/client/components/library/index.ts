@@ -1,5 +1,5 @@
 import { qs } from '../../utils/html';
-import { fetchLibrary, FALLBACK_ART_DATA_URI, applyPlaylistCover, renderTrackArt } from '../../api';
+import { fetchLibrary, FALLBACK_ART_DATA_URI, applyPlaylistCover, renderAlbumArt, renderTrackArt } from '../../api';
 import { buildUrl, trackHref, detailHref } from '../../router';
 import { renderHapticIcons, ROLE_ICON_CLASSES, ROLE_LABELS } from '../haptic/icons';
 import { formatHoursMinutes } from '../../utils/formatTime';
@@ -7,8 +7,9 @@ import { classifyArtAspect } from '../../utils/artAspect';
 import {
     albumHasFavorite,
     albumMatchesActiveTags,
+    albumCategory,
     albumMatchesHapticFilters,
-    applyAlbumDisplay,
+    applyGroupDisplay,
     artistTagValue,
     countMediaMatches,
     filterAvailableTags,
@@ -21,9 +22,11 @@ import {
     reachableTags,
     shuffleLibraryItems,
     sortLibraryItems,
+    trackCategory,
     trackMatchesActiveTags,
     trackMatchesHapticFilters,
     type AlbumDisplayMode,
+    type MediaCategory,
     type LibrarySortMode,
     type SortableLibraryItem,
 } from '../../../shared/libraryFiltering';
@@ -36,7 +39,8 @@ import {
 } from './templates';
 import { createFavoriteButton, type FavoriteItem } from './favorites';
 import { createQueueMenu } from './queueMenu';
-import { createMediaRow, createTrackRow, mediaTypeCell, MEDIA_TYPE_ICONS, type MediaType } from './mediaRows';
+import { albumMediaType, createMediaRow, createTrackRow, mediaTypeCell, MEDIA_TYPE_ICONS, MEDIA_TYPE_LABELS, trackMediaType, type MediaType } from './mediaRows';
+import { trackTitle } from './titles';
 
 type LibraryViewMode = 'grid' | 'list' | 'tags';
 
@@ -59,18 +63,13 @@ const MEDIA_FILTERS = [
     { key: 'tracks', label: 'Audio', icon: MEDIA_TYPE_ICONS.audio },
     { key: 'playlists', label: 'Playlists', icon: MEDIA_TYPE_ICONS.playlist },
     { key: 'videos', label: 'Videos', icon: MEDIA_TYPE_ICONS.video },
-] as const satisfies readonly FilterOption[];
-type MediaFilterKey = typeof MEDIA_FILTERS[number]['key'];
+    { key: 'movies', label: 'Movies', icon: MEDIA_TYPE_ICONS.movie },
+    { key: 'series', label: 'TV series', icon: MEDIA_TYPE_ICONS.episode },
+] as const satisfies readonly (FilterOption & { key: MediaCategory })[];
+type MediaFilterKey = MediaCategory;
 
-type CardType = MediaType;
-
-/** Cards show their type with the icon of the matching media filter. */
-const CARD_TYPE_FILTERS: Record<CardType, MediaFilterKey> = {
-    album: 'albums',
-    audio: 'tracks',
-    playlist: 'playlists',
-    video: 'videos',
-};
+/** Offered only when the library holds items of that type. */
+const OPTIONAL_MEDIA_FILTERS: ReadonlySet<MediaFilterKey> = new Set(['movies', 'series']);
 
 /** Every file has an Auto script when the plugin generates them, so filtering by it would select nothing. */
 const HAPTIC_TYPES = (Object.keys(ROLE_LABELS) as FunscriptType[]).filter((type) => type !== 'auto');
@@ -152,6 +151,7 @@ export class Library {
     private largePortraitArtwork = true;
     private wideLandscapeArtwork = true;
     private albumDisplay: AlbumDisplayMode = 'albums-tracks';
+    private seasonDisplay: AlbumDisplayMode = 'albums-tracks';
 
     constructor(callbacks: LibraryCallbacks) {
         this.callbacks = callbacks;
@@ -167,6 +167,7 @@ export class Library {
             this.videos = data.videos;
             this.albums = data.albums;
             this.playlists = data.playlists;
+            this.bindMediaFilterMenu();
             this.render();
             this.loaded = true;
             this.applyViewModeVisibility();
@@ -192,14 +193,11 @@ export class Library {
         const isSearching = this.searchQuery.length > 0;
 
         const shows = (key: MediaFilterKey): boolean => this.mediaFilters.size === 0 || this.mediaFilters.has(key);
-        const filteredAlbums = shows('albums') ? this.getFilteredAlbums() : [];
+        const filteredAlbums = this.getFilteredAlbums().filter((album) => shows(albumCategory(album)));
         const visiblePlaylists = shows('playlists') ? this.getFilteredPlaylists() : [];
-        const filteredMedia = [
-            ...(shows('tracks') ? this.filterTrackList(this.tracks) : []),
-            ...(shows('videos') ? this.filterTrackList(this.videos) : []),
-        ];
+        const filteredMedia = this.filterTrackList(this.allMedia()).filter((track) => shows(trackCategory(track)));
         const { albums: visibleAlbums, tracks: visibleMedia } =
-            applyAlbumDisplay(this.albumDisplay, filteredAlbums, filteredMedia, this.albums);
+            applyGroupDisplay(this.albumDisplay, this.seasonDisplay, filteredAlbums, filteredMedia, this.albums);
         const tracksById = new Map(this.allMedia().map((track) => [track.id, track]));
 
         if (visibleMedia.length === 0 && visibleAlbums.length === 0 && visiblePlaylists.length === 0) {
@@ -212,7 +210,7 @@ export class Library {
         const rows: LibraryRow[] = [
             ...visibleAlbums.map((album) => ({
                 morphKey: `album-${album.id}`,
-                typeLabel: 'Album',
+                typeLabel: MEDIA_TYPE_LABELS[albumMediaType(album)],
                 title: album.title,
                 artist: album.artist ?? '',
                 year: album.year,
@@ -232,8 +230,8 @@ export class Library {
             })),
             ...visibleMedia.map((track) => ({
                 morphKey: `track-${track.id}`,
-                typeLabel: track.type === 'video' ? 'Video' : 'Audio',
-                title: track.title,
+                typeLabel: MEDIA_TYPE_LABELS[trackMediaType(track)],
+                title: trackTitle(track),
                 artist: track.artist,
                 year: track.year ?? '',
                 durationSeconds: track.durationSeconds,
@@ -393,13 +391,7 @@ export class Library {
         });
 
         this.loadLibraryFilters();
-        this.bindFilterMenu(
-            'media',
-            MEDIA_FILTERS,
-            this.mediaFilters as Set<string>,
-            (key) => key,
-            'All media',
-        );
+        this.bindMediaFilterMenu();
         this.bindFilterMenu(
             'haptic',
             HAPTIC_TYPES.map((type) => ({ key: type, label: ROLE_LABELS[type], icon: `bi device-role-icon ${ROLE_ICON_CLASSES[type]}` })),
@@ -565,8 +557,11 @@ export class Library {
         }
 
         const counts = countMediaMatches(library, this.activeTags);
+        const present = this.presentCategories();
         this.tagViewCounts?.querySelectorAll<HTMLElement>('[data-count]').forEach((el) => {
-            el.textContent = String(counts[el.dataset.count as keyof typeof counts] ?? 0);
+            const key = el.dataset.count as MediaFilterKey;
+            el.textContent = String(counts[key] ?? 0);
+            if (OPTIONAL_MEDIA_FILTERS.has(key)) el.parentElement?.classList.toggle('d-none', !present.has(key));
         });
     }
 
@@ -595,6 +590,17 @@ export class Library {
     /** Re-renders a loaded library, since it changes which items are shown. */
     setAlbumDisplay(mode: AlbumDisplayMode): void {
         this.albumDisplay = mode;
+        if (this.loaded) this.render();
+    }
+
+    /** As {@link setAlbumDisplay}, for TV seasons and their episodes. */
+    setSeasonDisplay(mode: AlbumDisplayMode): void {
+        this.seasonDisplay = mode;
+        if (this.loaded) this.render();
+    }
+
+    /** Episode titles change with the "append series name" setting. */
+    refreshTitles(): void {
         if (this.loaded) this.render();
     }
 
@@ -708,6 +714,25 @@ export class Library {
         stored.favorites = this.favoritesOnly;
         localStorage.setItem(LIBRARY_FILTERS_KEY, JSON.stringify(stored));
         localStorage.setItem(LIBRARY_SORT_KEY, JSON.stringify({ field: this.sortField, asc: this.sortAsc, seed: this.shuffleSeed }));
+    }
+
+    /** Media types the library holds items of. */
+    private presentCategories(): Set<MediaFilterKey> {
+        return new Set<MediaFilterKey>([...this.allMedia().map(trackCategory), ...this.albums.map(albumCategory)]);
+    }
+
+    /**
+     * The media filter, offering movies and TV series only when the library has them. A saved
+     * selection of a type the library lacks is dropped, so it cannot hide everything unseen.
+     */
+    private bindMediaFilterMenu(): void {
+        const present = this.presentCategories();
+        const options = MEDIA_FILTERS.filter(({ key }) => !OPTIONAL_MEDIA_FILTERS.has(key) || present.has(key));
+        for (const key of [...this.mediaFilters]) {
+            if (!options.some((option) => option.key === key)) this.mediaFilters.delete(key);
+        }
+        if (this.mediaFilters.size === options.length) this.mediaFilters.clear();
+        this.bindFilterMenu('media', options, this.mediaFilters as Set<string>, (key) => key, 'All media');
     }
 
     /** Fills a filter dropdown with one checkbox per option plus a "show all" reset. */
@@ -885,7 +910,8 @@ export class Library {
             tracks = tracks.filter((t) =>
                 t.title.toLowerCase().includes(q) ||
                 t.artist.toLowerCase().includes(q) ||
-                t.album.toLowerCase().includes(q)
+                t.album.toLowerCase().includes(q) ||
+                (t.episode?.seriesName.toLowerCase().includes(q) ?? false)
             );
         }
         return tracks;
@@ -907,10 +933,11 @@ export class Library {
         if (this.searchQuery) {
             const q = this.searchQuery.toLowerCase();
             // With its tracks hidden, an album is what a search for one of them finds.
-            const searchTracks = this.albumDisplay === 'albums';
+            const searchTracks = (a: AlbumInfo): boolean =>
+                (a.kind === 'season' ? this.seasonDisplay : this.albumDisplay) === 'albums';
             albums = albums.filter((a) =>
                 a.title.toLowerCase().includes(q) || (a.artist ?? '').toLowerCase().includes(q) ||
-                (searchTracks && a.trackIds.some((id) => tracksById.get(id)?.title.toLowerCase().includes(q)))
+                (searchTracks(a) && a.trackIds.some((id) => tracksById.get(id)?.title.toLowerCase().includes(q)))
             );
         }
         return albums;
@@ -998,9 +1025,9 @@ export class Library {
     private createAlbumCard(album: AlbumInfo, tracksById: Map<string, TrackInfo>): HTMLElement {
         const col = document.createElement('div');
         col.className = CARD_SQUARE_GRID_CLASSES;
-        const artSrc = renderTrackArt(album.coverTrackId ? tracksById.get(album.coverTrackId) : null);
+        const artSrc = renderAlbumArt(album, tracksById);
         const artist = `${album.artist || 'Unknown'}`;
-        const meta = this.buildCardMeta('album', album.durationSeconds, album.year);
+        const meta = this.buildCardMeta(albumMediaType(album), album.durationSeconds, album.year);
         col.innerHTML = cardHtml({
             href: detailHref('album', album.id),
             artSrc,
@@ -1024,13 +1051,13 @@ export class Library {
         col.className = CARD_SQUARE_GRID_CLASSES;
         const artSrc = renderTrackArt(track);
         const artist = track.artist || 'Unknown';
-        const meta = this.buildCardMeta(track.type, track.durationSeconds, track.year);
+        const meta = this.buildCardMeta(trackMediaType(track), track.durationSeconds, track.year);
         col.innerHTML = cardHtml({
             href: trackHref(track.id),
             artSrc,
             fallbackArt: FALLBACK_ART_DATA_URI,
             altText: 'Album art',
-            title: track.title,
+            title: trackTitle(track),
             artist: artist,
             ...meta
         });
@@ -1038,7 +1065,7 @@ export class Library {
             event.preventDefault();
             this.callbacks.openTrack(track.id);
         });
-        this.addCardActions(col, track, () => [track.id], track.title);
+        this.addCardActions(col, track, () => [track.id], trackTitle(track));
         this.applyCardAspect(col);
         return col;
     }
@@ -1096,11 +1123,11 @@ export class Library {
 
     private createAlbumRow(album: AlbumInfo, tracksById: Map<string, TrackInfo>): HTMLElement {
         return createMediaRow({
-            artSrc: renderTrackArt(album.coverTrackId ? tracksById.get(album.coverTrackId) : null),
+            artSrc: renderAlbumArt(album, tracksById),
             fallbackArt: FALLBACK_ART_DATA_URI,
             title: album.title,
             artist: album.artist || 'Unknown artist',
-            ...mediaTypeCell('album'),
+            ...mediaTypeCell(albumMediaType(album)),
             year: album.year,
             duration: formatHoursMinutes(album.durationSeconds),
             hapticIcons: renderHapticIcons(this.albumFunscriptTypes(album, tracksById)),
@@ -1143,10 +1170,9 @@ export class Library {
         return Array.from(types);
     }
 
-    private buildCardMeta(type: CardType, durationSeconds: number, year = ''): { typeIcon: string; typeLabel: string; meta: string } {
-        const filter = MEDIA_FILTERS.find((f) => f.key === CARD_TYPE_FILTERS[type])!;
+    private buildCardMeta(type: MediaType, durationSeconds: number, year = ''): { typeIcon: string; typeLabel: string; meta: string } {
         const meta = [year.trim(), formatHoursMinutes(durationSeconds)].filter(Boolean).join(' • ');
-        return { typeIcon: filter.icon, typeLabel: filter.label, meta };
+        return { typeIcon: MEDIA_TYPE_ICONS[type], typeLabel: MEDIA_TYPE_LABELS[type], meta };
     }
 
     private playlistArtists(playlist: PlaylistInfo): string {

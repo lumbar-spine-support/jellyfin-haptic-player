@@ -1,4 +1,4 @@
-import { applyPlaylistCover } from '../../api';
+import { applyPlaylistCover, artworkUrl } from '../../api';
 import { qs } from '../../utils/html';
 import { bindFavoriteButton } from './favorites';
 import { createEditTrackRow, createTrackRow } from './mediaRows';
@@ -114,7 +114,13 @@ export class DetailView {
         this.stopEditing();
         this.editBtn?.classList.add('d-none');
         const source: QueueSource = { type: 'album', id: album.id };
-        this.renderHeader('Album', album.title, album.artist || 'Unknown artist', [album.coverTrackId]);
+        const season = album.kind === 'season';
+        this.renderHeader(season ? 'Season' : 'Album', album.title, album.artist || 'Unknown artist', [album.coverTrackId]);
+        // A season shows its series poster rather than an episode still.
+        if (season && album.artwork && this.cover) {
+            this.cover.src = artworkUrl(album.artwork.itemId, album.artwork.tag);
+            this.fitCover();
+        }
         this.renderRows(album.trackIds.map((trackId, index) => ({
             trackId,
             onClick: () => this.options.openTrack(trackId, source, false, index),
