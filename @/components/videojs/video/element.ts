@@ -6,6 +6,7 @@ import '../ui/skip-button';
 import '../ui/queue';
 import '../ui/chapter-snap';
 import '../ui/time-slider.css';
+import '../ui/playback-info.css';
 import skinHTML from './skin.html';
 import { defineSkin } from '../skins/define-skin';
 

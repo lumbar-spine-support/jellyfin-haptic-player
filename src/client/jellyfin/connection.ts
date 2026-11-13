@@ -37,8 +37,11 @@ export function randomDeviceId(): string {
     return Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-/** Jellyfin lists every sign-in under Dashboard → Devices; a stable id keeps that to one entry per browser. */
-function deviceId(): string {
+/**
+ * Jellyfin lists every sign-in under Dashboard → Devices; a stable id keeps that to one entry per
+ * browser. Transcodes are tied to it as well.
+ */
+export function deviceId(): string {
     let id = readStorage(DEVICE_ID_KEY);
     if (!id) {
         id = randomDeviceId();

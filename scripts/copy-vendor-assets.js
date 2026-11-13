@@ -78,6 +78,13 @@ try {
     path.join(vendor, 'bootstrap-icons', 'fonts'),
   );
 
+  // hls.js (light build) for videos Jellyfin transcodes to HLS; loaded on demand by
+  // src/client/components/player/stream.ts, so it stays out of js/app.js.
+  copy(
+    path.join(nm, 'hls.js', 'dist', 'hls.light.min.js'),
+    path.join(vendor, 'hls', 'hls.light.min.js'),
+  );
+
   // Video.js 10 is bundled into js/app.js by esbuild, so it needs no copy here.
   fs.rmSync(path.join(vendor, '@videojs'), { recursive: true, force: true });
 
