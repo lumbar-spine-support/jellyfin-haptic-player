@@ -65,7 +65,7 @@ public sealed class StaticFileSourceTests : IDisposable
         }
 
         var source = StaticFileSource.FromAssembly(typeof(StaticFileSource).Assembly, "web");
-        foreach (var file in new[] { "index.html", "manifest.webmanifest", "js/app.js", "css/app.css", "vendor/bootstrap/bootstrap.bundle.min.js", "vendor/bootstrap-icons/bootstrap-icons.min.css" })
+        foreach (var file in new[] { "index.html", "manifest.webmanifest", "js/app.js", "css/app.css", "vendor/bootstrap/bootstrap.bundle.min.js", "vendor/bootstrap-icons/bootstrap-icons.min.css", "vendor/hls/hls.light.min.js" })
         {
             using var stream = source.Open(file);
             Assert.True(stream is not null, file);
