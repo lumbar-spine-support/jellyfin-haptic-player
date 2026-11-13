@@ -252,4 +252,6 @@ export interface PlaybackRequest {
   storyboardSrc: string | null;
   /** VR180 projection detected from the filename; absent for flat media. */
   vr?: VrFormat | null;
+  /** Movie or TV episode: the player offers Jellyfin's audio and subtitle streams. */
+  kind?: VideoKind;
 }

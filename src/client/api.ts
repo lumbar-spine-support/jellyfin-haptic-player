@@ -8,8 +8,8 @@ import { toPlaylist } from './jellyfin/mapper';
 import { canOverwritePlaylist, createPlaylist, deletePlaylist, loadPlaylist, updatePlaylist } from './jellyfin/playlists';
 import { imageUrl, streamUrl, trickplayVtt } from './jellyfin/urls';
 import {
-  fetchTranscodingInfo, pingTranscode, resolvePlayback, stopTranscode,
-  type JellyfinTranscodingInfoDto, type PlaybackSource,
+  fetchTranscodingInfo, pingTranscode, resolvePlayback, stopTranscode, subtitleUrl,
+  type JellyfinTranscodingInfoDto, type PlaybackOptions, type PlaybackSource,
 } from './jellyfin/playback';
 import { browserProbe, buildDeviceProfile } from './utils/deviceProfile';
 import { versionFromPluginInfo, type PluginInfo } from './utils/formatVersion';
@@ -116,15 +116,22 @@ let deviceProfile: object | null = null;
  * stream with whatever ffmpeg has to convert (usually only the audio). Falls back to the original
  * file when Jellyfin cannot be asked.
  */
-export async function resolveMediaSource(track: Pick<TrackInfo, 'id' | 'type'>): Promise<PlaybackSource | null> {
+export async function resolveMediaSource(
+  track: Pick<TrackInfo, 'id' | 'type'>, options: PlaybackOptions = {},
+): Promise<PlaybackSource | null> {
   const api = requireJellyfin();
   deviceProfile ??= buildDeviceProfile(browserProbe());
   try {
-    return await resolvePlayback(api, api.endpoint, track, deviceProfile);
+    return await resolvePlayback(api, api.endpoint, track, deviceProfile, options);
   } catch (err) {
     console.warn('[playback] PlaybackInfo failed; playing the original file', err);
     return null;
   }
+}
+
+/** WebVTT of a text subtitle stream, for a `<track>` element. */
+export function subtitleTrackUrl(itemId: string, mediaSourceId: string, index: number): string {
+  return subtitleUrl(requireJellyfin().endpoint, itemId, mediaSourceId, index);
 }
 
 /** Ends a transcode on the server, e.g. when its player slot loads something else or the page unloads. */

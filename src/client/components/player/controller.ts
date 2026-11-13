@@ -240,6 +240,7 @@ export class PlaybackController {
             chaptersSrc: chaptersVttUrl(track),
             storyboardSrc: storyboardVttUrl(track),
             vr: track.type === 'video' ? parseVrFormat(track.filename) : null,
+            ...(track.kind ? { kind: track.kind } : {}),
         };
     }
 }
