@@ -100,6 +100,7 @@ flowchart TB
 | --- | --- | --- |
 | Scan media, read tags, chapters, cover art | Jellyfin | — |
 | Stream media with range requests, trickplay | Jellyfin | `/Videos/{id}/stream`, `/Audio/{id}/stream` (`static=true`) |
+| Decide direct play vs. transcode, transcode to HLS | Jellyfin | `POST /Items/{id}/PlaybackInfo`, `/videos/{id}/master.m3u8`, `DELETE /Videos/ActiveEncodings`, `/Sessions/Playing/Ping`, `/Sessions` (live `TranscodingInfo`) |
 | Serve the app and the user docs | Jellyfin plugin | `WebController`, `DocsController` |
 | Client settings and version | Jellyfin plugin | `HappyController`, `ClientSettings`, `configPage.html` |
 | Index and serve funscripts | Jellyfin plugin | `FunscriptIndex`, `HappyController` |

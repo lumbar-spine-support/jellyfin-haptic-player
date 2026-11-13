@@ -3,6 +3,9 @@
 <media-poster class="media-poster">
 <img alt="" decoding="async" class="media-poster-image">
 </media-poster>
+<div class="media-playback-info" role="status" aria-label="Playback info" hidden>
+<button type="button" class="media-playback-info-close" data-playback-info-close aria-label="Hide playback info">&times;</button>
+</div>
 <media-buffering-indicator class="media-buffering-indicator">
 <media-icon family="compat" name="spinner" class="media-buffering-indicator-spinner-icon">
 </media-icon>
@@ -403,6 +406,15 @@ Queue
 </template>
 </media-captions-radio-group>
 </media-menu-content>
+<media-menu-separator class="media-menu-separator">
+</media-menu-separator>
+<media-menu-item class="media-menu-item" data-playback-info-toggle>
+<i class="bi bi-info-circle media-menu-trigger-icon" aria-hidden="true"></i>
+<span>Playback info</span>
+<span class="media-menu-hint">
+<span class="media-menu-hint-label" data-playback-info-state>Off</span>
+</span>
+</media-menu-item>
 </media-menu-content>
 </media-menu>
 </media-controls-group>

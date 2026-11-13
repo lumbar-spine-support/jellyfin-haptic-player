@@ -2,11 +2,16 @@ import type { Chapter, ClientSettings, Funscript, FunscriptInfo, LibraryResponse
 import { DEFAULT_FUNSCRIPT_SUFFIXES } from '../shared/funscriptNames';
 import { parseVrFormat } from '../shared/vrFormat';
 import { buildChaptersVtt } from '../shared/webvtt';
-import type { JellyfinConnection } from './jellyfin/connection';
+import { deviceId, type JellyfinConnection } from './jellyfin/connection';
 import { loadLibrary, setFavorite, type LoadOptions } from './jellyfin/library';
 import { toPlaylist } from './jellyfin/mapper';
 import { canOverwritePlaylist, createPlaylist, deletePlaylist, loadPlaylist, updatePlaylist } from './jellyfin/playlists';
 import { imageUrl, streamUrl, trickplayVtt } from './jellyfin/urls';
+import {
+  fetchTranscodingInfo, pingTranscode, resolvePlayback, stopTranscode,
+  type JellyfinTranscodingInfoDto, type PlaybackSource,
+} from './jellyfin/playback';
+import { browserProbe, buildDeviceProfile } from './utils/deviceProfile';
 import { versionFromPluginInfo, type PluginInfo } from './utils/formatVersion';
 import { markImageLoading } from './utils/imagePlaceholders';
 
@@ -102,6 +107,39 @@ export async function fetchFunscript(track: TrackInfo, funscript: FunscriptInfo)
 /** Builds the media-stream URL for a track or video. */
 export function mediaUrl(track: Pick<TrackInfo, 'id' | 'type'>): string {
   return streamUrl(requireJellyfin().endpoint, track);
+}
+
+let deviceProfile: object | null = null;
+
+/**
+ * Where to play a video from: the original file when this browser decodes it, else Jellyfin's HLS
+ * stream with whatever ffmpeg has to convert (usually only the audio). Falls back to the original
+ * file when Jellyfin cannot be asked.
+ */
+export async function resolveMediaSource(track: Pick<TrackInfo, 'id' | 'type'>): Promise<PlaybackSource | null> {
+  const api = requireJellyfin();
+  deviceProfile ??= buildDeviceProfile(browserProbe());
+  try {
+    return await resolvePlayback(api, api.endpoint, track, deviceProfile);
+  } catch (err) {
+    console.warn('[playback] PlaybackInfo failed; playing the original file', err);
+    return null;
+  }
+}
+
+/** Ends a transcode on the server, e.g. when its player slot loads something else or the page unloads. */
+export function stopMediaTranscode(playSessionId: string, unloading = false): void {
+  void stopTranscode(requireJellyfin(), deviceId(), playSessionId, unloading).catch(() => { /* reaped by Jellyfin later */ });
+}
+
+/** Tells Jellyfin a transcode is still in use, so a long pause does not end it. */
+export function keepMediaTranscodeAlive(playSessionId: string): void {
+  void pingTranscode(requireJellyfin(), playSessionId).catch(() => { /* next ping retries */ });
+}
+
+/** Live state of this browser's transcode, for the playback info overlay. */
+export function fetchMediaTranscodingInfo(): Promise<JellyfinTranscodingInfoDto | null> {
+  return fetchTranscodingInfo(requireJellyfin(), deviceId()).catch(() => null);
 }
 
 // Generated WebVTT lives in blob: URLs, which are same-origin and so need no CORS for <track>.

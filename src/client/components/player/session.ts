@@ -5,6 +5,7 @@ import { vrFormatToAttribute } from '../../../shared/vrFormat';
 import { selectLoop } from '@/components/videojs/features/loop';
 import { TRACK_ID_ATTRIBUTE } from '@/components/videojs/features/favorite';
 import { setMediaChapters, setMediaStoryboard } from '@/components/videojs/features/chapters';
+import { directLoader, type LoadedStream, type StreamLoader } from './stream';
 
 interface PlayerSlot {
     readonly el: VideoPlayerElement;
@@ -12,6 +13,7 @@ interface PlayerSlot {
     readonly artistEl: HTMLElement | null;
     readonly yearEl: HTMLElement | null;
     request: PlaybackRequest | null;
+    stream: LoadedStream | null;
 }
 
 /**
@@ -32,13 +34,16 @@ export class PlaybackSession {
     private readonly storeAbort = new AbortController();
     private readonly visibilityObserver: MutationObserver;
 
-    /** Waits for the custom elements to upgrade so `store` is available. */
-    static async create(hosts: [HTMLElement, HTMLElement]): Promise<PlaybackSession> {
+    /**
+     * Waits for the custom elements to upgrade so `store` is available. `loader` attaches each
+     * request's media to a slot (see `stream.ts`); by default it just sets `src`.
+     */
+    static async create(hosts: [HTMLElement, HTMLElement], loader: StreamLoader = directLoader): Promise<PlaybackSession> {
         await customElements.whenDefined('video-player');
-        return new PlaybackSession(hosts);
+        return new PlaybackSession(hosts, loader);
     }
 
-    private constructor(hosts: [HTMLElement, HTMLElement]) {
+    private constructor(hosts: [HTMLElement, HTMLElement], private readonly loader: StreamLoader) {
         this.slots = hosts.map((host) => {
             const el = host.querySelector<VideoPlayerElement>('video-player');
             if (!el) throw new Error('PlaybackSession requires a <video-player> inside each host element');
@@ -48,6 +53,7 @@ export class PlaybackSession {
                 artistEl: host.querySelector<HTMLElement>('.player-artist'),
                 yearEl: host.querySelector<HTMLElement>('.player-year'),
                 request: null,
+                stream: null,
             };
         }) as [PlayerSlot, PlayerSlot];
 
@@ -107,6 +113,11 @@ export class PlaybackSession {
         return this.slots[this.focusIndex].request?.id ?? null;
     }
 
+    /** The stream loaded into the slot that renders `player` (a `<video-player>`), for the playback info overlay. */
+    streamOf(player: Element): LoadedStream | null {
+        return this.slots.find((slot) => slot.el === player)?.stream ?? null;
+    }
+
     /** Whether the browsed page shows the playing track itself. */
     get focusedIsActive(): boolean {
         return this.focusedVisible && this.focusIndex === this.activeIndex;
@@ -141,6 +152,9 @@ export class PlaybackSession {
         this.loadSlot(index, request);
         this.emit();
         const store = this.slots[index].el.store;
+        // Jellyfin may first have to say where the video comes from.
+        await this.slots[index].stream?.ready;
+        if (this.slots[index].request?.id !== request.id) return;
         // A freshly loaded source already starts at zero, and seeking it would
         // block on metadata that has not arrived yet.
         if (reused) await store.seek(0);
@@ -184,8 +198,9 @@ export class PlaybackSession {
         const slot = this.slots[index];
         if (slot.request?.id !== request.id) {
             slot.el.store.pause();
+            slot.stream?.detach();
             const media = slot.el.querySelector('video');
-            if (media) media.src = request.src;
+            slot.stream = media ? this.loader(media, request) : null;
         }
         const artist = request.artist.trim();
         const year = request.year.trim();
