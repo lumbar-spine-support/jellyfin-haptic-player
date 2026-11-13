@@ -31,6 +31,8 @@ import { DetailView } from './components/library/detail';
 import type { PlaylistChanges } from './components/library/playlistDraft';
 import { toggleFavorite } from './components/library/favorites';
 import { setQueueActions } from './components/library/queueMenu';
+import { jellyfinLoader } from './components/player/stream';
+import { mountPlaybackInfo } from './components/player/playbackInfo';
 import { showToast } from './utils/toast';
 import { settleImagePlaceholders } from './utils/imagePlaceholders';
 import { descriptionPlaceholderHtml, tagsPlaceholderHtml } from './templates';
@@ -141,7 +143,7 @@ class App {
 
   /** Waits for the `<video-player>` elements to upgrade before wiring the app. */
   static async create(playerHosts: [HTMLElement, HTMLElement]): Promise<App> {
-    return new App(await PlaybackSession.create(playerHosts));
+    return new App(await PlaybackSession.create(playerHosts, jellyfinLoader));
   }
 
   private constructor(session: PlaybackSession) {
@@ -259,6 +261,7 @@ class App {
       void this.showVersion();
     });
     this.footer?.bind(this.session, this.playback, (trackId) => this.navigateTo(trackHref(trackId)));
+    mountPlaybackInfo(this.session);
 
     this.mountDeviceAssignment(this.buttplug, '#intiface-devices');
 

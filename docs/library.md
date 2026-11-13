@@ -99,7 +99,9 @@ Cover art is the primary image of an item in Jellyfin: embedded art, an image ne
 
 ## Video codecs
 
-Media always plays as the original file and is never transcoded, so your browser must be able to decode it. If it can't (for example HEVC/H.265 on many Linux desktops), HAPPY shows a warning and only the audio plays.
+HAPPY plays the original file whenever your browser can decode it, which keeps haptics exactly in time. Before a video starts, HAPPY asks Jellyfin whether that is the case. If not, Jellyfin converts only what the browser cannot play and HAPPY plays that stream instead. A typical case is a Blu-ray rip in MKV with TrueHD, DTS or AC-3 audio: browsers show its picture but stay silent, so Jellyfin converts the audio and copies the video. Converting needs some CPU on the Jellyfin server, and Chromecast cannot take over such a stream.
+
+To see how a video is played, choose **Playback info** in the player's settings menu (the gear). A small overlay then shows whether the video plays directly or is converted and why, the codecs of the file and of the converted stream, how fast the server converts, and dropped frames and buffer in the browser. Tap × or the menu entry again to hide it.
 
 ## Funscripts
 

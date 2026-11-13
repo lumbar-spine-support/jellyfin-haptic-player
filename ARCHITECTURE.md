@@ -12,10 +12,16 @@ HAPPY is a TypeScript browser application that runs inside a Jellyfin server. Th
 
 The plugin is intentionally stateless with respect to playback. All live playback, footer state, haptic timing, and Intiface device connection state live in the browser.
 
-Media always plays **directly** (`/Videos|Audio/{id}/stream?static=true`), never transcoded: haptic
-timing follows the media element's own clock, and VR needs the full-resolution frame. Chromecast and
-other remote playback receivers fetch that URL themselves; the Jellyfin access token travels in its
-`ApiKey` query parameter, so no separate media token is needed.
+Media plays **directly** (`/Videos|Audio/{id}/stream?static=true`) whenever the browser can decode
+it: haptic timing follows the media element's own clock, and VR needs the full-resolution frame.
+Before loading a video the client asks Jellyfin (`POST /Items/{id}/PlaybackInfo`) with a device
+profile of what this browser decodes (`src/client/utils/deviceProfile.ts`). Only when Jellyfin says
+the file cannot be played as is (typically an MKV with TrueHD, DTS or AC-3 audio, which browsers
+play silently) does the slot play Jellyfin's HLS stream (fMP4, video copied where possible) through
+hls.js; its timeline starts at 0 like the file's, so haptics stay in sync. Audio files always play
+directly. Chromecast and other remote playback receivers fetch the direct URL themselves; the
+Jellyfin access token travels in its `ApiKey` query parameter, so no separate media token is needed.
+A video that is transcoded plays through MSE, which remote playback cannot hand over.
 
 The one carve-out is the optional **DG-Lab V4 relay** (`dglab-relay/`). A browser cannot accept
 WebSocket connections, so pairing a phone-hosted DG-Lab app with the player needs a meeting
