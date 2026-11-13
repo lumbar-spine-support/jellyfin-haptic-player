@@ -15,6 +15,12 @@ export interface MediaProbe {
     matroska: boolean;
 }
 
+/** Dynamic ranges the profile may accept; Jellyfin copies only streams whose `VideoRangeType` is listed. */
+const HDR_RANGES = ['HDR10', 'HDR10Plus', 'HLG'];
+const DOLBY_VISION_RANGES = ['DOVI', 'DOVIWithHDR10', 'DOVIWithHLG', 'DOVIWithSDR', 'DOVIWithHDR10Plus'];
+/** Subtitle formats Jellyfin can hand out as WebVTT. Image subtitles (PGS, VobSub, DVB) are left out, so Jellyfin burns them in. */
+const TEXT_SUBTITLES = ['vtt', 'webvtt', 'srt', 'subrip', 'ass', 'ssa', 'mov_text', 'ttml', 'microdvd', 'sub'];
+
 /** MIME types that tell whether a codec decodes; one hit is enough. */
 const VIDEO_CODECS: Record<string, string[]> = {
     h264: ['video/mp4; codecs="avc1.640029"', 'video/mp4; codecs="avc1.42E01E"'],
@@ -51,6 +57,34 @@ function supported(probe: MediaProbe, types: readonly string[]): boolean {
 /** Codec names (Jellyfin spelling) this browser decodes, from `table`. */
 function decodable(probe: MediaProbe, table: Record<string, string[]>): string[] {
     return Object.entries(table).filter(([, types]) => supported(probe, types)).map(([codec]) => codec);
+}
+
+/**
+ * Limits within a codec, as Jellyfin's own web client declares them. Without them Jellyfin would
+ * also copy Dolby Vision or 10-bit H.264 streams, which browsers fail to parse or decode.
+ */
+function codecProfiles(probe: MediaProbe): object[] {
+    const condition = (Condition: string, Property: string, Value: string): object => ({ Condition, Property, Value, IsRequired: false });
+    const main10 = supported(probe, ['video/mp4; codecs="hvc1.2.4.L153.B0"', 'video/mp4; codecs="hev1.2.4.L153.B0"']);
+    const dolbyVision = supported(probe, ['video/mp4; codecs="dvh1.05.06"', 'video/mp4; codecs="dvhe.05.06"']);
+    const ranges = ['SDR', ...(main10 ? HDR_RANGES : []), ...(dolbyVision ? DOLBY_VISION_RANGES : [])].join('|');
+    return [
+        { Type: 'Video', Codec: 'h264', Conditions: [
+            condition('EqualsAny', 'VideoProfile', 'high|main|baseline|constrained baseline'),
+            condition('LessThanEqual', 'VideoBitDepth', '8'),
+            condition('EqualsAny', 'VideoRangeType', 'SDR'),
+        ] },
+        { Type: 'Video', Codec: 'hevc', Conditions: [
+            condition('EqualsAny', 'VideoProfile', main10 ? 'main|main 10' : 'main'),
+            condition('EqualsAny', 'VideoRangeType', ranges),
+        ] },
+        { Type: 'Video', Codec: 'av1', Conditions: [
+            condition('EqualsAny', 'VideoRangeType', ['SDR', ...(main10 ? HDR_RANGES : [])].join('|')),
+        ] },
+        { Type: 'Video', Codec: 'vp9', Conditions: [
+            condition('EqualsAny', 'VideoRangeType', ['SDR', ...(main10 ? HDR_RANGES : [])].join('|')),
+        ] },
+    ];
 }
 
 export function buildDeviceProfile(probe: MediaProbe): object {
@@ -90,8 +124,8 @@ export function buildDeviceProfile(probe: MediaProbe): object {
             BreakOnNonKeyFrames: true,
         }],
         ContainerProfiles: [],
-        CodecProfiles: [],
-        SubtitleProfiles: [],
+        CodecProfiles: codecProfiles(probe),
+        SubtitleProfiles: TEXT_SUBTITLES.map((format) => ({ Format: format, Method: 'External' })),
     };
 }
 

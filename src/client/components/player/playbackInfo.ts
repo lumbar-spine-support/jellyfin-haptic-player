@@ -25,7 +25,9 @@ function render(overlay: HTMLElement, rows: [string, string][]): void {
         dd.textContent = value;
         list.append(dt, dd);
     }
-    overlay.querySelector('dl')?.replaceWith(list) ?? overlay.appendChild(list);
+    const previous = overlay.querySelector('dl');
+    if (previous) previous.replaceWith(list);
+    else overlay.appendChild(list);
 }
 
 /**
@@ -39,6 +41,7 @@ export function mountPlaybackInfo(session: PlaybackSession): void {
     let enabled = setting.get();
     let transcoding: JellyfinTranscodingInfoDto | null = null;
     let transcodingAsked = 0;
+    let transcodingSession: string | null = null;
     let timer: ReturnType<typeof setInterval> | undefined;
 
     const players = (): HTMLElement[] => [...document.querySelectorAll<HTMLElement>('video-player')];
@@ -51,10 +54,18 @@ export function mountPlaybackInfo(session: PlaybackSession): void {
             if (!overlay) continue;
             overlay.hidden = !enabled;
             const media = player.querySelector('video');
-            if (!enabled || !media || player.offsetParent === null) continue;
+            // `<video-player>` is `display: contents` and has no box; the overlay's own visibility
+            // tells whether this slot is on screen.
+            if (!enabled || !media || !overlay.checkVisibility()) continue;
 
             const stream = session.streamOf(player);
             const info = stream?.info() ?? null;
+            // A new transcode (other audio, a fallback) must not show the last one's live numbers.
+            if (info?.playSessionId !== transcodingSession) {
+                transcodingSession = info?.playSessionId ?? null;
+                transcoding = null;
+                transcodingAsked = 0;
+            }
             if (info?.method === 'transcode' && Date.now() - transcodingAsked > TRANSCODING_REFRESH_MS) {
                 transcodingAsked = Date.now();
                 void fetchMediaTranscodingInfo().then((live) => { transcoding = live; });

@@ -14,6 +14,9 @@ export interface JellyfinMediaStreamDto {
     Language?: string | null;
     VideoRangeType?: string | null;
     IsDefault?: boolean | null;
+    IsTextSubtitleStream?: boolean | null;
+    /** Jellyfin's label, e.g. `English - Dolby TrueHD 5.1 - Default`; what its own player lists. */
+    DisplayTitle?: string | null;
     Index?: number | null;
 }
 
@@ -26,6 +29,7 @@ export interface JellyfinMediaSourceDto {
     TranscodingSubProtocol?: string | null;
     MediaStreams?: JellyfinMediaStreamDto[] | null;
     DefaultAudioStreamIndex?: number | null;
+    DefaultSubtitleStreamIndex?: number | null;
 }
 
 export interface JellyfinPlaybackInfoDto {
@@ -63,6 +67,15 @@ export interface StreamDetails {
     range: string | null;
 }
 
+/** An audio or subtitle stream the user can pick, labelled as Jellyfin's own player lists it. */
+export interface TrackOption {
+    /** Jellyfin's stream index, passed back as `AudioStreamIndex` / `SubtitleStreamIndex`. */
+    index: number;
+    label: string;
+    /** Subtitles only: text (sent as WebVTT) rather than images (burnt in by a transcode). */
+    isText: boolean;
+}
+
 /** How a video reaches the browser, and why. */
 export interface StreamInfo {
     /** `direct`: the original file (`static=true`). `transcode`: Jellyfin's HLS, remuxed and/or re-encoded by ffmpeg. */
@@ -70,11 +83,22 @@ export interface StreamInfo {
     container: string;
     bitrate: number | null;
     video: StreamDetails | null;
+    /** The audio stream that plays. */
     audio: StreamDetails | null;
     /** Jellyfin's `TranscodeReasons`, e.g. `AudioCodecNotSupported`; empty for direct play. */
     reasons: string[];
     /** Identifies the transcode on the server; null for direct play. */
     playSessionId: string | null;
+    /** Needed for subtitle URLs; equals the item id for single-version items. */
+    mediaSourceId: string;
+    audioTracks: TrackOption[];
+    subtitleTracks: TrackOption[];
+    /** The audio stream that plays; null when the file has none. */
+    audioIndex: number | null;
+    /** The audio stream Jellyfin picks by default (the user's language preference, else the flagged default). */
+    defaultAudioIndex: number | null;
+    /** Jellyfin's default subtitle (forced, or by the user's preference); -1 for none. */
+    defaultSubtitleIndex: number;
 }
 
 /** Where to load a video from. */
@@ -83,6 +107,18 @@ export interface PlaybackSource {
     /** The URL is an HLS playlist (needs hls.js or native HLS). */
     hls: boolean;
     info: StreamInfo;
+}
+
+/** What to ask Jellyfin for besides its defaults. */
+export interface PlaybackOptions {
+    /** Audio stream to play; Jellyfin's default when absent. */
+    audioStreamIndex?: number;
+    /** An image subtitle to burn in; text subtitles never need this. */
+    burnSubtitleIndex?: number;
+    /** False forces Jellyfin's stream (HLS), e.g. for an audio stream other than the file's default. */
+    allowDirectPlay?: boolean;
+    /** False re-encodes the video too, for streams the browser fails on despite the profile. */
+    allowVideoCopy?: boolean;
 }
 
 /** Upper bound Jellyfin may stream at: LAN-sized, like Jellyfin's own web client. */
@@ -102,18 +138,36 @@ function details(stream: JellyfinMediaStreamDto | undefined): StreamDetails | nu
     };
 }
 
-/** The audio stream Jellyfin plays by default: `DefaultAudioStreamIndex`, else the flagged default, else the first. */
-function defaultAudio(source: JellyfinMediaSourceDto): JellyfinMediaStreamDto | undefined {
-    const audio = (source.MediaStreams ?? []).filter((s) => s.Type === 'Audio');
-    return audio.find((s) => s.Index === source.DefaultAudioStreamIndex) ?? audio.find((s) => s.IsDefault) ?? audio[0];
+function streamsOf(source: JellyfinMediaSourceDto | undefined, type: string): JellyfinMediaStreamDto[] {
+    return (source?.MediaStreams ?? []).filter((s) => s.Type === type && typeof s.Index === 'number');
 }
 
-/** Jellyfin's transcoding URL with the token as `ApiKey`, which media elements and hls.js can send. */
-function transcodingUrl(endpoint: JellyfinEndpoint, path: string): string {
+/** The audio stream Jellyfin plays by default: `DefaultAudioStreamIndex`, else the flagged default, else the first. */
+function defaultAudio(source: JellyfinMediaSourceDto | undefined): JellyfinMediaStreamDto | undefined {
+    const audio = streamsOf(source, 'Audio');
+    return audio.find((s) => s.Index === source?.DefaultAudioStreamIndex) ?? audio.find((s) => s.IsDefault) ?? audio[0];
+}
+
+function option(stream: JellyfinMediaStreamDto, fallback: string): TrackOption {
+    return {
+        index: stream.Index!,
+        label: stream.DisplayTitle?.trim() || stream.Language || `${fallback} ${stream.Index}`,
+        isText: stream.IsTextSubtitleStream !== false,
+    };
+}
+
+/** Jellyfin's URL with the token as `ApiKey`, which media elements, `<track>` and hls.js can send. */
+function withApiKey(endpoint: JellyfinEndpoint, path: string): string {
     const url = new URL(path, `${endpoint.serverUrl}/`);
     url.searchParams.delete('api_key');
     url.searchParams.set('ApiKey', endpoint.token);
     return url.toString();
+}
+
+/** A text subtitle stream converted to WebVTT by Jellyfin, for a `<track>` element. */
+export function subtitleUrl(endpoint: JellyfinEndpoint, itemId: string, mediaSourceId: string, index: number): string {
+    return withApiKey(endpoint,
+        `/Videos/${encodeURIComponent(itemId)}/${encodeURIComponent(mediaSourceId)}/Subtitles/${index}/0/Stream.vtt`);
 }
 
 /**
@@ -124,13 +178,23 @@ export function toPlaybackSource(
     endpoint: JellyfinEndpoint,
     track: Pick<TrackInfo, 'id' | 'type'>,
     result: JellyfinPlaybackInfoDto,
+    audioStreamIndex?: number,
 ): PlaybackSource {
     const source = result.MediaSources?.[0];
+    const audio = streamsOf(source, 'Audio');
+    const byDefault = defaultAudio(source);
+    const playing = audio.find((s) => s.Index === audioStreamIndex) ?? byDefault;
     const base = {
         container: source?.Container ?? '',
         bitrate: source?.Bitrate ?? null,
-        video: details((source?.MediaStreams ?? []).find((s) => s.Type === 'Video')),
-        audio: source ? details(defaultAudio(source)) : null,
+        video: details(streamsOf(source, 'Video')[0]),
+        audio: details(playing),
+        mediaSourceId: source?.Id ?? track.id,
+        audioTracks: audio.map((s) => option(s, 'Audio')),
+        subtitleTracks: streamsOf(source, 'Subtitle').map((s) => option(s, 'Subtitle')),
+        audioIndex: playing?.Index ?? null,
+        defaultAudioIndex: byDefault?.Index ?? null,
+        defaultSubtitleIndex: source?.DefaultSubtitleStreamIndex ?? -1,
     };
     const direct: PlaybackSource = {
         url: streamUrl(endpoint, track),
@@ -139,7 +203,7 @@ export function toPlaybackSource(
     };
     if (!source || source.SupportsDirectPlay !== false || !source.TranscodingUrl) return direct;
 
-    const url = transcodingUrl(endpoint, source.TranscodingUrl);
+    const url = withApiKey(endpoint, source.TranscodingUrl);
     const reasons = new URL(url).searchParams.get('TranscodeReasons')?.split(',').filter(Boolean) ?? [];
     return {
         url,
@@ -150,14 +214,17 @@ export function toPlaybackSource(
 
 /**
  * Asks Jellyfin how this browser should play a video, given what it can decode (`deviceProfile`).
- * Subtitles are left off so Jellyfin never burns them in, which would force a full video transcode.
+ * Subtitles stay out of the stream unless an image subtitle is to be burnt in: text subtitles come
+ * as separate WebVTT, so they never force a video transcode.
  */
 export async function resolvePlayback(
     api: JellyfinApi,
     endpoint: JellyfinEndpoint,
     track: Pick<TrackInfo, 'id' | 'type'>,
     deviceProfile: object,
+    options: PlaybackOptions = {},
 ): Promise<PlaybackSource> {
+    const allowDirectPlay = options.allowDirectPlay !== false && options.burnSubtitleIndex === undefined;
     const res = await api.request(
         `/Items/${encodeURIComponent(track.id)}/PlaybackInfo?userId=${encodeURIComponent(api.userId)}`,
         {
@@ -168,17 +235,18 @@ export async function resolvePlayback(
                 DeviceProfile: deviceProfile,
                 MaxStreamingBitrate: MAX_STREAMING_BITRATE,
                 StartTimeTicks: 0,
-                SubtitleStreamIndex: -1,
-                EnableDirectPlay: true,
-                EnableDirectStream: true,
+                ...(options.audioStreamIndex !== undefined ? { AudioStreamIndex: options.audioStreamIndex } : {}),
+                SubtitleStreamIndex: options.burnSubtitleIndex ?? -1,
+                EnableDirectPlay: allowDirectPlay,
+                EnableDirectStream: allowDirectPlay,
                 EnableTranscoding: true,
-                AllowVideoStreamCopy: true,
+                AllowVideoStreamCopy: options.allowVideoCopy !== false,
                 AllowAudioStreamCopy: true,
                 AutoOpenLiveStream: false,
             }),
         });
     if (!res.ok) throw new Error(`PlaybackInfo failed with HTTP ${res.status}`);
-    return toPlaybackSource(endpoint, track, await res.json() as JellyfinPlaybackInfoDto);
+    return toPlaybackSource(endpoint, track, await res.json() as JellyfinPlaybackInfoDto, options.audioStreamIndex);
 }
 
 /** Ends the server's ffmpeg job of a transcode; `keepalive` lets it run while the page unloads. */

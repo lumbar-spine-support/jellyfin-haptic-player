@@ -34,6 +34,7 @@ import { setAppendSeriesName } from './components/library/titles';
 import { setQueueActions } from './components/library/queueMenu';
 import { jellyfinLoader } from './components/player/stream';
 import { mountPlaybackInfo } from './components/player/playbackInfo';
+import { mountTrackMenus } from './components/player/trackMenus';
 import { showToast } from './utils/toast';
 import { settleImagePlaceholders } from './utils/imagePlaceholders';
 import { descriptionPlaceholderHtml, tagsPlaceholderHtml } from './templates';
@@ -269,6 +270,7 @@ class App {
     });
     this.footer?.bind(this.session, this.playback, (trackId) => this.navigateTo(trackHref(trackId)));
     mountPlaybackInfo(this.session);
+    mountTrackMenus(this.session);
 
     this.mountDeviceAssignment(this.buttplug, '#intiface-devices');
 

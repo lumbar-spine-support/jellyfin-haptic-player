@@ -118,6 +118,11 @@ export class PlaybackSession {
         return this.slots.find((slot) => slot.el === player)?.stream ?? null;
     }
 
+    /** What the slot that renders `player` was asked to play. */
+    requestOf(player: Element): PlaybackRequest | null {
+        return this.slots.find((slot) => slot.el === player)?.request ?? null;
+    }
+
     /** Whether the browsed page shows the playing track itself. */
     get focusedIsActive(): boolean {
         return this.focusedVisible && this.focusIndex === this.activeIndex;

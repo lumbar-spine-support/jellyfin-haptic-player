@@ -406,6 +406,48 @@ Queue
 </template>
 </media-captions-radio-group>
 </media-menu-content>
+<media-menu-item commandfor="vjs-happy-audio-content" class="media-menu-item" data-track-menu="audio" style="display: none">
+<i class="bi bi-soundwave media-menu-trigger-icon" aria-hidden="true"></i>
+<span>Audio track</span>
+<span class="media-menu-hint">
+<span class="media-menu-hint-label" data-track-menu-value>
+</span>
+<media-icon family="compat" name="chevron" class="media-menu-forward-chevron">
+</media-icon>
+</span>
+</media-menu-item>
+<media-menu-content class="media-menu-content" id="vjs-happy-audio-content">
+<media-menu-item class="media-menu-back-item">
+<media-icon family="compat" name="chevron" class="media-menu-back-chevron">
+</media-icon>
+<span>Audio track</span>
+</media-menu-item>
+<media-menu-separator class="media-menu-separator">
+</media-menu-separator>
+<div class="media-track-menu-options" data-track-menu-options="audio">
+</div>
+</media-menu-content>
+<media-menu-item commandfor="vjs-happy-subtitles-content" class="media-menu-item" data-track-menu="subtitles" style="display: none">
+<i class="bi bi-badge-cc media-menu-trigger-icon" aria-hidden="true"></i>
+<span>Subtitles</span>
+<span class="media-menu-hint">
+<span class="media-menu-hint-label" data-track-menu-value>
+</span>
+<media-icon family="compat" name="chevron" class="media-menu-forward-chevron">
+</media-icon>
+</span>
+</media-menu-item>
+<media-menu-content class="media-menu-content" id="vjs-happy-subtitles-content">
+<media-menu-item class="media-menu-back-item">
+<media-icon family="compat" name="chevron" class="media-menu-back-chevron">
+</media-icon>
+<span>Subtitles</span>
+</media-menu-item>
+<media-menu-separator class="media-menu-separator">
+</media-menu-separator>
+<div class="media-track-menu-options" data-track-menu-options="subtitles">
+</div>
+</media-menu-content>
 <media-menu-separator class="media-menu-separator">
 </media-menu-separator>
 <media-menu-item class="media-menu-item" data-playback-info-toggle>

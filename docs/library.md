@@ -112,6 +112,10 @@ Cover art is the primary image of an item in Jellyfin: embedded art, an image ne
 
 HAPPY plays the original file whenever your browser can decode it, which keeps haptics exactly in time. Before a video starts, HAPPY asks Jellyfin whether that is the case. If not, Jellyfin converts only what the browser cannot play and HAPPY plays that stream instead. A typical case is a Blu-ray rip in MKV with TrueHD, DTS or AC-3 audio: browsers show its picture but stay silent, so Jellyfin converts the audio and copies the video. Converting needs some CPU on the Jellyfin server, and Chromecast cannot take over such a stream.
 
+For movies and TV episodes, the settings menu (the gear) also offers **Audio track** and **Subtitles**, with the same tracks and names as Jellyfin's own player. Text subtitles (SRT, ASS, WebVTT) are shown on top of the video. Picture-based subtitles from Blu-rays and DVDs (PGS, VobSub) and audio tracks other than the file's default make Jellyfin convert the video stream; playback continues at the same position.
+
+If the browser fails to play a video anyway, HAPPY asks Jellyfin once more, this time for a converted stream, and continues where it stopped.
+
 To see how a video is played, choose **Playback info** in the player's settings menu (the gear). A small overlay then shows whether the video plays directly or is converted and why, the codecs of the file and of the converted stream, how fast the server converts, and dropped frames and buffer in the browser. Tap × or the menu entry again to hide it.
 
 ## Funscripts
