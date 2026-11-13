@@ -60,6 +60,43 @@ export function applyAlbumDisplay<A extends Pick<AlbumInfo, 'trackIds'>, T exten
   return { albums: grouping, tracks: [...tracks] };
 }
 
+/**
+ * The media filter each item belongs to; every item has exactly one. Movies and TV (episodes and
+ * seasons) have their own, so `videos` holds only the videos that are neither.
+ */
+export const MEDIA_CATEGORIES = ['albums', 'tracks', 'playlists', 'videos', 'movies', 'series'] as const;
+export type MediaCategory = typeof MEDIA_CATEGORIES[number];
+
+export function trackCategory(track: Pick<TrackInfo, 'type' | 'kind'>): MediaCategory {
+  if (track.type === 'audio') return 'tracks';
+  if (track.kind === 'movie') return 'movies';
+  if (track.kind === 'episode') return 'series';
+  return 'videos';
+}
+
+export function albumCategory(album: Pick<AlbumInfo, 'kind'>): MediaCategory {
+  return album.kind === 'season' ? 'series' : 'albums';
+}
+
+/**
+ * {@link applyAlbumDisplay} with music albums and TV seasons each under their own mode: `seasonMode`
+ * decides between seasons and episodes, `albumMode` for everything else.
+ */
+export function applyGroupDisplay<A extends Pick<AlbumInfo, 'trackIds' | 'kind'>, T extends Pick<TrackInfo, 'id' | 'kind'>>(
+  albumMode: AlbumDisplayMode,
+  seasonMode: AlbumDisplayMode,
+  albums: readonly A[],
+  tracks: readonly T[],
+  allAlbums: readonly Pick<AlbumInfo, 'trackIds' | 'kind'>[],
+): { albums: A[]; tracks: T[] } {
+  const isSeason = (album: Pick<AlbumInfo, 'kind'>): boolean => album.kind === 'season';
+  const music = applyAlbumDisplay(albumMode, albums.filter((a) => !isSeason(a)),
+    tracks.filter((t) => t.kind !== 'episode'), allAlbums.filter((a) => !isSeason(a)));
+  const seasons = applyAlbumDisplay(seasonMode, albums.filter(isSeason),
+    tracks.filter((t) => t.kind === 'episode'), allAlbums.filter(isSeason));
+  return { albums: [...music.albums, ...seasons.albums], tracks: [...music.tracks, ...seasons.tracks] };
+}
+
 function sortValue(item: SortableLibraryItem, field: LibrarySortField): string | number {
   if (field === 'type') return item.typeLabel;
   if (field === 'duration') return item.durationSeconds;
@@ -212,11 +249,12 @@ export function reachableTags(
   return reachable;
 }
 
-export type MediaCounts = { albums: number; tracks: number; playlists: number; videos: number };
+export type MediaCounts = Record<MediaCategory, number>;
 
 /**
  * Counts items per media type matching the plain tags in `activeTags`; artist entries are ignored.
- * Single-track albums are not counted as albums, since the library shows them as their track.
+ * Single-track albums are not counted as albums, since the library shows them as their track. TV
+ * series count their episodes, as audio counts album tracks.
  */
 export function countMediaMatches(
   library: {
@@ -229,12 +267,15 @@ export function countMediaMatches(
 ): MediaCounts {
   const { tags } = splitActiveTags(activeTags);
   const tracksById = new Map([...library.tracks, ...library.videos].map((track) => [track.id, track]));
-  return {
-    albums: library.albums.filter((album) => isGroupingAlbum(album) && albumMatchesActiveTags(album, tracksById, tags)).length,
-    tracks: library.tracks.filter((track) => trackMatchesActiveTags(track.tags, tags)).length,
-    playlists: library.playlists.filter((playlist) => playlistMatchesActiveTags(playlist, tracksById, tags)).length,
-    videos: library.videos.filter((video) => trackMatchesActiveTags(video.tags, tags)).length,
-  };
+  const counts: MediaCounts = { albums: 0, tracks: 0, playlists: 0, videos: 0, movies: 0, series: 0 };
+  counts.albums = library.albums.filter((album) =>
+    album.kind !== 'season' && isGroupingAlbum(album) && albumMatchesActiveTags(album, tracksById, tags)).length;
+  counts.playlists = library.playlists.filter((playlist) => playlistMatchesActiveTags(playlist, tracksById, tags)).length;
+  counts.tracks = library.tracks.filter((track) => trackMatchesActiveTags(track.tags, tags)).length;
+  for (const video of library.videos) {
+    if (trackMatchesActiveTags(video.tags, tags)) counts[trackCategory({ type: 'video', kind: video.kind })]++;
+  }
+  return counts;
 }
 
 /** Artist filters are OR-ed together, since a single item rarely has more than one artist. */

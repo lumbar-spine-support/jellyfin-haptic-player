@@ -15,6 +15,8 @@ Create one Jellyfin library for each kind of media, with exactly these library t
 
 Other library types lose information: audio descriptions go missing, and videos lose their artist. A library's type cannot be changed later, so if you already have a library of another type, create a new one.
 
+Movies and TV shows can be shared with HAPPY too: select your existing **Movies** and **Shows** libraries on the plugin's settings page. See [Movies and TV series](#movies-and-tv-series).
+
 Give each library its own folder, and put the funscripts next to your media:
 
 ```
@@ -74,6 +76,15 @@ Put an NFO file named like the video (`<video name>.nfo`) next to it:
 The controls next to the search box limit the library by media type, by toy type (only items with scripts for all selected toys) and to your favorites, and sort it. **Shuffle** in the sort menu shows the library in a random order. Items without a value, such as playlists without a year, are always listed last. HAPPY remembers your choices in the browser.
 
 **Album Display** under *Appearance* in the settings decides how albums appear in the library: **Albums + Tracks**, **Albums only** or **Tracks only**. An album with a single track always shows as just the track.
+
+## Movies and TV series
+
+Items of Jellyfin's **Movies** and **Shows** libraries get their own media filters, **Movies** and **TV series**. They appear in the filter only when your library has items of that kind, and those items no longer count as **Videos**.
+
+- The artist of a movie or episode is its director, as listed under *People* in Jellyfin. When no director is listed, the producers are shown instead.
+- The episodes of one season are grouped like an album, titled `Series – Season 1` and shown with the series poster. Opening the season lists its episodes in order, and playing it plays them one after another.
+- **TV Season Display** in the settings works like *Album Display*: **Seasons + Episodes**, **Seasons only** or **Episodes only**. A season with a single episode shows as just the episode.
+- Episodes are listed as `S03E09 Episode name – Series`. Turn off **Append Series Name to Episodes** in the settings to leave out the series name.
 
 ## Favorites
 

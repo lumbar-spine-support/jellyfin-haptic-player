@@ -295,7 +295,7 @@ Media elements cannot send headers, so stream and trickplay sheet URLs carry the
 
 `loadLibrary()` (`library.ts`) loads everything once and the client keeps it in memory:
 
-- one `/Items` request for all playable items, or one per library with `ParentId` when the plugin settings select libraries (`libraryIds`; merged, duplicates once) (`Audio`, `AudioBook`, `Video`, `Movie`, `MusicVideo`, `Episode`) with `Fields=Path,Tags,Genres,Overview,Chapters,Trickplay`; `MediaType` decides audio vs video
+- one `/Items` request for all playable items, or one per library with `ParentId` when the plugin settings select libraries (`libraryIds`; merged, duplicates once) (`Audio`, `AudioBook`, `Video`, `Movie`, `MusicVideo`, `Episode`) with `Fields=Path,Tags,Genres,Overview,Chapters,Trickplay,People`; `MediaType` decides audio vs video
 - `GET /Happy/Funscripts` from the plugin (a missing plugin logs a warning and the library loads without funscripts)
 - Jellyfin playlists and their entries (entries outside the loaded items are dropped, so playlists follow the library selection)
 
@@ -305,6 +305,12 @@ Media elements cannot send headers, so stream and trickplay sheet URLs carry the
 - tags are Jellyfin `Tags` ∪ `Genres` (case-insensitive), the description is the item `Overview`
 - albums are grouped client-side from album artist + album (`src/shared/albums.ts`), because
   Jellyfin only builds album entities for Music libraries
+- `Movie` and `Episode` items get `TrackInfo.kind`; episodes also `TrackInfo.episode` (series,
+  season, numbers, series poster tag). Their artist is the `Director` people, else the `Producer`s.
+  Episodes never join music albums: `buildSeasons()` groups them per season into an `AlbumInfo`
+  with `kind: 'season'`, which reuses the album page and queue
+- every item belongs to exactly one media filter (`trackCategory()`/`albumCategory()` in
+  `src/shared/libraryFiltering.ts`): movies and TV are not *Videos*
 - funscript type and subcategory are parsed client-side from the plugin's file names
   (`src/shared/funscriptNames.ts`, honouring the configured `funscriptSuffixes`)
 - embedded chapters come from Jellyfin; funscript `metadata.chapters` are only known once the

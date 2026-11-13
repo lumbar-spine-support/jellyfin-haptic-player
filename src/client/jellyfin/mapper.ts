@@ -1,5 +1,5 @@
-import type { ChapterSource, FunscriptInfo, LibraryResponse, PlaylistInfo, TrackInfo, TrickplayInfo } from '../../shared/types';
-import { buildAlbums } from '../../shared/albums';
+import type { ChapterSource, EpisodeInfo, FunscriptInfo, LibraryResponse, PlaylistInfo, TrackInfo, TrickplayInfo, VideoKind } from '../../shared/types';
+import { buildAlbums, buildSeasons } from '../../shared/albums';
 import { normalizeChapters } from '../../shared/chapters';
 import { parseFunscriptName, type FunscriptSuffixes } from '../../shared/funscriptNames';
 import type { HappyFunscriptListing, JellyfinItemDto, JellyfinPlaylist } from './dto';
@@ -46,6 +46,41 @@ function funscriptsOf(scripts: HappyFunscriptListing[string] | undefined, suffix
     return result.sort((a, b) => a.filename.localeCompare(b.filename));
 }
 
+/** Names of the people with one of Jellyfin's `People` roles, in Jellyfin's order, each once. */
+function peopleOf(item: JellyfinItemDto, role: string): string[] {
+    const names = (item.People ?? [])
+        .filter((person) => person.Type === role)
+        .map((person) => person.Name?.trim() ?? '')
+        .filter(Boolean);
+    return [...new Set(names)];
+}
+
+/** Music artists; for films and episodes, which have none, the directors or else the producers. */
+function artistOf(item: JellyfinItemDto): string {
+    const artist = item.AlbumArtist?.trim() || item.Artists?.join(', ') || '';
+    if (artist) return artist;
+    const people = peopleOf(item, 'Director');
+    return (people.length ? people : peopleOf(item, 'Producer')).join(', ');
+}
+
+function kindOf(item: JellyfinItemDto): VideoKind | undefined {
+    if (item.Type === 'Movie') return 'movie';
+    if (item.Type === 'Episode') return 'episode';
+    return undefined;
+}
+
+function episodeOf(item: JellyfinItemDto): EpisodeInfo {
+    return {
+        seriesId: item.SeriesId ?? '',
+        seriesName: item.SeriesName?.trim() ?? '',
+        seasonId: item.SeasonId ?? '',
+        seasonName: item.SeasonName?.trim() ?? '',
+        season: item.ParentIndexNumber ?? null,
+        episode: item.IndexNumber ?? null,
+        seriesArtworkTag: item.SeriesPrimaryImageTag ?? null,
+    };
+}
+
 /** The resolution closest to {@link PREFERRED_TRICKPLAY_WIDTH} of the first media source. */
 export function trickplayOf(item: JellyfinItemDto): TrickplayInfo | undefined {
     for (const [mediaSourceId, resolutions] of Object.entries(item.Trickplay ?? {})) {
@@ -82,7 +117,7 @@ export function toTrack(item: JellyfinItemDto, scripts: HappyFunscriptListing[st
         title: item.Name?.trim() || stem(filename) || item.Id,
         filename,
         description: item.Overview ?? '',
-        artist: item.AlbumArtist?.trim() || item.Artists?.join(', ') || '',
+        artist: artistOf(item),
         album: item.Album?.trim() ?? '',
         year: item.ProductionYear ? String(item.ProductionYear) : '',
         trackNumber: item.IndexNumber ?? null,
@@ -108,6 +143,9 @@ export function toTrack(item: JellyfinItemDto, scripts: HappyFunscriptListing[st
 
     const trickplay = type === 'video' ? trickplayOf(item) : undefined;
     if (trickplay) track.trickplay = trickplay;
+    const kind = type === 'video' ? kindOf(item) : undefined;
+    if (kind) track.kind = kind;
+    if (kind === 'episode') track.episode = episodeOf(item);
     return track;
 }
 
@@ -141,7 +179,7 @@ export function buildLibrary(
     return {
         tracks: media.filter((track) => track.type === 'audio'),
         videos: media.filter((track) => track.type === 'video'),
-        albums: buildAlbums(media),
+        albums: [...buildAlbums(media), ...buildSeasons(media)],
         playlists: playlists.map((playlist) => toPlaylist(playlist, tracksById)).filter((playlist) => playlist.entries.length > 0),
     };
 }

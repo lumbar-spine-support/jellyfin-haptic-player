@@ -83,7 +83,7 @@ test(`${TAG} requests are scoped to the user and ask for the fields the mapper n
     assert.equal(query.get('userId'), USER);
     assert.equal(query.get('Recursive'), 'true');
     assert.deepEqual(query.get('IncludeItemTypes')?.split(','), ['Audio', 'AudioBook', 'Video', 'Movie', 'MusicVideo', 'Episode']);
-    assert.deepEqual(query.get('Fields')?.split(','), ['Path', 'Tags', 'Genres', 'Overview', 'Chapters', 'Trickplay']);
+    assert.deepEqual(query.get('Fields')?.split(','), ['Path', 'Tags', 'Genres', 'Overview', 'Chapters', 'Trickplay', 'People']);
     assert.equal(query.get('EnableUserData'), 'true');
     assert.ok(paths.includes('/Happy/Funscripts'));
     // Playlist ids and the user id are URL-encoded.
