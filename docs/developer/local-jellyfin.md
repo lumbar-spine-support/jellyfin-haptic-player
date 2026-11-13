@@ -9,6 +9,7 @@ flowchart LR
   Script -- "compose up jellyfin" --> JF["jellyfin/jellyfin<br/>localhost:8097"]
   Script -- "wizard, libraries, users, scan" --> JF
   Fixtures["test/fixtures/media"] -- "/media/videos, /media/audio (ro)" --> JF
+  MovieFixtures["test/fixtures/movies, tvshows"] -- "/media/movies, /media/tvshows (ro)" --> JF
   Script -- "credentials" --> Env["config/dev-jellyfin.env"]
 ```
 
@@ -47,6 +48,8 @@ VS Code:
   - **Videos**: *Music Videos* over `/media/videos`, NFO reader, trickplay during the scan. A library's type cannot change, so a Jellyfin set up with an older type needs `npm run dev:jellyfin:reset` first.
   - **Audio**: *Books* over `/media/audio`.
   - Both are the same fixture folder, mounted read-only twice. Two libraries over one path would share their items, and the audio library would retype the videos.
+  - **Movies**: *Movies* over `/media/movies` (`test/fixtures/movies`). *Track Test (2024)* is 30 s of Big Buck Bunny with a TrueHD 5.1 default track, an AAC commentary and English/German SRT subtitles, for the transcode path and the audio/subtitle menus. Its MKV carries no bitrate tags, so Jellyfin re-encodes its video instead of copying it.
+  - **Shows**: *Shows* over `/media/tvshows` (`test/fixtures/tvshows`), one season of two episodes.
 - **Users**:
   - `happy-admin` (administrator)
   - `happy-user` (non-admin, all libraries). Sign in with this one, and the tests use it too.
