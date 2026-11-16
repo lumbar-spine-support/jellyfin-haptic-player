@@ -50,7 +50,7 @@ services:
   # One-shot build of the plugin into jellyfin-plugin/artifacts/dev (no .NET SDK needed on the host).
   plugin-build:
     <<: *no-selinux-relabel
-    image: mcr.microsoft.com/dotnet/sdk:10.0
+    image: mcr.microsoft.com/dotnet/sdk:11.0
     profiles: [tools]
     user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
     working_dir: /src
@@ -69,7 +69,7 @@ services:
   # One-shot `dotnet test` of the plugin (npm run test:plugin).
   plugin-test:
     <<: *no-selinux-relabel
-    image: mcr.microsoft.com/dotnet/sdk:10.0
+    image: mcr.microsoft.com/dotnet/sdk:11.0
     profiles: [tools]
     user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
     working_dir: /src
