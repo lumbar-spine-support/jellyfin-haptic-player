@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.1](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.9.0...v1.9.1) (2026-11-17)
+
+
+### Bug Fixes
+
+* **deps:** Bump the npm-minor-patch group with 4 updates ([31ae0ef](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/31ae0ef90fd731c5aab37be9c73859bd0cb1939a))
+
 ## [1.9.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.8.1...v1.9.0) (2026-11-12)
 
 
