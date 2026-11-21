@@ -236,6 +236,7 @@ The detailed sequence is in [Browse and play a track](use-cases/browse-and-play.
 `App.trackScripts(track)` starts downloading each script of `trackFunscripts(track, autoFunscriptEnabled)` (the files in `track.funscripts`, plus the generated Auto script when enabled) through the plugin and caches the result per track id in `scriptCache`. Each entry is a `PendingScript { channel, loaded }`: the channel is known at once, `loaded` resolves to a prepared `LoadedScript` (or `null` when it failed) on its own, because the Auto script can take far longer than the files:
 
 - `Visualization.mount(container, channels)` draws one row per channel at once, as a glowing placeholder (Bootstrap `placeholder-glow`, on the canvas and the label, `aria-busy`); `setScript(channel, prepared)` fills a row in, or removes it when the script failed.
+- Drawing stays cheap for long, dense scripts: `decimateCurve` (`visualization/geometry.ts`) reduces the polyline to first/min/max/last per device-pixel column before stroking, and a row only redraws its canvas when the visible window, size, colours or script changed; otherwise a frame just moves the cursor overlay (so the whole-track view is not stroked again during playback).
 - For the active track, each script joins the running `FunscriptSync` engines with `addScript()` as it arrives, which does not stop the devices like `resyncNow()` would. `activeGeneration` drops scripts of a track that is no longer active.
 - `openTrack()` waits for the script files (not the Auto script) before autoplay, as before.
 

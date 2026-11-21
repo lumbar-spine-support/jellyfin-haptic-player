@@ -56,6 +56,50 @@ export function curvePoints(
     return points;
 }
 
+/**
+ * Reduces a polyline to at most four points per pixel column (first, min, max and last, in
+ * order; "M4" decimation), which draws the same pixels as the full line but keeps the number
+ * of canvas segments proportional to the canvas width instead of the script length. An emitted
+ * point carries the highest speed of the points it replaces, so fast strokes keep their colour.
+ */
+export function decimateCurve(points: readonly CurvePoint[], startMs: number, msPerPixel: number): CurvePoint[] {
+    if (points.length <= 4 || !(msPerPixel > 0)) return points as CurvePoint[];
+    const out: CurvePoint[] = [];
+    let pendingSpeed = 0;
+    const emit = (p: CurvePoint): void => {
+        const speed = Math.max(pendingSpeed, p.speed);
+        pendingSpeed = 0;
+        out.push(speed === p.speed ? p : { ms: p.ms, pos: p.pos, speed });
+    };
+
+    let i = 0;
+    while (i < points.length) {
+        const column = Math.floor((points[i]!.ms - startMs) / msPerPixel);
+        const first = i;
+        let min = i;
+        let max = i;
+        let j = i + 1;
+        for (; j < points.length && Math.floor((points[j]!.ms - startMs) / msPerPixel) === column; j++) {
+            const pos = points[j]!.pos;
+            if (pos < points[min]!.pos) min = j;
+            if (pos > points[max]!.pos) max = j;
+        }
+        const last = j - 1;
+        const lo = Math.min(min, max);
+        const hi = Math.max(min, max);
+        // Fold the speeds of skipped points into the next emitted one.
+        let prev = first - 1;
+        for (const k of [first, lo, hi, last]) {
+            if (k === prev) continue;
+            for (let s = prev + 1; s < k; s++) pendingSpeed = Math.max(pendingSpeed, points[s]!.speed);
+            emit(points[k]!);
+            prev = k;
+        }
+        i = j;
+    }
+    return out;
+}
+
 /** Speed (position units per second) at which the heat scale saturates. */
 export const HEAT_MAX_SPEED = 500;
 const HEAT_BUCKETS = 32;

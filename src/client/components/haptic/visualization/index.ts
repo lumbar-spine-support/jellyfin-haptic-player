@@ -3,7 +3,7 @@ import type { PreparedScript } from '../../../../shared/interpolation';
 import { ROLE_ICON_CLASSES } from '../icons';
 import type { PlaybackSession } from '../../player';
 import { emptyStateHtml, scriptRowHtml } from './templates';
-import { curvePoints, heatColor, MediaClock } from './geometry';
+import { curvePoints, decimateCurve, heatColor, MediaClock } from './geometry';
 
 interface ScriptRenderer {
   channel: HapticChannel;
@@ -17,6 +17,12 @@ interface ScriptRenderer {
   /** CSS pixel size; the backing buffer is this times devicePixelRatio. */
   width: number;
   height: number;
+  /**
+   * What the canvas currently shows. While it matches, a frame only moves the cursor overlay,
+   * so the whole-track view of a long script isn't stroked again on every animation frame.
+   */
+  drawn: string;
+  drawnScript: PreparedScript | null;
 }
 
 const CANVAS_HEIGHT = 60;
@@ -118,6 +124,8 @@ export class Visualization {
         prepared: null,
         width: 0,
         height: 0,
+        drawn: '',
+        drawnScript: null,
       });
       this.resizeObserver.observe(canvas);
     }
@@ -234,29 +242,45 @@ export class Visualization {
     const ctx = canvas.getContext('2d');
     if (!ctx || W <= 0) return;
 
-    ctx.setTransform(canvas.width / W, 0, 0, canvas.height / H, 0, 0);
-    ctx.clearRect(0, 0, W, H);
-
-    r.cursor.hidden = duration <= 0 || !prepared;
-    if (duration <= 0 || !prepared) return;
-
-    const { startSec, endSec } = this.getVisibleWindow(currentTime, duration);
+    const empty = duration <= 0 || !prepared;
+    r.cursor.hidden = empty;
+    const { startSec, endSec } = empty ? { startSec: 0, endSec: 0 } : this.getVisibleWindow(currentTime, duration);
     const startMs = startSec * 1000;
     const spanMs = (endSec - startSec) * 1000;
+    const toX = (ms: number): number => ((ms - startMs) / spanMs) * W;
+
+    const drawn = empty
+      ? ''
+      : `${startSec}|${endSec}|${duration}|${W}x${H}@${canvas.width}x${canvas.height}|${this.colorGradient}|${this.colors.line}`;
+    if (drawn && drawn === r.drawn && prepared === r.drawnScript) {
+      this.placeCursor(r, toX(currentTime * 1000));
+      return;
+    }
+    r.drawn = drawn;
+    r.drawnScript = prepared;
+
+    ctx.setTransform(canvas.width / W, 0, 0, canvas.height / H, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    if (empty) return;
     // Keep the stroke inside the canvas at pos 0/100.
     const inset = 1;
     const snap = prepared.method !== 'pchip';
-    const toX = (ms: number): number => ((ms - startMs) / spanMs) * W;
     const toY = (pos: number): number => {
       const y = inset + (1 - pos / 100) * (H - 2 * inset);
       return snap ? Math.round(y) + 0.5 : y;
     };
 
-    const points = curvePoints(
-      prepared,
-      Math.max(0, startMs),
-      Math.min(duration * 1000, startMs + spanMs),
-      (spanMs / W) * 2,
+    // Only one pixel column's extremes can show, so dense scripts are reduced to a few points per column.
+    const msPerPixel = spanMs / canvas.width;
+    const points = decimateCurve(
+      curvePoints(
+        prepared,
+        Math.max(0, startMs),
+        Math.min(duration * 1000, startMs + spanMs),
+        (spanMs / W) * 2,
+      ),
+      startMs,
+      msPerPixel,
     );
     if (points.length > 1) {
       ctx.lineWidth = this.colorGradient ? 1.5 : 1;

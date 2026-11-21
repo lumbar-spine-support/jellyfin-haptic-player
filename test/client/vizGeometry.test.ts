@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { MediaClock, curvePoints, heatColor, HEAT_MAX_SPEED } from '../../src/client/components/haptic/visualization/geometry';
+import { MediaClock, curvePoints, decimateCurve, heatColor, HEAT_MAX_SPEED } from '../../src/client/components/haptic/visualization/geometry';
 import { prepareScript, type InterpolationMethod } from '../../src/shared/interpolation';
 
 const TAG = '[client:vizGeometry]';
@@ -61,4 +61,27 @@ test(`${TAG} MediaClock extrapolates while playing and freezes when paused`, () 
     now += 1000;
     assert.equal(clock.read(100), 11.2);
     assert.equal(clock.read(11), 11, 'clamped to duration');
+});
+
+test(`${TAG} decimateCurve keeps first, min, max and last of each pixel column in order`, () => {
+    const p = (ms: number, pos: number, speed = 0) => ({ ms, pos, speed });
+    const points = [p(0, 50), p(1, 90, 10), p(2, 10, 20), p(3, 40, 300), p(4, 60, 5), p(10, 0, 7), p(11, 100, 8)];
+    const out = decimateCurve(points, 0, 10);
+    assert.deepEqual(out.map((q) => [q.ms, q.pos]), [[0, 50], [1, 90], [2, 10], [4, 60], [10, 0], [11, 100]]);
+    assert.equal(out[3]!.speed, 300, 'a kept point carries the top speed of the points it replaces');
+    assert.equal(out[2]!.speed, 20);
+});
+
+test(`${TAG} decimateCurve bounds a dense script to a few points per pixel`, () => {
+    const dense = Array.from({ length: 100_000 }, (_, i) => ({ ms: i, pos: i % 2 ? 100 : 0, speed: 1 }));
+    const out = decimateCurve(dense, 0, 100);
+    assert.ok(out.length <= 4 * 1000, `${out.length} points`);
+    assert.deepEqual(out[0], dense[0]);
+    assert.deepEqual(out[out.length - 1], dense[dense.length - 1]);
+    assert.ok(out.some((q) => q.pos === 0) && out.some((q) => q.pos === 100), 'extremes survive');
+});
+
+test(`${TAG} decimateCurve leaves sparse curves untouched`, () => {
+    const sparse = curvePoints(prep('linear'), 0, 200, 1);
+    assert.deepEqual(decimateCurve(sparse, 0, 1), sparse);
 });
