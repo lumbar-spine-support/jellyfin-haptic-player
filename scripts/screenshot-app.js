@@ -9,6 +9,10 @@ const TARGET = process.argv[2];
 
 const LANDSCAPE_VIEWPORT = { width: 412, height: 915 };
 const SCREENSHOT_FULL_PAGE = false;
+// Every screenshot uses this theme, whatever the Jellyfin's plugin settings say (see useScreenshotTheme).
+const SCREENSHOT_THEME = 'oled';
+// The theme's first font, bundled so that the screenshots look the same on every machine.
+const SCREENSHOT_FONT_WEIGHTS = [400, 500, 600, 700];
 // Card title of test/fixtures/media/BigBuckBunny_320x180.mp4 (Jellyfin falls back to the file name).
 const PLAYER_MEDIA = /big\s*buck\s*bunny/i;
 
@@ -41,9 +45,6 @@ const APP_URL = `${JELLYFIN_URL}/Happy/Web/`;
 const SOCIAL_PATH = 'docs/social.png';
 const SOCIAL_SIZE = { width: 1280, height: 640 };
 const SOCIAL_VIEWPORT = { width: 412, height: 924 };
-const SOCIAL_THEME = 'oled';
-// The theme's first font, bundled so that the preview looks the same on every machine.
-const SOCIAL_FONT_WEIGHTS = [400, 500, 600, 700];
 const SOCIAL_VIDEO_TITLE = /^Big Buck Bunny$/;
 // Still 1:31 on the clock, but just past the cut to the wide shot of the bunny with the apple.
 const SOCIAL_SEEK_SECONDS = 91.9;
@@ -63,32 +64,38 @@ async function capture(page, path) {
     return page.screenshot({ path, fullPage: SCREENSHOT_FULL_PAGE });
 }
 
-function socialThemeCss() {
-    const fonts = SOCIAL_FONT_WEIGHTS.map((weight) => {
+function screenshotThemeCss() {
+    const fonts = SCREENSHOT_FONT_WEIGHTS.map((weight) => {
         const file = readFileSync(`node_modules/@fontsource/noto-sans/files/noto-sans-latin-${weight}-normal.woff2`);
         return `@font-face { font-family: "Noto Sans"; font-weight: ${weight}; src: url(data:font/woff2;base64,${file.toString('base64')}); }`;
     });
-    return [...fonts, readFileSync(`public/css/themes/${SOCIAL_THEME}.css`, 'utf8')].join('\n');
+    return [...fonts, readFileSync(`public/css/themes/${SCREENSHOT_THEME}.css`, 'utf8')].join('\n');
 }
 
-/** Applies the preview's look to this browser only; the Jellyfin's plugin settings stay as they are. */
-async function useSocialSettings(page) {
-    const themeCss = socialThemeCss();
+/**
+ * Applies SCREENSHOT_THEME and `settings` to this browser only; the Jellyfin's plugin settings stay as they are.
+ * Must run before signIn, so that the client reads the overridden /Happy/Config.
+ */
+async function useScreenshotSettings(page, settings = {}) {
+    const themeCss = screenshotThemeCss();
     await page.route('**/theme.css', (route) => route.fulfill({ contentType: 'text/css', body: themeCss }));
     await page.route('**/Happy/Config', async (route) => {
         const response = await route.fetch();
         await route.fulfill({
             response,
-            json: {
-                ...await response.json(),
-                theme: SOCIAL_THEME,
-                dglabEnabled: true,
-                dglabSandboxEnabled: true,
-                dglabRelayUrl: SOCIAL_DGLAB_RELAY,
-                funscriptColorGradient: true,
-                blurContent: false,
-            },
+            json: { ...await response.json(), theme: SCREENSHOT_THEME, ...settings },
         });
+    });
+}
+
+/** The preview's look on top of the screenshot theme. */
+function useSocialSettings(page) {
+    return useScreenshotSettings(page, {
+        dglabEnabled: true,
+        dglabSandboxEnabled: true,
+        dglabRelayUrl: SOCIAL_DGLAB_RELAY,
+        funscriptColorGradient: true,
+        blurContent: false,
     });
 }
 
@@ -317,6 +324,7 @@ async function captureDocs(browser) {
     });
 
     const page = await context.newPage();
+    await useScreenshotSettings(page);
 
     await signIn(page);
 
