@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.10.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.9.0...v1.10.0) (2026-11-27)
+
+
+### Features
+
+* **library:** show movies and TV series with seasons as albums ([f3f4735](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/f3f4735c996242631d9d3780a6f2e46d52c97a34))
+* **player:** audio and subtitle menus for movies and episodes ([cd32d17](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/cd32d178d38b1353b5c233eed03519522418f22d))
+
+
+### Bug Fixes
+
+* **deps:** Bump the npm-minor-patch group across 1 directory with 3 updates ([1fa7dd8](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/1fa7dd8f2fdc275736d37bda9137a0447cc42198))
+* **deps:** Bump the npm-minor-patch group with 4 updates ([31ae0ef](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/31ae0ef90fd731c5aab37be9c73859bd0cb1939a))
+* **player:** play MKVs whose audio the browser cannot decode ([8801dfe](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/8801dfe06177bd716d78b24c363a3e14ef420170))
+* **plugin:** embed hls.js so transcoded videos load it instead of a 404 ([498f06d](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/498f06d2a856c130772fec525fab5ad44cd805d8))
+* **ui:** give the navbar the page background so it matches the body ([8fffb38](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/8fffb388242e5e3485a6f49b3ae37d1b4d0a8ceb))
+* **ui:** route user to plugin settings page instead of jellyfin main menu ([19e7a7f](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/19e7a7f0b1f83a158407bf7212ba4cca8077abef))
+
+
+### Performance
+
+* **visualization:** decimate funscript timelines and skip unchanged redraws ([132aaee](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/132aaeea667d38aaf9edea7fe3c3f3cbe37da737))
+
 ## [1.9.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.8.1...v1.9.0) (2026-11-12)
 
 
