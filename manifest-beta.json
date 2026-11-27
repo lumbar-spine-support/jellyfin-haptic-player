@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.9.0.10",
+        "changelog": "Beta build 1.9.0.10 from dev (commit 919495f). Not released yet, may be unstable.",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.9.0.10.zip",
+        "checksum": "8cdc2da0e8352c027ca9e51d13448077",
+        "timestamp": "2026-11-27T17:53:45Z"
+      },
+      {
         "version": "1.9.0.9",
         "changelog": "Beta build 1.9.0.9 from dev (commit 132aaee). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- perf(visualization): decimate funscript timelines and skip unchanged redraws (132aaee)\n- feat(player): audio and subtitle menus for movies and episodes (cd32d17)\n- chore(dev): add Movies and Shows libraries to the dev Jellyfin (729f65b)\n- fix(plugin): embed hls.js so transcoded videos load it instead of a 404 (498f06d)\n- feat(library): show movies and TV series with seasons as albums (f3f4735)\n- fix(player): play MKVs whose audio the browser cannot decode (8801dfe)\n- test(fixtures): add movie and tvseries test fixtures (e4d543c)\n- fix(ui): give the navbar the page background so it matches the body (8fffb38)\n- fix(ui): route user to plugin settings page instead of jellyfin main menu (19e7a7f)",
         "targetAbi": "12.1.0.0",
@@ -39,14 +47,6 @@
         "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.9.0.6.zip",
         "checksum": "be7a688eefaf400dfb939df9fcfc4f4c",
         "timestamp": "2026-11-13T11:30:59Z"
-      },
-      {
-        "version": "1.9.0.5",
-        "changelog": "Beta build 1.9.0.5 from dev (commit 2f66d2a). Not released yet, may be unstable.\n\nChanges since the last release:\n\n- fix(player): play MKVs whose audio the browser cannot decode (2f66d2a)\n- test(fixtures): add movie and tvseries test fixtures (a13e6c2)\n- fix(ui): give the navbar the page background so it matches the body (9750699)\n- fix(ui): route user to plugin settings page instead of jellyfin main menu (711c0ab)",
-        "targetAbi": "12.1.0.0",
-        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.9.0.5.zip",
-        "checksum": "ff60a10cde04379870d4ce8de2c49805",
-        "timestamp": "2026-11-13T11:28:31Z"
       },
       {
         "version": "1.9.0.0",
