@@ -9,6 +9,14 @@
     "imageUrl": "https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/main/jellyfin-plugin/thumb.png",
     "versions": [
       {
+        "version": "1.10.0.1",
+        "changelog": "Beta build 1.10.0.1 from dev (commit 2114baf). Not released yet, may be unstable.",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/lumbar-spine-support/jellyfin-haptic-player/releases/download/beta/happy_1.10.0.1.zip",
+        "checksum": "18789405f8dab060df2b7365a286b7d3",
+        "timestamp": "2026-11-27T18:11:52Z"
+      },
+      {
         "version": "1.10.0.0",
         "changelog": "## [1.10.0](https://github.com/lumbar-spine-support/jellyfin-haptic-player/compare/v1.9.0...v1.10.0) (2026-11-27)\n\n\n### Features\n\n* **library:** show movies and TV series with seasons as albums ([f3f4735](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/f3f4735c996242631d9d3780a6f2e46d52c97a34))\n* **player:** audio and subtitle menus for movies and episodes ([cd32d17](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/cd32d178d38b1353b5c233eed03519522418f22d))\n\n\n### Bug Fixes\n\n* **deps:** Bump the npm-minor-patch group across 1 directory with 3 updates ([1fa7dd8](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/1fa7dd8f2fdc275736d37bda9137a0447cc42198))\n* **deps:** Bump the npm-minor-patch group with 4 updates ([31ae0ef](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/31ae0ef90fd731c5aab37be9c73859bd0cb1939a))\n* **player:** play MKVs whose audio the browser cannot decode ([8801dfe](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/8801dfe06177bd716d78b24c363a3e14ef420170))\n* **plugin:** embed hls.js so transcoded videos load it instead of a 404 ([498f06d](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/498f06d2a856c130772fec525fab5ad44cd805d8))\n* **ui:** give the navbar the page background so it matches the body ([8fffb38](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/8fffb388242e5e3485a6f49b3ae37d1b4d0a8ceb))\n* **ui:** route user to plugin settings page instead of jellyfin main menu ([19e7a7f](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/19e7a7f0b1f83a158407bf7212ba4cca8077abef))\n\n\n### Performance\n\n* **visualization:** decimate funscript timelines and skip unchanged redraws ([132aaee](https://github.com/lumbar-spine-support/jellyfin-haptic-player/commit/132aaeea667d38aaf9edea7fe3c3f3cbe37da737))\n\nInstall or update HAPPY through its Jellyfin plugin repository: https://raw.githubusercontent.com/lumbar-spine-support/jellyfin-haptic-player/jellyfin-plugin-repository/manifest.json (Dashboard → Plugins → Repositories), or download `happy_1.10.0.0.zip` below.",
         "targetAbi": "12.1.0.0",
