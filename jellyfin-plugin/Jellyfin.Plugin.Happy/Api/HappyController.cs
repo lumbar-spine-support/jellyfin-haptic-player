@@ -61,7 +61,9 @@ public class HappyController : ControllerBase
     {
         var assembly = typeof(HappyController).Assembly;
         string? Metadata(string key) => assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
-            .FirstOrDefault(a => a.Key == key)?.Value is { Length: > 0 } value ? value : null;
+            .FirstOrDefault(a => a.Key == key)?.Value is { Length: > 0 } value
+                ? value
+                : null;
 #if DEBUG
         const bool Debug = true;
 #else
